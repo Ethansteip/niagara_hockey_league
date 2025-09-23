@@ -37,15 +37,15 @@
 
 			<!-- Desktop Navigation -->
 			<div class="hidden w-1/3 flex-1 items-center justify-center lg:flex">
-				<nav class="flex gap-6">
+				<!-- <nav class="flex gap-6">
 					<Button variant="ghost" size="sm" href="##">About</Button>
 					<Button variant="ghost" size="sm" href="##">Docs.</Button>
 					<Button variant="ghost" size="sm" href="##">Pricing</Button>
-				</nav>
+				</nav> -->
 			</div>
 
 			<div class="flex w-1/3 items-center justify-end gap-4">
-				{#if !session}
+				<!-- {#if !session}
 					<Button variant="outline" href="/auth/signup" size="sm" class="hidden lg:flex">
 						Sign Up 
 						<ChevronRight class="h-4 w-4" />
@@ -56,12 +56,12 @@
 					</Button>
 				{:else}
 					<NavUser user={session.user} />
-				{/if}
+				{/if} -->
 
 				<!-- Mobile Menu Button -->
-				<Button variant="ghost" size="icon" class="lg:hidden" onclick={() => (open = true)}>
+				<!-- <Button variant="ghost" size="icon" class="lg:hidden" onclick={() => (open = true)}>
 					<Menu class="h-5 w-5" />
-				</Button>
+				</Button> -->
 			</div>
 		</div>
 	</div>
