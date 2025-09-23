@@ -95,7 +95,6 @@
                 </Avatar>
                 <div class="min-w-0 flex-1">
                   <h3 class="font-semibold text-slate-900 truncate">{game.homeTeamName}</h3>
-                  <p class="text-sm text-slate-500">{game.homeTeamShortName}</p>
                 </div>
               </div>
 
@@ -110,7 +109,6 @@
               <div class="flex items-center space-x-3 flex-1 justify-end">
                 <div class="min-w-0 flex-1 text-right">
                   <h3 class="font-semibold text-slate-900 truncate">{game.awayTeamName}</h3>
-                  <p class="text-sm text-slate-500">{game.awayTeamShortName}</p>
                 </div>
                 <Avatar class="w-13 h-13 ring-2 ring-slate-300 p-1">
                   <AvatarImage src={game.awayTeamLogoUrl} alt={game.awayTeamName} />

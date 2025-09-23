@@ -3,6 +3,8 @@
   import { Badge } from "$lib/components/ui/badge";
   import { Avatar, AvatarFallback, AvatarImage } from "$lib/components/ui/avatar";
   import { Separator } from "$lib/components/ui/separator";
+  import { ArrowLeft } from "@lucide/svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   let { data } = $props();
   let { games } = $derived(data);
@@ -62,8 +64,11 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <!-- Header Section -->
-    <div class="text-left mb-5">
+    <div class="flex items-center justify-between mb-5">
       <h1 class="text-3xl font-bold text-slate-900 mb-2">All Games</h1>
+      <Button variant="outline" href="/">
+        <ArrowLeft class="w-4 h-4" />
+      </Button>
     </div>
 
     <!-- Games Grid -->
@@ -94,7 +99,6 @@
                 </Avatar>
                 <div class="min-w-0 flex-1">
                   <h3 class="font-semibold text-slate-900 truncate">{game.homeTeamName}</h3>
-                  <p class="text-sm text-slate-500">{game.homeTeamShortName}</p>
                 </div>
               </div>
 
@@ -109,7 +113,6 @@
               <div class="flex items-center space-x-3 flex-1 justify-end">
                 <div class="min-w-0 flex-1 text-right">
                   <h3 class="font-semibold text-slate-900 truncate">{game.awayTeamName}</h3>
-                  <p class="text-sm text-slate-500">{game.awayTeamShortName}</p>
                 </div>
                 <Avatar class="w-13 h-13 ring-2 ring-slate-300 p-1">
                   <AvatarImage src={game.awayTeamLogoUrl} alt={game.awayTeamName} />
