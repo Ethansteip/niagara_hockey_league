@@ -1,0 +1,1 @@
+ALTER TABLE "games" RENAME COLUMN "game_number" TO "week_number";

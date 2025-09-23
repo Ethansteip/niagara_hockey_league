@@ -108,6 +108,7 @@ export const teams = pgTable(
       .references(() => leagues.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     shortName: text("short_name"),
+    logoUrl: text("logo_url"),
     createdAt: createdAt(),
   },
   (t) => [
@@ -218,7 +219,15 @@ export const games = pgTable(
     divisionId: integer("division_id")
       .notNull()
       .references(() => divisions.id, { onDelete: "cascade" }),
-    gameNumber: integer("game_number"),
+    homeTeamId: integer("home_team_id")
+      .notNull()
+      .default(1)
+      .references(() => teams.id, { onDelete: "cascade" }),
+    awayTeamId: integer("away_team_id")
+      .notNull()
+      .default(1)
+      .references(() => teams.id, { onDelete: "cascade" }),
+    weekNumber: integer("week_number"),
     startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
     arenaId: integer("arena_id").references(() => arenas.id, {
       onDelete: "set null",

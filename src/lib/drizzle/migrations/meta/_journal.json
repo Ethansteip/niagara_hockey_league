@@ -8,6 +8,27 @@
       "when": 1758497896390,
       "tag": "0000_sudden_grandmaster",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1758589162855,
+      "tag": "0001_cloudy_redwing",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758591251633,
+      "tag": "0002_complete_ben_urich",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758592060843,
+      "tag": "0003_polite_spirit",
+      "breakpoints": true
     }
   ]
 }
