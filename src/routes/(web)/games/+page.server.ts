@@ -36,8 +36,7 @@ export const load = async (event) => {
     .innerJoin(homeTeam, eq(games.homeTeamId, homeTeam.id))
     .innerJoin(awayTeam, eq(games.awayTeamId, awayTeam.id))
     .where(eq(games.status, "scheduled"))
-    .orderBy(asc(games.startsAt))
-    .limit(2);
+    .orderBy(asc(games.startsAt));
 
   return { games: gamesResult };
 };

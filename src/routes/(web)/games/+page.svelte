@@ -3,7 +3,6 @@
   import { Badge } from "$lib/components/ui/badge";
   import { Avatar, AvatarFallback, AvatarImage } from "$lib/components/ui/avatar";
   import { Separator } from "$lib/components/ui/separator";
-  import Button from "$lib/components/ui/button/button.svelte";
 
   let { data } = $props();
   let { games } = $derived(data);
@@ -64,7 +63,7 @@
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <!-- Header Section -->
     <div class="text-left mb-5">
-      <h1 class="text-3xl font-bold text-slate-900 mb-2">Upcoming Games</h1>
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">All Games</h1>
     </div>
 
     <!-- Games Grid -->
@@ -165,8 +164,5 @@
         </CardContent>
       </Card>
     {/if}
-    <div class="flex w-full justify-end">
-      <Button variant="link" href="/games">View All Games</Button>
-    </div>
   </div>
 </div>
