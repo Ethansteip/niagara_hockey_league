@@ -6,6 +6,57 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function formatGameTime(startsAt: string) {
+  // The database stores local times but with 'Z' suffix (treating them as UTC)
+  // We need to parse them as local times instead
+  const utcDate = new Date(startsAt);
+
+  // Create a new date using the same year, month, day, hour, minute but in local time
+  const localDate = new Date(
+    utcDate.getUTCFullYear(),
+    utcDate.getUTCMonth(),
+    utcDate.getUTCDate(),
+    utcDate.getUTCHours(),
+    utcDate.getUTCMinutes(),
+    utcDate.getUTCSeconds()
+  );
+
+  const now = new Date();
+  const diffInHours = (localDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+  // Format the local time
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  };
+  const formattedDate = localDate.toLocaleString("en-US", options);
+
+  // Add relative time
+  if (diffInHours < 24 && diffInHours > 0) {
+    const hours = Math.floor(diffInHours);
+    const minutes = Math.floor((diffInHours - hours) * 60);
+    if (hours > 0) {
+      return `${formattedDate} (in ${hours}h ${minutes}m)`;
+    } else {
+      return `${formattedDate} (in ${minutes}m)`;
+    }
+  }
+
+  return formattedDate;
+}
+
+export function getTeamInitials(teamName: string) {
+  return teamName
+    .split(" ")
+    .map((word) => word.charAt(0))
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

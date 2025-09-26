@@ -1,5 +1,4 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { type Provider } from "@supabase/supabase-js";
 import { getFormData } from "$lib/server/event.js";
 
 export const load = async ({ locals: { getSession } }) => {
@@ -24,6 +23,8 @@ export const actions = {
       email,
       password,
     });
+
+    console.log(error);
 
     if (error) {
       return fail(400, {

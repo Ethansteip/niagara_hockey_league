@@ -347,13 +347,18 @@ export const teamStandings = pgTable(
     teamSeasonId: integer("team_season_id")
       .notNull()
       .references(() => teamSeasons.id, { onDelete: "cascade" }),
-    gp: integer("gp").notNull().default(0),
-    w: integer("w").notNull().default(0),
-    l: integer("l").notNull().default(0),
-    otl: integer("otl").notNull().default(0),
+    teamId: integer("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "cascade" })
+      .default(1),
+    gamesPlayed: integer("games_played").notNull().default(0),
+    wins: integer("wins").notNull().default(0),
+    ties: integer("ties").notNull().default(0),
+    losses: integer("losses").notNull().default(0),
+    overtimeLosses: integer("overtime_losses").notNull().default(0),
     points: integer("points").notNull().default(0),
-    gf: integer("gf").notNull().default(0),
-    ga: integer("ga").notNull().default(0),
+    goalsFor: integer("goals_for").notNull().default(0),
+    goalsAgainst: integer("goals_against").notNull().default(0),
     createdAt: createdAt(),
   },
   (t) => [

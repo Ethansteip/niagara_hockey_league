@@ -29,6 +29,20 @@
       "when": 1758592060843,
       "tag": "0003_polite_spirit",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1758846144821,
+      "tag": "0004_mighty_zaladane",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1758846270008,
+      "tag": "0005_tearful_ser_duncan",
+      "breakpoints": true
     }
   ]
 }

@@ -1,10 +1,12 @@
 import { db } from "$lib/drizzle/index.js";
-import { games, teams, teamSeasons } from "$lib/drizzle/schema.js";
+import { games, teams, teamStandings } from "$lib/drizzle/schema.js";
 import { eq, asc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 const homeTeam = alias(teams, "homeTeam");
 const awayTeam = alias(teams, "awayTeam");
+const homeTeamStandings = alias(teamStandings, "homeTeamStandings");
+const awayTeamStandings = alias(teamStandings, "awayTeamStandings");
 
 export const load = async (event) => {
   const gamesResult = await db
@@ -31,10 +33,21 @@ export const load = async (event) => {
       awayTeamName: awayTeam.name,
       awayTeamShortName: awayTeam.shortName,
       awayTeamLogoUrl: awayTeam.logoUrl,
+      // team standings
+      homeTeamStandings: homeTeamStandings, // need to join with teamStandings table
+      awayTeamStandings: awayTeamStandings, // need to join with teamStandings table
     })
     .from(games)
     .innerJoin(homeTeam, eq(games.homeTeamId, homeTeam.id))
     .innerJoin(awayTeam, eq(games.awayTeamId, awayTeam.id))
+    .innerJoin(
+      homeTeamStandings,
+      eq(games.homeTeamId, homeTeamStandings.teamId)
+    )
+    .innerJoin(
+      awayTeamStandings,
+      eq(games.awayTeamId, awayTeamStandings.teamId)
+    )
     .where(eq(games.status, "scheduled"))
     .orderBy(asc(games.startsAt))
     .limit(2);

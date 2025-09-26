@@ -1,0 +1,2 @@
+ALTER TABLE "team_standings" ADD COLUMN "team_id" integer DEFAULT 1 NOT NULL;--> statement-breakpoint
+ALTER TABLE "team_standings" ADD CONSTRAINT "team_standings_team_id_teams_id_fk" FOREIGN KEY ("team_id") REFERENCES "public"."teams"("id") ON DELETE cascade ON UPDATE no action;
