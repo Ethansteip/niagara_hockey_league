@@ -1,13 +1,16 @@
 <script>
   import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
+  import Button from "$lib/components/ui/button/button.svelte";
   import { Avatar, AvatarFallback, AvatarImage } from "$lib/components/ui/avatar";
   import { Separator } from "$lib/components/ui/separator";
   import { formatGameTime } from "$lib/utils";
   import { getTeamInitials } from "$lib/utils";
+  import { ChevronRight, Calendar } from "@lucide/svelte";
 
   let { 
     weekNumber, 
+    id,
     status, 
     homeTeamLogoUrl, 
     homeTeamName, 
@@ -81,11 +84,12 @@
     <!-- Game Details -->
     <div class="flex items-center justify-between text-sm">
       <div class="flex items-center space-x-2 text-slate-600">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
+        <Calendar class="w-5 h-5" />
         <span class="font-medium">{formatGameTime(startsAt)}</span>
       </div>
+      <Button variant="ghost" size="icon" href="/games/{id}">
+        <ChevronRight class="w-5 h-5" />
+      </Button>
     </div>
   </CardContent>
 </Card>

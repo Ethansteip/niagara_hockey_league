@@ -21,7 +21,8 @@
     <!-- Games Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
       {#each games as game}
-        <ScheduledGame 
+        <ScheduledGame
+          id={game.id}
           weekNumber={game.weekNumber}
           status={game.status}
           homeTeamLogoUrl={game.homeTeamLogoUrl}
