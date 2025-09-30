@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Zap, User, Book, Menu, ChevronRight } from '@lucide/svelte';
+	import { Zap, User, Book, Menu, ChevronRight, Calendar, NotebookPen } from '@lucide/svelte';
 	import * as Sheet from '$lib/components/ui/sheet/index';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import NavUser from '$lib/components/layout/web/NavUser.svelte';
@@ -12,12 +12,12 @@
 		open = false;
 	}
 
-	let logoutForm: HTMLFormElement;
+	// let logoutForm: HTMLFormElement;
 
-	const handleLogout = () => {
-		logoutForm.requestSubmit();
-		closeMobileMenu();
-	}
+	// const handleLogout = () => {
+	// 	logoutForm.requestSubmit();
+	// 	closeMobileMenu();
+	// }
 </script>
 
 <div class="w-full" id="top">
@@ -59,9 +59,9 @@
 				{/if} -->
 
 				<!-- Mobile Menu Button -->
-				<!-- <Button variant="ghost" size="icon" class="lg:hidden" onclick={() => (open = true)}>
+				<Button variant="ghost" size="icon" class="" onclick={() => (open = true)}>
 					<Menu class="h-5 w-5" />
-				</Button> -->
+				</Button>
 			</div>
 		</div>
 	</div>
@@ -71,17 +71,18 @@
 		<Sheet.Content side="left" class="w-80 bg-background border-r">
 			<div class="flex flex-col h-full">
 				<!-- Header -->
-				<div class="flex items-center gap-2 p-6 border-b">
+				<div class="flex items-center gap-2 p-6">
 					<div class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
 						<Zap class="size-4" />
 					</div>
+					{PUBLIC_APP_NAME}
 				</div>
 
 				<!-- Navigation -->
 				<div class="flex-1 p-4">
 					<nav class="space-y-2">
-						{#if !session}
-							<div class="space-y-1">
+						<!-- {#if !session} -->
+							<!-- <div class="space-y-1">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/auth" onclick={closeMobileMenu}>
 									<User class="size-4" />
 									Sign In
@@ -90,23 +91,23 @@
 									<User class="size-4" />
 									Sign Up
 								</Button>
-							</div>
+							</div> -->
 							
 							<div class="border-t pt-4 mt-4">
-								<Button variant="ghost" class="w-full justify-start h-11" href="##" onclick={closeMobileMenu}>
-									<Book class="size-4" />
-									About
+								<Button variant="ghost" class="w-full justify-start h-11" href="/" onclick={closeMobileMenu}>
+									<Calendar class="size-4" />
+									Upcoming Games
 								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="##" onclick={closeMobileMenu}>
-									<Book class="size-4" />
-									Documentation
+								<Button variant="ghost" class="w-full justify-start h-11" href="/games" onclick={closeMobileMenu}>
+									<Calendar class="size-4" />
+									All Games
 								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="##" onclick={closeMobileMenu}>
-									<Book class="size-4" />
-									Pricing
+								<Button variant="ghost" class="w-full justify-start h-11" href="/games/played" onclick={closeMobileMenu}>
+									<NotebookPen class="size-4" />
+									Game History
 								</Button>
 							</div>
-						{:else}
+						<!-- {:else}
 							<div class="space-y-1">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/app" onclick={closeMobileMenu}>
 									Dashboard
@@ -139,7 +140,7 @@
 									</form>
 								</Button>
 							</div>
-						{/if}
+						{/if} -->
 					</nav>
 				</div>
 			</div>

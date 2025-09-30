@@ -46,9 +46,15 @@
                 <Calendar class="w-4 h-4" />
                 <span class="font-medium">{formatGameTime(game.startsAt.toString())}</span>
               </div>
-              <Badge variant={game.status === 'final' ? 'default' : 'secondary'} class="text-sm">
+              {#if game.status !== 'final'}
+              <Badge variant="secondary" class="hidden sm:flex">
                 {game.status.charAt(0).toUpperCase() + game.status.slice(1)}
               </Badge>
+              {:else}
+              <Badge variant="default">
+                {game.status.charAt(0).toUpperCase() + game.status.slice(1)}
+              </Badge>
+              {/if}
             </CardTitle>
         </div>
       </CardHeader>
@@ -57,8 +63,8 @@
         <!-- Teams Matchup -->
         <div class="flex items-center justify-between">
           <!-- Home Team -->
-          <div class="flex items-center space-x-2 sm:space-x-3 flex-1">
-            <Avatar class="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 ring-2 ring-slate-300 p-1">
+          <div class="flex flex-col items-center justify-center space-x-2 sm:space-x-3">
+            <Avatar class="w-20 h-20">
               <AvatarImage src={game.homeTeamLogoUrl} alt={game.homeTeamName} />
               <AvatarFallback class="bg-slate-100 text-slate-700 font-semibold text-sm sm:text-lg">
                 {getTeamInitials(game.homeTeamName)}
@@ -66,7 +72,6 @@
             </Avatar>
             <div class="flex flex-col min-w-0">
               <h3 class="font-bold text-sm sm:text-lg lg:text-xl text-slate-900 truncate">{game.homeTeamName}</h3>
-              <p class="text-xs sm:text-sm text-slate-600">Home</p>
             </div>
           </div>
 
@@ -74,7 +79,7 @@
           <div class="flex flex-col items-center mx-2 sm:mx-4 flex-shrink-0">
             {#if game.status === 'final'}
               <div class="text-center">
-                <div class="text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-slate-900">
+                <div class="text-4xl font-bold text-slate-900">
                   {game.homeScore} - {game.awayScore}
                 </div>
                 {#if game.decidedIn}
@@ -87,23 +92,22 @@
               </div>
             {:else}
               <div class="w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-full bg-slate-100 flex items-center justify-center">
-                <span class="text-xs sm:text-sm lg:text-lg font-bold text-slate-600">VS</span>
+                <span class="text-3xl font-bold">VS</span>
               </div>
             {/if}
           </div>
 
           <!-- Away Team -->
-          <div class="flex items-center space-x-2 sm:space-x-3 flex-1 justify-end">
-            <div class="flex flex-col text-right min-w-0">
-              <h3 class="font-bold text-sm sm:text-lg lg:text-xl text-slate-900 truncate">{game.awayTeamName}</h3>
-              <p class="text-xs sm:text-sm text-slate-600">Away</p>
-            </div>
-            <Avatar class="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 ring-2 ring-slate-300 p-1">
+          <div class="flex flex-col items-center justify-center space-x-2 sm:space-x-3">
+            <Avatar class="w-20 h-20">
               <AvatarImage src={game.awayTeamLogoUrl} alt={game.awayTeamName} />
               <AvatarFallback class="bg-slate-100 text-slate-700 font-semibold text-sm sm:text-lg">
                 {getTeamInitials(game.awayTeamName)}
               </AvatarFallback>
             </Avatar>
+            <div class="flex flex-col min-w-0">
+              <h3 class="font-bold text-sm sm:text-lg lg:text-xl text-slate-900 truncate">{game.awayTeamName}</h3>
+            </div>
           </div>
         </div>
 
@@ -159,7 +163,7 @@
                 <div class="text-lg font-bold {getGoalDifferential(game.homeTeamStandings) >= 0 ? 'text-green-600' : 'text-red-600'}">
                   {formatGoalDifferential(game.homeTeamStandings)}
                 </div>
-                <div class="text-xs text-slate-600">Diff</div>
+                <div class="text-xs text-slate-600">Goal Diff.</div>
               </div>
             </div>
 
@@ -206,7 +210,7 @@
                 <div class="text-lg font-bold {getGoalDifferential(game.awayTeamStandings) >= 0 ? 'text-green-600' : 'text-red-600'}">
                   {formatGoalDifferential(game.awayTeamStandings)}
                 </div>
-                <div class="text-xs text-slate-600">Diff</div>
+                <div class="text-xs text-slate-600">Goal Diff.</div>
               </div>
             </div>
 
