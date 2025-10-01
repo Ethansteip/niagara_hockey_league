@@ -1,6 +1,6 @@
 import { db } from "$lib/drizzle/index.js";
 import { games, teams, teamStandings } from "$lib/drizzle/schema.js";
-import { eq, asc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 const homeTeam = alias(teams, "homeTeam");
@@ -49,7 +49,7 @@ export const load = async (event) => {
       eq(games.awayTeamId, awayTeamStandings.teamId)
     )
     .where(eq(games.status, "final"))
-    .orderBy(asc(games.startsAt));
+    .orderBy(desc(games.startsAt));
 
   return { games: gamesResult };
 };
