@@ -6,6 +6,9 @@ import { createServerClient } from "@supabase/ssr";
 import { redirect } from "@sveltejs/kit";
 import type { Session } from "@supabase/supabase-js";
 import { getValidatedSession } from "$lib/utils.js";
+import { db } from "$lib/drizzle/index.js";
+import { profiles } from "$lib/drizzle/schema.js";
+import { eq } from "drizzle-orm";
 
 export const handle = async ({ event, resolve }) => {
   event.locals.supabase = createServerClient(
@@ -32,6 +35,23 @@ export const handle = async ({ event, resolve }) => {
    */
   event.locals.getSession = async (): Promise<Session | null> => {
     return await getValidatedSession(event.locals.supabase);
+  };
+
+  /**
+   * Fetch the user's profile from the database based on their session.
+   * Returns null if there's no session or no profile found.
+   */
+  event.locals.getProfile = async () => {
+    const session = await event.locals.getSession();
+    if (!session) return null;
+
+    const [profile] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.userId, session.user.id))
+      .limit(1);
+
+    return profile ?? null;
   };
 
   const session = await event.locals.getSession();

@@ -29,5 +29,5 @@ export const load = async ({ fetch, data, depends }) => {
     ? await getValidatedSession(supabase)
     : data.session;
 
-  return { supabase, session };
+  return { supabase, session, profile: data.profile };
 };

@@ -4,11 +4,19 @@
   import Button from "$lib/components/ui/button/button.svelte";
 
   let { data } = $props();
-  let { games } = $derived(data);
+  let { games, teams } = $derived(data);
 </script>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+<div class="min-h-screen bg-gradient-to-b from-slate-200 to-slate-100">
   <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Teams icons section -->
+     <!-- <div class="flex justify-around items-center w-full h-auto">
+      {#each teams as team}
+          <Button variant="rounded" size="lg">
+            <img src={team.logoUrl} alt={team.name} class="size-8" />
+          </Button>
+      {/each}
+     </div> -->
     <!-- Header Section -->
     <div class="text-left mb-5">
       <h1 class="text-3xl font-bold text-slate-900 mb-2">Upcoming Games</h1>

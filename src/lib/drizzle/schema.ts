@@ -14,6 +14,7 @@ import {
   index,
   uniqueIndex,
   serial,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -21,11 +22,11 @@ import { relations } from "drizzle-orm";
 // ENUMS
 // =====================
 export const positionEnum = pgEnum("position_enum", [
-  "G",
-  "D",
-  "LW",
-  "C",
-  "RW",
+  "Goalie",
+  "Defence",
+  "Left-wing",
+  "Center",
+  "Right-wing",
 ]);
 export const shotHandEnum = pgEnum("shot_hand_enum", ["L", "R"]);
 export const gameStatusEnum = pgEnum("game_status_enum", [
@@ -47,6 +48,19 @@ export const decidedInEnum = pgEnum("decided_in_enum", [
 const id = () => serial("id").primaryKey();
 const createdAt = () =>
   timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
+
+// =====================
+// Users
+// =====================
+export const profiles = pgTable("profiles", {
+  id: id(),
+  userId: uuid("user_id").notNull(),
+  email: text().default("").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  position: positionEnum(),
+  avatarUrl: text("avatar_url"),
+});
 
 // =====================
 // CORE ENTITIES
@@ -109,6 +123,7 @@ export const teams = pgTable(
     name: text("name").notNull(),
     shortName: text("short_name"),
     logoUrl: text("logo_url"),
+    code: text(),
     createdAt: createdAt(),
   },
   (t) => [
@@ -535,6 +550,8 @@ export const teamStandingsRelations = relations(teamStandings, ({ one }) => ({
 // =====================
 // TYPES (handy for service layer)
 // =====================
+export type Profile = typeof profiles.$inferSelect;
+export type NewProfile = typeof profiles.$inferInsert;
 export type League = typeof leagues.$inferSelect;
 export type NewLeague = typeof leagues.$inferInsert;
 export type Season = typeof seasons.$inferSelect;

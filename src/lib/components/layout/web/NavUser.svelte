@@ -1,89 +1,84 @@
 <script lang="ts">
 	import { 
-		BellIcon, 
 		ChevronsUpDownIcon, 
-		CreditCardIcon, 
-		LogOutIcon, 
-		SparklesIcon, 
+		LogOutIcon,
 		HouseIcon, 
-		BadgeCheckIcon 
+		UserPen
 	} from "@lucide/svelte";
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
+  import type { Profile } from "$lib/drizzle/schema";
+	import { useSidebar } from "$lib/components/ui/sidebar/index.js";
 
 	let {
-		user,
+		profile,
+		isDashboard = false
 	}: {
-		user: {
-			name: string;
-			email: string;
-			avatar: string;
-		};
+		profile: Profile;
+		isDashboard?: boolean
 	} = $props();
 
+	const sidebar = useSidebar();
 	let logoutForm: HTMLFormElement;
+	let fullName = `${profile.firstName} ${profile.lastName}`;
 </script>
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger>
 		<Button variant="ghost" size="lg" class="h-auto gap-2 px-2 py-1.5">
 			<Avatar.Root class="size-8 rounded-lg">
-				<Avatar.Image src={user.avatar} alt={user.name} />
-				<Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+				<Avatar.Image src={profile.avatarUrl} alt={fullName} />
+				<Avatar.Fallback class="rounded-lg">{profile.firstName[0]}{profile.lastName[0]}</Avatar.Fallback>
 			</Avatar.Root>
 			<div class="grid flex-1 text-left text-sm leading-tight">
-				<span class="truncate font-medium">{user.name}</span>
-				<span class="truncate text-xs">{user.email}</span>
+				<span class="truncate font-medium">{fullName}</span>
+				<span class="truncate text-xs">{profile.email}</span>
 			</div>
 			<ChevronsUpDownIcon class="ml-auto size-4" />
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content
-		class="w-56 min-w-56 rounded-lg"
-		side="bottom"
-		align="end"
-		sideOffset={4}
+	class="w-(--bits-dropdown-menu-anchor-width) min-w-56 rounded-lg"
+	side={sidebar?.isMobile ? "bottom" : "right"}
+	align="end"
+	sideOffset={4}
 	>
 		<DropdownMenu.Label class="p-0 font-normal">
 			<div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 				<Avatar.Root class="size-8 rounded-lg">
-					<Avatar.Image src={user.avatar} alt={user.name} />
-					<Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+					<Avatar.Image src={profile.avatarUrl} alt={fullName} />
+					<Avatar.Fallback class="rounded-lg">{profile.firstName[0]}{profile.lastName[0]}</Avatar.Fallback>
 				</Avatar.Root>
 				<div class="grid flex-1 text-left text-sm leading-tight">
-					<span class="truncate font-medium">{user.name}</span>
-					<span class="truncate text-xs">{user.email}</span>
+					<span class="truncate text-xs">{fullName}</span>
+					<span class="truncate text-xs">{profile.email}</span>
 				</div>
 			</div>
 		</DropdownMenu.Label>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
-			<DropdownMenu.Item>
-				<SparklesIcon class="size-4" />
-				Upgrade to Pro
-			</DropdownMenu.Item>
-		</DropdownMenu.Group>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Group>
+			<a href="/app/profile/{profile.id}">
+				<DropdownMenu.Item>
+					<UserPen class="size-4" />
+					Profile
+				</DropdownMenu.Item>
+			</a>
+			{#if isDashboard}
+			<a href="/">
+				<DropdownMenu.Item>
+					<HouseIcon class="size-4" />
+					Home
+				</DropdownMenu.Item>
+			</a>
+			{:else}
 			<a href="/app">
 				<DropdownMenu.Item>
 					<HouseIcon class="size-4" />
 					Dashboard
 				</DropdownMenu.Item>
 			</a>
-			<DropdownMenu.Item>
-				<BadgeCheckIcon class="size-4" />
-				Account
-			</DropdownMenu.Item>
-			<DropdownMenu.Item>
-				<CreditCardIcon class="size-4" />
-				Billing
-			</DropdownMenu.Item>
-			<DropdownMenu.Item>
-				<BellIcon class="size-4" />
-				Notifications
-			</DropdownMenu.Item>
+			{/if}
 		</DropdownMenu.Group>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Item onclick={() => logoutForm.requestSubmit()}>

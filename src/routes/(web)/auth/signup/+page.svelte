@@ -4,10 +4,20 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Separator } from '$lib/components/ui/separator';
+	import * as Select from "$lib/components/ui/select";
   import { toast } from 'svelte-sonner';
   import { enhance } from '$app/forms';
 
+	let { data } = $props();
+
+	const teams = data.teams;
+	let teamsSelectData = teams.map((team) => {
+		return { value: team.name, label: team.name, img_url: team.logoUrl }
+	});
+
+	let teamCode = data.teamCode ?? "";
+	let preSelectedTeam = data.preSelectedTeam
+	let selectedTeam = $state(preSelectedTeam || "");
   let password = $state('');
   let confirmPassword = $state('');
 
@@ -17,11 +27,15 @@
   let passwordsMatch = $derived(password === confirmPassword);
 
 	let loading = $state(false);
+
+	const triggerContent = $derived(
+    teamsSelectData.find((t) => t.value === selectedTeam)
+  );
 </script>
 
 <div class="flex h-screen items-center justify-center p-4">
 	<Card.Root class="w-full max-w-md">
-		<Card.Content class="pt-6">
+		<Card.Content class="py-6">
 			<h2 class="mb-2 text-3xl font-bold">Sign Up</h2>
 			<p class="mb-6 text-muted-foreground">
 				Already have an account? <a href="/auth" class="text-primary hover:underline">Sign In</a
@@ -44,8 +58,42 @@
             }
           };
       }}>
-				<div class="space-y-2">
-					<Input type="email" placeholder="Email" name="email" autofocus required/>
+			<div class="space-y-2">
+				<Input type="email" placeholder="Email" name="email" required autofocus/>
+			</div>
+			<div class="flex flex-col lg:flex-row space-y-2 gap-2">
+				<Input type="text" placeholder="First name" name="first-name" required/>
+				<Input type="text" placeholder="Last Name" name="last-name" required/>
+			</div>
+				<div class="flex flex-col lg:flex-row space-y-4 gap-2">
+					<Select.Root type="single" name="favoriteFruit" bind:value={selectedTeam}>
+						<Select.Trigger class="w-full lg:w-1/2">
+							{#if triggerContent}
+							<div  class="flex gap-2 items-center">
+								<img src={triggerContent.img_url} alt={triggerContent.label} class="size-6">
+								{triggerContent.label}
+							</div>
+							{:else}
+							<p class="text-[16px]">Select your team</p>
+							{/if}
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								<Select.Label>Your team</Select.Label>
+								{#each teamsSelectData as team (team.value)}
+									<Select.Item
+										value={team.value}
+										label={team.label}
+										disabled={team.value === "grapes"}
+									>
+										<img src={team.img_url} alt={team.label} class="size-6">
+										{team.label}
+									</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+					<Input type="text" placeholder="Team Code" name="team-code" class="w-full lg:w-1/2" value={teamCode} required/>
 				</div>
 
 				<div class="relative space-y-2">
@@ -93,16 +141,16 @@
 					{/if}
 				</Button>
 
-				<div class="relative">
+				<!-- <div class="relative">
 					<div class="absolute inset-0 flex items-center">
 						<Separator class="my-4" />
 					</div>
 					<div class="relative flex justify-center text-xs uppercase">
 						<span class="bg-background px-2 text-muted-foreground">Or continue with</span>
 					</div>
-				</div>
+				</div> -->
 
-				<div class="grid gap-4 sm:grid-cols-2">
+				<!-- <div class="grid gap-4 sm:grid-cols-2">
 					<Button variant="outline" class="gap-2">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -121,7 +169,7 @@
             </svg>
             Apple
 					</Button>
-				</div>
+				</div> -->
 			</form>
 		</Card.Content>
 	</Card.Root>

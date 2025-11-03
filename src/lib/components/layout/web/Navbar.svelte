@@ -1,27 +1,27 @@
 <script lang="ts">
-	import { Zap, User, Book, Menu, ChevronRight, Calendar, NotebookPen } from '@lucide/svelte';
+	import { Zap, User, Menu, ChevronRight, Calendar, NotebookPen, House } from '@lucide/svelte';
 	import * as Sheet from '$lib/components/ui/sheet/index';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import NavUser from '$lib/components/layout/web/NavUser.svelte';
 	import { PUBLIC_APP_NAME } from '$env/static/public';
 
-	let { session } = $props();
+	let { session, profile } = $props();
 	let open = $state(false);
 
 	const closeMobileMenu = () => {
 		open = false;
 	}
 
-	// let logoutForm: HTMLFormElement;
+	let logoutForm: HTMLFormElement = $state()!;
 
-	// const handleLogout = () => {
-	// 	logoutForm.requestSubmit();
-	// 	closeMobileMenu();
-	// }
+	const handleLogout = () => {
+		logoutForm.requestSubmit();
+		closeMobileMenu();
+	}
 </script>
 
-<div class="w-full" id="top">
-	<div id="top" class="border-b bg-background">
+<div class="w-full border-b border-border" id="top">
+	<div id="top" class=" max-w-screen-xl mx-auto bg-background">
 		<div class="flex h-[3.8rem] items-center justify-between px-4">
 			<!-- Logo and Project Name -->
 			<a class="flex w-1/3 items-center gap-2" href="/">
@@ -37,29 +37,40 @@
 
 			<!-- Desktop Navigation -->
 			<div class="hidden w-1/3 flex-1 items-center justify-center lg:flex">
-				<!-- <nav class="flex gap-6">
-					<Button variant="ghost" size="sm" href="##">About</Button>
-					<Button variant="ghost" size="sm" href="##">Docs.</Button>
-					<Button variant="ghost" size="sm" href="##">Pricing</Button>
-				</nav> -->
+				<nav class="flex gap-6">
+					<Button variant="ghost" size="sm" href="/">
+						<House />
+						Home
+					</Button>
+					<Button variant="ghost" size="sm" href="/games">
+						<Calendar />
+						All Games
+					</Button>
+					<Button variant="ghost" size="sm" href="/games/history">
+						<NotebookPen />
+						Game History
+					</Button>
+				</nav>
 			</div>
 
 			<div class="flex w-1/3 items-center justify-end gap-4">
-				<!-- {#if !session}
-					<Button variant="outline" href="/auth/signup" size="sm" class="hidden lg:flex">
+				{#if !session}
+					<Button variant="outline" href="/auth/signup" size="sm" class="hidden lg:flex group/signup">
 						Sign Up 
-						<ChevronRight class="h-4 w-4" />
+						<ChevronRight class="h-4 w-4 transform-translate duration-200 group-hover/signup:translate-x-0.5" />
 					</Button>
-					<Button href="/auth" variant="outline" size="sm" class="hidden lg:flex">
+					<Button href="/auth" variant="outline" size="sm" class="hidden lg:flex group/signin">
 						Sign In
-						<ChevronRight class="h-4 w-4" />
+						<ChevronRight class="h-4 w-4 transform-translate duration-200 group-hover/signin:translate-x-0.5" />
 					</Button>
 				{:else}
-					<NavUser user={session.user} />
-				{/if} -->
+				<div class="hidden lg:flex">
+					<NavUser {profile} />
+				</div>
+				{/if}
 
 				<!-- Mobile Menu Button -->
-				<Button variant="ghost" size="icon" class="" onclick={() => (open = true)}>
+				<Button variant="ghost" size="icon" class="flex lg:hidden" onclick={() => (open = true)}>
 					<Menu class="h-5 w-5" />
 				</Button>
 			</div>
@@ -81,8 +92,8 @@
 				<!-- Navigation -->
 				<div class="flex-1 p-4">
 					<nav class="space-y-2">
-						<!-- {#if !session} -->
-							<!-- <div class="space-y-1">
+						{#if !session}
+							<div class="space-y-1">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/auth" onclick={closeMobileMenu}>
 									<User class="size-4" />
 									Sign In
@@ -91,7 +102,7 @@
 									<User class="size-4" />
 									Sign Up
 								</Button>
-							</div> -->
+							</div>
 							
 							<div class="border-t pt-4 mt-4">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/" onclick={closeMobileMenu}>
@@ -107,7 +118,7 @@
 									Game History
 								</Button>
 							</div>
-						<!-- {:else}
+						{:else}
 							<div class="space-y-1">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/app" onclick={closeMobileMenu}>
 									Dashboard
@@ -140,7 +151,7 @@
 									</form>
 								</Button>
 							</div>
-						{/if} -->
+						{/if}
 					</nav>
 				</div>
 			</div>

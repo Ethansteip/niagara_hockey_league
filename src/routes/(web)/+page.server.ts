@@ -52,5 +52,13 @@ export const load = async (event) => {
     .orderBy(asc(games.startsAt))
     .limit(2);
 
-  return { games: gamesResult };
+  const teamsResult = await db
+    .select({
+      id: teams.id,
+      name: teams.name,
+      logoUrl: teams.logoUrl,
+    })
+    .from(teams);
+
+  return { games: gamesResult, teams: teamsResult };
 };

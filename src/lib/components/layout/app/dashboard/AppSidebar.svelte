@@ -135,12 +135,13 @@
   import NavMain from "$lib/components/layout/app/dashboard/NavMain.svelte"
 	import NavProjects from "$lib/components/layout/app/dashboard/NavProjects.svelte";
 	import NavSecondary from "$lib/components/layout/app/dashboard/NavSecondary.svelte";
-	import NavUser from "$lib/components/layout/app/dashboard/NavUser.svelte";
+	// import NavUser from "$lib/components/layout/app/dashboard/NavUser.svelte";
+	import NavUser from "$lib/components/layout/web/NavUser.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { CommandIcon } from "@lucide/svelte";
 	import { PUBLIC_APP_NAME } from "$env/static/public";
 
-	let { ref = $bindable(null), session, ...restProps } = $props();
+	let { ref = $bindable(null), session, profile, ...restProps } = $props();
 </script>
 
 <Sidebar.Root bind:ref variant="inset" {...restProps}>
@@ -171,6 +172,6 @@
 		<NavSecondary items={data.navSecondary} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>
-		<NavUser  user={session.user} isAppNav={true} />
+		<NavUser  {profile} isDashboard={true}/>
 	</Sidebar.Footer>
 </Sidebar.Root>

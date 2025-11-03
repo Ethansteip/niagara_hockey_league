@@ -1,3 +1,7 @@
-export const load = async ({ locals: { getSession }, cookies }) => {
-  return { session: await getSession(), cookies: cookies.getAll() };
+export const load = async ({ locals: { getSession, getProfile }, cookies }) => {
+  return {
+    session: await getSession(),
+    profile: await getProfile(),
+    cookies: cookies.getAll(),
+  };
 };

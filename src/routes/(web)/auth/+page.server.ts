@@ -3,9 +3,8 @@ import { type Provider } from "@supabase/supabase-js";
 import { getFormData } from "$lib/server/event.js";
 
 export const load = async ({ locals: { getSession } }) => {
-  const session = await getSession();
-
   /* User is already logged in. */
+  const session = await getSession();
   if (session) redirect(303, "/app");
 };
 

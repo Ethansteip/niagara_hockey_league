@@ -9,6 +9,7 @@
   import { onMount } from 'svelte'
 
   let { data, children } = $props();
+  let profile = $derived(data.profile);
 
   /**
    * We use the $derived rune so that
@@ -53,7 +54,7 @@
 
 <Toaster />
 <Sidebar.Provider>
-	<AppSidebar {session}/>
+	<AppSidebar {session} {profile}/>
 	<Sidebar.Inset>
 		<header class="flex h-16 shrink-0 items-center gap-2">
 			<div class="flex items-center gap-2 px-4">

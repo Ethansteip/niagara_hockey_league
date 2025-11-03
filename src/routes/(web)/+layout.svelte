@@ -19,6 +19,7 @@
    * initializing a client during every invalidation.
    */
   let { supabase, session } = $derived(data);
+  let profile = data.profile;
 
   onMount(() => {
     const {
@@ -50,7 +51,7 @@
 </script>
 
 <Toaster />
-<Navbar {session} />
+<Navbar {session} {profile}/>
 <main class="w-full h-[calc(100vh-3.8rem)]">
   {@render children?.()}
 </main>
