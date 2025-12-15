@@ -28,7 +28,9 @@ export const positionEnum = pgEnum("position_enum", [
   "Center",
   "Right-wing",
 ]);
+
 export const shotHandEnum = pgEnum("shot_hand_enum", ["L", "R"]);
+
 export const gameStatusEnum = pgEnum("game_status_enum", [
   "scheduled",
   "in_progress",
@@ -37,12 +39,20 @@ export const gameStatusEnum = pgEnum("game_status_enum", [
   "cancelled",
   "postponed",
 ]);
-export const rosterRoleEnum = pgEnum("roster_role_enum", ["player", "goalie"]);
+
 export const decidedInEnum = pgEnum("decided_in_enum", [
   "regulation",
   "overtime",
   "shootout",
 ]);
+
+export const profileRoleEnum = pgEnum("profile_role_enum", [
+  "player",
+  "captain",
+  "admin",
+]);
+
+export const rosterRoleEnum = pgEnum("roster_role_enum", ["player", "goalie"]);
 
 // Helpers
 const id = () => serial("id").primaryKey();
@@ -50,16 +60,31 @@ const createdAt = () =>
   timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
 // =====================
-// Users
+// PROFILES (authenticated users - linked to Supabase Auth)
 // =====================
 export const profiles = pgTable("profiles", {
   id: id(),
-  userId: uuid("user_id").notNull(),
-  email: text().default("").notNull(),
+  userId: uuid("user_id").notNull().unique(),
+  email: text("email").default("").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  avatarUrl: text("avatar_url"),
+  role: profileRoleEnum("role").notNull().default("player"),
+});
+
+// =====================
+// PLAYERS (non-authenticated player data - for historical/imported players)
+// =====================
+export const players = pgTable("players", {
+  id: id(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   position: positionEnum(),
-  avatarUrl: text("avatar_url"),
+  shoots: shotHandEnum("shoots"),
+  profileId: integer("profile_id").references(() => profiles.id, {
+    onDelete: "set null",
+  }),
+  createdAt: createdAt(),
 });
 
 // =====================
@@ -169,27 +194,6 @@ export const arenas = pgTable("arenas", {
   province: text("province"),
   createdAt: createdAt(),
 });
-
-export const players = pgTable(
-  "players",
-  {
-    id: id(),
-    firstName: text("first_name").notNull(),
-    lastName: text("last_name").notNull(),
-    preferredName: text("preferred_name"),
-    email: text("email"),
-    phone: text("phone"),
-    birthdate: date("birthdate"),
-    position: positionEnum("position"),
-    shoots: shotHandEnum("shoots"),
-    createdAt: createdAt(),
-  },
-  (t) => [
-    {
-      uniqEmail: uniqueIndex("players_email_uniq").on(t.email),
-    },
-  ]
-);
 
 export const rosters = pgTable(
   "rosters",
@@ -450,10 +454,6 @@ export const arenasRelations = relations(arenas, ({ many }) => ({
   games: many(games),
 }));
 
-export const playersRelations = relations(players, ({ many }) => ({
-  rosters: many(rosters),
-}));
-
 export const rostersRelations = relations(rosters, ({ one, many }) => ({
   teamSeason: one(teamSeasons, {
     fields: [rosters.teamSeasonId],
@@ -465,6 +465,18 @@ export const rostersRelations = relations(rosters, ({ one, many }) => ({
   }),
   skaterStats: many(playerGameStats),
   goalieStats: many(goalieGameStats),
+}));
+
+export const playersRelations = relations(players, ({ one, many }) => ({
+  rosters: many(rosters),
+  profile: one(profiles, {
+    fields: [players.profileId],
+    references: [profiles.id],
+  }),
+}));
+
+export const profilesRelations = relations(profiles, ({ many }) => ({
+  players: many(players),
 }));
 
 export const gamesRelations = relations(games, ({ one, many }) => ({
@@ -552,6 +564,8 @@ export const teamStandingsRelations = relations(teamStandings, ({ one }) => ({
 // =====================
 export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
+export type Player = typeof players.$inferSelect;
+export type NewPlayer = typeof players.$inferInsert;
 export type League = typeof leagues.$inferSelect;
 export type NewLeague = typeof leagues.$inferInsert;
 export type Season = typeof seasons.$inferSelect;
@@ -564,8 +578,6 @@ export type TeamSeason = typeof teamSeasons.$inferSelect;
 export type NewTeamSeason = typeof teamSeasons.$inferInsert;
 export type Arena = typeof arenas.$inferSelect;
 export type NewArena = typeof arenas.$inferInsert;
-export type Player = typeof players.$inferSelect;
-export type NewPlayer = typeof players.$inferInsert;
 export type Roster = typeof rosters.$inferSelect;
 export type NewRoster = typeof rosters.$inferInsert;
 export type Game = typeof games.$inferSelect;

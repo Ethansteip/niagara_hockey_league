@@ -93,7 +93,7 @@
 							</Select.Group>
 						</Select.Content>
 					</Select.Root>
-					<Input type="text" placeholder="Team Code" name="team-code" class="w-full lg:w-1/2" value={teamCode} required/>
+					<Input type="text" placeholder="Team Code" name="teamCode" class="w-full lg:w-1/2" value={teamCode} required/>
 				</div>
 
 				<div class="relative space-y-2">

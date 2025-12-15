@@ -8,103 +8,34 @@
 		MapIcon, 
 		SendIcon, 
 		Settings2Icon, 
-		SquareTerminalIcon
+		SquareTerminalIcon,
+		Zap
 	} from "@lucide/svelte";
 
 	const data = {
 		navMain: [
 			{
-				title: "Playground",
+				title: "Games",
 				url: "#",
 				icon: SquareTerminalIcon,
 				isActive: true,
 				items: [
 					{
+						title: "All",
+						url: "#",
+					},
+					{
+						title: "Upcoming",
+						url: "#",
+					},
+					{
 						title: "History",
 						url: "#",
-					},
-					{
-						title: "Starred",
-						url: "#",
-					},
-					{
-						title: "Settings",
-						url: "#",
-					},
+					}
 				],
-			},
-			{
-				title: "Models",
-				url: "#",
-				icon: BotIcon,
-				items: [
-					{
-						title: "Genesis",
-						url: "#",
-					},
-					{
-						title: "Explorer",
-						url: "#",
-					},
-					{
-						title: "Quantum",
-						url: "#",
-					},
-				],
-			},
-			{
-				title: "Documentation",
-				url: "#",
-				icon: BookOpenIcon,
-				items: [
-					{
-						title: "Introduction",
-						url: "#",
-					},
-					{
-						title: "Get Started",
-						url: "#",
-					},
-					{
-						title: "Tutorials",
-						url: "#",
-					},
-					{
-						title: "Changelog",
-						url: "#",
-					},
-				],
-			},
-			{
-				title: "Settings",
-				url: "#",
-				icon: Settings2Icon,
-				items: [
-					{
-						title: "General",
-						url: "#",
-					},
-					{
-						title: "Team",
-						url: "#",
-					},
-					{
-						title: "Billing",
-						url: "#",
-					},
-					{
-						title: "Limits",
-						url: "#",
-					},
-				],
-			},
+			}
 		],
 		navSecondary: [
-			{
-				title: "Support",
-				url: "#",
-				icon: LifeBuoyIcon,
-			},
 			{
 				title: "Feedback",
 				url: "#",
@@ -113,19 +44,14 @@
 		],
 		projects: [
 			{
-				name: "Design Engineering",
+				name: "My Team",
 				url: "#",
 				icon: FrameIcon,
 			},
 			{
-				name: "Sales & Marketing",
+				name: "Standings",
 				url: "#",
 				icon: ChartPieIcon,
-			},
-			{
-				name: "Travel",
-				url: "#",
-				icon: MapIcon,
 			},
 		],
 	};
@@ -135,10 +61,8 @@
   import NavMain from "$lib/components/layout/app/dashboard/NavMain.svelte"
 	import NavProjects from "$lib/components/layout/app/dashboard/NavProjects.svelte";
 	import NavSecondary from "$lib/components/layout/app/dashboard/NavSecondary.svelte";
-	// import NavUser from "$lib/components/layout/app/dashboard/NavUser.svelte";
 	import NavUser from "$lib/components/layout/web/NavUser.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import { CommandIcon } from "@lucide/svelte";
 	import { PUBLIC_APP_NAME } from "$env/static/public";
 
 	let { ref = $bindable(null), session, profile, ...restProps } = $props();
@@ -154,11 +78,10 @@
 							<div
 								class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
 							>
-								<CommandIcon class="size-4" />
+								<Zap class="size-4" />
 							</div>
 							<div class="grid flex-1 text-left text-sm leading-tight">
 								<span class="truncate font-medium">{PUBLIC_APP_NAME}</span>
-								<span class="truncate text-xs">Enterprise</span>
 							</div>
 						</a>
 					{/snippet}

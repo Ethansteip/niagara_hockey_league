@@ -50,7 +50,7 @@
 								id="email" 
 								type="email" 
 								name="email" 
-								placeholder="m@example.com" 
+								placeholder="me@example.com" 
 								required 
 								autofocus 
 							/>
@@ -65,9 +65,9 @@
 							{/if}
 						</Button>
 
-						<div class="text-center text-sm">
+						<div class="text-center text-muted-foreground text-sm">
 							Remember your password? 
-							<a href="/auth" class="text-primary hover:underline">Sign in</a>
+							<a href="/auth" class="underline text-primary hover:underline">Sign in</a>
 						</div>
 					</form>
 				</Card.Content>

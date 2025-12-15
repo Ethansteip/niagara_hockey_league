@@ -1,7 +1,6 @@
 <script lang="ts">
-  import '../../app.css';
+  import '../app.css';
 	import Navbar from '$lib/components/layout/web/Navbar.svelte';
-	import Footer from '$lib/components/layout/web/Footer.svelte';
   import { Toaster } from '$lib/components/ui/sonner';
   import { goto, invalidate } from '$app/navigation'
   import { onMount } from 'svelte'

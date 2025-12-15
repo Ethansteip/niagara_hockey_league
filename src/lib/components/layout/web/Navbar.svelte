@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Zap, User, Menu, ChevronRight, Calendar, NotebookPen, House } from '@lucide/svelte';
+	import { Zap, User, Menu, ChevronRight, Calendar, NotebookPen, House, Wallpaper, UserPen } from '@lucide/svelte';
 	import * as Sheet from '$lib/components/ui/sheet/index';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import NavUser from '$lib/components/layout/web/NavUser.svelte';
+	import { Separator } from "$lib/components/ui/separator/index.js";
 	import { PUBLIC_APP_NAME } from '$env/static/public';
 
 	let { session, profile } = $props();
@@ -93,6 +94,21 @@
 				<div class="flex-1 p-4">
 					<nav class="space-y-2">
 						{#if !session}
+							<div class="border-t pt-4 flex flex-col space-y-3">
+								<Button variant="ghost" class="w-full justify-start h-11" href="/" onclick={closeMobileMenu}>
+									<Calendar class="size-4" />
+									Upcoming Games
+								</Button>
+								<Button variant="ghost" class="w-full justify-start h-11" href="/games" onclick={closeMobileMenu}>
+									<Calendar class="size-4" />
+									All Games
+								</Button>
+								<Button variant="ghost" class="w-full justify-start h-11" href="/games/history" onclick={closeMobileMenu}>
+									<NotebookPen class="size-4" />
+									Game History
+								</Button>
+							</div>
+							<Separator />
 							<div class="space-y-1">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/auth" onclick={closeMobileMenu}>
 									<User class="size-4" />
@@ -103,8 +119,19 @@
 									Sign Up
 								</Button>
 							</div>
+						{:else}
+							<div class="space-y-2">
+								<Button variant="ghost" class="w-full justify-start h-11" href="/app" onclick={closeMobileMenu}>
+									<Wallpaper />
+									Dashboard
+								</Button>
+								<Button variant="ghost" class="w-full justify-start h-11" href="/app/account" onclick={closeMobileMenu}>
+									<UserPen />
+									Account
+								</Button>
+							</div>
 							
-							<div class="border-t pt-4 mt-4">
+							<div class="border-t pt-4 mt-4 flex flex-col space-y-3">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/" onclick={closeMobileMenu}>
 									<Calendar class="size-4" />
 									Upcoming Games
@@ -113,30 +140,9 @@
 									<Calendar class="size-4" />
 									All Games
 								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="/games/played" onclick={closeMobileMenu}>
+								<Button variant="ghost" class="w-full justify-start h-11" href="/games/history" onclick={closeMobileMenu}>
 									<NotebookPen class="size-4" />
 									Game History
-								</Button>
-							</div>
-						{:else}
-							<div class="space-y-1">
-								<Button variant="ghost" class="w-full justify-start h-11" href="/app" onclick={closeMobileMenu}>
-									Dashboard
-								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="/app/account" onclick={closeMobileMenu}>
-									Account
-								</Button>
-							</div>
-							
-							<div class="border-t pt-4 mt-4">
-								<Button variant="ghost" class="w-full justify-start h-11" href="##" onclick={closeMobileMenu}>
-									About
-								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="##" onclick={closeMobileMenu}>
-									Documentation
-								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="##" onclick={closeMobileMenu}>
-									Pricing
 								</Button>
 							</div>
 							

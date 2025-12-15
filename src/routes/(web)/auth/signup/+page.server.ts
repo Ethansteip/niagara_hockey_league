@@ -13,6 +13,7 @@ export const load = async ({ locals: { getSession }, url }) => {
   let preSelectedTeam = "";
   const teamCode = url.searchParams.get("teamCode") ?? "";
 
+  // url encoded
   // BRUINS_nL%25%261
   // WINGS_fp%242%24
   // HABS_9*%25%251
@@ -34,7 +35,11 @@ export const load = async ({ locals: { getSession }, url }) => {
 
 export const actions = {
   default: async ({ locals: { supabase } }) => {
-    const { email, password } = await getFormData("email", "password");
+    const { email, password, teamCode } = await getFormData(
+      "email",
+      "password",
+      "teamCode"
+    );
 
     if (!email || !password)
       return fail(400, {
@@ -42,6 +47,27 @@ export const actions = {
         message: "Please enter an email and password",
         email,
       });
+
+    if (!teamCode)
+      return fail(400, {
+        success: false,
+        message: "Please provide a team code to sign up.",
+        email,
+      });
+
+    /* Verify team code */
+    const teamCodeResult = await db
+      .select({ name: teamsTable.name })
+      .from(teamsTable)
+      .where(eq(teamsTable.code, teamCode));
+
+    if (teamCodeResult.length <= 0) {
+      return fail(400, {
+        success: false,
+        message: "Invalid team code - please try again.",
+        email,
+      });
+    }
 
     const { error } = await supabase.auth.signUp({
       email,
