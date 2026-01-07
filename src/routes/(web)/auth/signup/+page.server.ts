@@ -1,7 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { getFormData } from "$lib/server/event.js";
 import { db } from "$lib/drizzle/index.js";
-import { teams as teamsTable } from "$lib/drizzle/schema.js";
+import { teams as teamsTable, profiles } from "$lib/drizzle/schema.js";
 import { eq } from "drizzle-orm";
 
 export const load = async ({ locals: { getSession }, url }) => {
@@ -35,16 +35,26 @@ export const load = async ({ locals: { getSession }, url }) => {
 
 export const actions = {
   default: async ({ locals: { supabase } }) => {
-    const { email, password, teamCode } = await getFormData(
-      "email",
-      "password",
-      "teamCode"
-    );
+    const { email, password, teamCode, firstName, lastName } =
+      await getFormData(
+        "email",
+        "password",
+        "teamCode",
+        "firstName",
+        "lastName"
+      );
 
     if (!email || !password)
       return fail(400, {
         success: false,
         message: "Please enter an email and password",
+        email,
+      });
+
+    if (!firstName || !lastName)
+      return fail(400, {
+        success: false,
+        message: "Please enter your first and last name",
         email,
       });
 
@@ -69,20 +79,22 @@ export const actions = {
       });
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    console.log(error);
-
-    if (error) {
+    if (error || !data.user) {
       return fail(400, {
         success: false,
-        message: error.message ?? "Something went wrong",
+        message: error?.message ?? "Something went wrong",
         email,
       });
     }
+
+    await db
+      .insert(profiles)
+      .values({ firstName, lastName, userId: data.user.id, email });
 
     return {
       success: true,
