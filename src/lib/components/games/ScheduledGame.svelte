@@ -24,10 +24,10 @@
   } = $props();
 </script>
 
-<Card class="overflow-hidden hover:shadow-lg transition-all duration-200 border-slate-200">
+<Card class="overflow-hidden hover:shadow-lg transition-all duration-200 border-border">
   <CardHeader class="pb-3">
     <div class="flex items-center justify-between">
-      <CardTitle class="text-lg font-semibold text-slate-800">
+      <CardTitle class="text-lg font-semibold text-foreground">
         Week #{weekNumber}
       </CardTitle>
       <Badge variant="secondary">
@@ -41,38 +41,38 @@
     <div class="flex items-center justify-between mb-4">
       <!-- Home Team -->
       <div class="flex items-center space-x-3 flex-1">
-        <Avatar class="w-13 h-13 ring-2 ring-slate-300 p-1">
+        <Avatar class="w-13 h-13 ring-2 ring-ring p-1">
           <AvatarImage src={homeTeamLogoUrl} alt={homeTeamName} />
-          <AvatarFallback class="bg-slate-100 text-slate-700 font-semibold">
+          <AvatarFallback class="bg-muted text-card-foreground font-semibold">
             {getTeamInitials(homeTeamInitials)}
           </AvatarFallback>
         </Avatar>
         <div class="w-auto  flex flex-col justify-center items-center">
-          <h3 class="font-semibold text-slate-900 truncate">{homeTeamName}</h3>
+          <h3 class="font-semibold text-foreground truncate">{homeTeamName}</h3>
           {#if homeTeamStandings}
-            <p class="text-xs text-slate-600 tracking-wider">{homeTeamStandings.wins}-{homeTeamStandings.losses}-{homeTeamStandings.ties}</p>
+            <p class="text-xs text-muted-foreground tracking-wider">{homeTeamStandings.wins}-{homeTeamStandings.losses}-{homeTeamStandings.ties}</p>
           {/if}
         </div>
       </div>
 
       <!-- VS Divider -->
       <div class="flex flex-col items-center mx-4">
-        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-          <span class="text-xs font-bold text-slate-600">VS</span>
+        <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+          <span class="text-xs font-bold text-muted-foreground">VS</span>
         </div>
       </div>
 
       <!-- Away Team -->
       <div class="flex items-center space-x-3 flex-1 justify-end">
         <div class="w-auto  flex flex-col justify-center items-center">
-          <h3 class="font-semibold text-slate-900 truncate">{awayTeamName}</h3>
+          <h3 class="font-semibold text-foreground truncate">{awayTeamName}</h3>
           {#if awayTeamStandings}
-            <p class="text-xs text-slate-600 tracking-wider">{awayTeamStandings.wins}-{awayTeamStandings.losses}-{awayTeamStandings.ties}</p>
+            <p class="text-xs text-muted-foreground tracking-wider">{awayTeamStandings.wins}-{awayTeamStandings.losses}-{awayTeamStandings.ties}</p>
           {/if}
         </div>
-        <Avatar class="w-13 h-13 ring-2 ring-slate-300 p-1">
+        <Avatar class="w-13 h-13 ring-2 ring-ring p-1">
           <AvatarImage src={awayTeamLogoUrl} alt={awayTeamName} />
-          <AvatarFallback class="bg-slate-100 text-slate-700 font-semibold">
+          <AvatarFallback class="bg-muted text-card-foreground font-semibold">
             {getTeamInitials(awayTeamInitials)}
           </AvatarFallback>
         </Avatar>
@@ -83,7 +83,7 @@
 
     <!-- Game Details -->
     <div class="flex items-center justify-between text-sm">
-      <div class="flex items-center space-x-2 text-slate-600">
+      <div class="flex items-center space-x-2 text-muted-foreground">
         <Calendar class="w-5 h-5" />
         <span class="font-medium">{formatGameTime(startsAt)}</span>
       </div>

@@ -11,6 +11,7 @@ export const load = async ({ locals: { getSession } }) => {
 export const actions = {
   signin_email: async ({ locals: { supabase } }) => {
     const { email, password } = await getFormData("email", "password");
+
     if (!email || !password)
       return fail(400, {
         success: false,
@@ -27,11 +28,11 @@ export const actions = {
       return fail(error?.status ?? 400, {
         success: false,
         message: error?.message ?? "Something went wrong",
-        email,
       });
     }
 
     /* Login successful, redirect. */
+    console.log("Redirecting to app!");
     return redirect(303, "/app");
   },
   signin_otp: async ({ locals: { supabase } }) => {
