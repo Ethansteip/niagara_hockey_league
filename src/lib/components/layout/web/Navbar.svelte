@@ -55,7 +55,7 @@
 			</div>
 
 			<div class="flex w-1/3 items-center justify-end gap-4">
-				{#if !session}
+				<!-- {#if !session}
 					<Button variant="outline" href="/auth/signup" size="sm" class="hidden lg:flex group/signup">
 						Sign Up 
 						<ChevronRight class="h-4 w-4 transform-translate duration-200 group-hover/signup:translate-x-0.5" />
@@ -68,7 +68,7 @@
 				<div class="hidden lg:flex">
 					<NavUser {profile} />
 				</div>
-				{/if}
+				{/if} -->
 
 				<!-- Mobile Menu Button -->
 				<Button variant="ghost" size="icon" class="flex lg:hidden" onclick={() => (open = true)}>
@@ -93,8 +93,7 @@
 				<!-- Navigation -->
 				<div class="flex-1 p-4">
 					<nav class="space-y-2">
-						{#if !session}
-							<div class="border-t pt-4 flex flex-col space-y-3">
+						<div class="border-t pt-4 flex flex-col space-y-3">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/" onclick={closeMobileMenu}>
 									<Calendar class="size-4" />
 									Upcoming Games
@@ -108,56 +107,6 @@
 									Game History
 								</Button>
 							</div>
-							<Separator />
-							<div class="space-y-1">
-								<Button variant="ghost" class="w-full justify-start h-11" href="/auth" onclick={closeMobileMenu}>
-									<User class="size-4" />
-									Sign In
-								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="/auth/signup" onclick={closeMobileMenu}>
-									<User class="size-4" />
-									Sign Up
-								</Button>
-							</div>
-						{:else}
-							<div class="space-y-2">
-								<Button variant="ghost" class="w-full justify-start h-11" href="/app" onclick={closeMobileMenu}>
-									<Wallpaper />
-									Dashboard
-								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="/app/account" onclick={closeMobileMenu}>
-									<UserPen />
-									Account
-								</Button>
-							</div>
-							
-							<div class="border-t pt-4 mt-4 flex flex-col space-y-3">
-								<Button variant="ghost" class="w-full justify-start h-11" href="/" onclick={closeMobileMenu}>
-									<Calendar class="size-4" />
-									Upcoming Games
-								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="/games" onclick={closeMobileMenu}>
-									<Calendar class="size-4" />
-									All Games
-								</Button>
-								<Button variant="ghost" class="w-full justify-start h-11" href="/games/history" onclick={closeMobileMenu}>
-									<NotebookPen class="size-4" />
-									Game History
-								</Button>
-							</div>
-							
-							<div class="border-t pt-4 mt-4">
-								<Button 
-									variant="ghost" 
-									class="w-full justify-start h-11 text-destructive hover:text-destructive" 
-									onclick={handleLogout}
-								>
-									Log Out
-									<form bind:this={logoutForm} method="POST" action="/auth?/signout" class="hidden">
-									</form>
-								</Button>
-							</div>
-						{/if}
 					</nav>
 				</div>
 			</div>

@@ -4,12 +4,12 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Separator } from '$lib/components/ui/separator';
-  import { toast } from 'svelte-sonner';
   import { enhance } from '$app/forms';
+	import { createEnhanceHook } from '$lib/hooks/createEnhanceHook';
 
 	let showPassword = $state(false);
 	let loading = $state(false);
+	let setLoading = (value:  boolean) => (loading = value);
 </script>
 
 <div class="flex h-screen items-center justify-center p-4">
@@ -21,17 +21,12 @@
 				>
 			</p>
 
-			<form method="POST" action="?/signin_email" class="space-y-4" use:enhance={() => {
-        loading = true;
-        return async ({ update, result }) => {
-            loading = false;
-            update();
-            if (result.type === 'failure' && 'data' in result) {
-              const message = result.data?.message as string;
-              toast.error(message);
-            }
-          };
-      }}>
+			<form method="POST" action="?/signin_email" class="space-y-4" use:enhance={createEnhanceHook({
+						successToast: false, // Display a success toast on successful form submission
+						failureToast: true, // Display an error toast on unsuccessful form submission
+						successRedirect: "/app", // Specify form redirect here - eg. "/some-page"
+						setLoading // Manages loading indicator
+					})}>
 				<div class="space-y-2">
 					<Input type="email" placeholder="Email" name="email" autofocus required/>
 				</div>

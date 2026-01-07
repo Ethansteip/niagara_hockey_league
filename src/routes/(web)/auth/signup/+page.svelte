@@ -62,8 +62,8 @@
 				<Input type="email" placeholder="Email" name="email" required autofocus/>
 			</div>
 			<div class="flex flex-col lg:flex-row space-y-2 gap-2">
-				<Input type="text" placeholder="First name" name="first-name" required/>
-				<Input type="text" placeholder="Last Name" name="last-name" required/>
+				<Input type="text" placeholder="First name" name="firstName" required/>
+				<Input type="text" placeholder="Last Name" name="lastName" required/>
 			</div>
 				<div class="flex flex-col lg:flex-row space-y-4 gap-2">
 					<Select.Root type="single" name="favoriteFruit" bind:value={selectedTeam}>

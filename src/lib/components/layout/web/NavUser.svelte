@@ -19,21 +19,23 @@
 		isDashboard?: boolean
 	} = $props();
 
+	console.log("PROFILE: ", profile);
+
 	const sidebar = useSidebar();
 	let logoutForm: HTMLFormElement;
-	let fullName = `${profile.firstName} ${profile.lastName}`;
+	let fullName = `${profile?.firstName} ${profile?.lastName}`;
 </script>
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger>
 		<Button variant="ghost" size="lg" class="h-auto gap-2 px-2 py-1.5">
 			<Avatar.Root class="size-8 rounded-lg">
-				<Avatar.Image src={profile.avatarUrl} alt={fullName} />
-				<Avatar.Fallback class="rounded-lg">{profile.firstName[0]}{profile.lastName[0]}</Avatar.Fallback>
+				<Avatar.Image src={profile?.avatarUrl} alt={fullName} />
+				<Avatar.Fallback class="rounded-lg">{profile?.firstName[0]}{profile?.lastName[0]}</Avatar.Fallback>
 			</Avatar.Root>
 			<div class="grid flex-1 text-left text-sm leading-tight">
 				<span class="truncate font-medium">{fullName}</span>
-				<span class="truncate text-xs">{profile.email}</span>
+				<span class="truncate text-xs">{profile?.email}</span>
 			</div>
 			<ChevronsUpDownIcon class="ml-auto size-4" />
 		</Button>
@@ -48,17 +50,17 @@
 			<div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 				<Avatar.Root class="size-8 rounded-lg">
 					<Avatar.Image src={profile.avatarUrl} alt={fullName} />
-					<Avatar.Fallback class="rounded-lg">{profile.firstName[0]}{profile.lastName[0]}</Avatar.Fallback>
+					<Avatar.Fallback class="rounded-lg">{profile?.firstName[0]}{profile?.lastName[0]}</Avatar.Fallback>
 				</Avatar.Root>
 				<div class="grid flex-1 text-left text-sm leading-tight">
 					<span class="truncate text-xs">{fullName}</span>
-					<span class="truncate text-xs">{profile.email}</span>
+					<span class="truncate text-xs">{profile?.email}</span>
 				</div>
 			</div>
 		</DropdownMenu.Label>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
-			<a href="/app/profile/{profile.id}">
+			<a href="/app/profile/{profile?.id}">
 				<DropdownMenu.Item>
 					<UserPen class="size-4" />
 					Profile
