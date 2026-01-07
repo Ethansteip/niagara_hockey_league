@@ -2,6 +2,7 @@
   import ScheduledGame from "$lib/components/games/ScheduledGame.svelte";
   import { Card, CardContent } from "$lib/components/ui/card";
   import Button from "$lib/components/ui/button/button.svelte";
+  import Standings from "$lib/components/layout/web/Standings.svelte";
 
   let { data } = $props();
   let { games, teams } = $derived(data);
@@ -9,14 +10,6 @@
 
 <div class="min-h-screen bg-background">
   <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <!-- Teams icons section -->
-     <!-- <div class="flex justify-around items-center w-full h-auto">
-      {#each teams as team}
-          <Button variant="rounded" size="lg">
-            <img src={team.logoUrl} alt={team.name} class="size-8" />
-          </Button>
-      {/each}
-     </div> -->
     <!-- Header Section -->
     <div class="text-left mb-5">
       <h1 class="text-3xl font-bold text-foreground mb-2">Upcoming Games</h1>
@@ -63,5 +56,7 @@
     <div class="flex w-full justify-end">
       <Button variant="link" href="/games">View All Games</Button>
     </div>
+
+    <Standings />
   </div>
 </div>

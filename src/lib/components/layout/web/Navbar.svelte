@@ -22,7 +22,7 @@
 </script>
 
 <div class="w-full border-b border-border" id="top">
-	<div id="top" class=" max-w-screen-xl mx-auto bg-background">
+	<div id="top" class=" max-w-screen-2xl mx-auto bg-background">
 		<div class="flex h-[3.8rem] items-center justify-between px-4">
 			<!-- Logo and Project Name -->
 			<a class="flex w-1/3 items-center gap-2" href="/">
@@ -95,8 +95,8 @@
 					<nav class="space-y-2">
 						<div class="border-t pt-4 flex flex-col space-y-3">
 								<Button variant="ghost" class="w-full justify-start h-11" href="/" onclick={closeMobileMenu}>
-									<Calendar class="size-4" />
-									Upcoming Games
+									<House class="size-4" />
+									Home
 								</Button>
 								<Button variant="ghost" class="w-full justify-start h-11" href="/games" onclick={closeMobileMenu}>
 									<Calendar class="size-4" />
