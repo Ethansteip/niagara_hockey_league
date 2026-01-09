@@ -22,10 +22,10 @@
 </script>
 
 <div class="w-full border-b border-border" id="top">
-	<div id="top" class=" max-w-screen-2xl mx-auto bg-background">
+	<div id="top" class="max-w-4xl mx-auto bg-background">
 		<div class="flex h-[3.8rem] items-center justify-between px-4">
 			<!-- Logo and Project Name -->
-			<a class="flex w-1/3 items-center gap-2" href="/">
+			<a class="flex items-center gap-2" href="/">
 				<div class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
 					<Zap class="size-4" />
 				</div>
@@ -37,7 +37,7 @@
 			</a>
 
 			<!-- Desktop Navigation -->
-			<div class="hidden w-1/3 flex-1 items-center justify-center lg:flex">
+			<div class="hidden flex-1 items-center justify-end lg:flex">
 				<nav class="flex gap-6">
 					<Button variant="ghost" size="sm" href="/">
 						<House />
@@ -54,21 +54,8 @@
 				</nav>
 			</div>
 
-			<div class="flex w-1/3 items-center justify-end gap-4">
-				<!-- {#if !session}
-					<Button variant="outline" href="/auth/signup" size="sm" class="hidden lg:flex group/signup">
-						Sign Up 
-						<ChevronRight class="h-4 w-4 transform-translate duration-200 group-hover/signup:translate-x-0.5" />
-					</Button>
-					<Button href="/auth" variant="outline" size="sm" class="hidden lg:flex group/signin">
-						Sign In
-						<ChevronRight class="h-4 w-4 transform-translate duration-200 group-hover/signin:translate-x-0.5" />
-					</Button>
-				{:else}
-				<div class="hidden lg:flex">
-					<NavUser {profile} />
-				</div>
-				{/if} -->
+			<div class="flex items-center justify-end gap-4">
+				
 
 				<!-- Mobile Menu Button -->
 				<Button variant="ghost" size="icon" class="flex lg:hidden" onclick={() => (open = true)}>

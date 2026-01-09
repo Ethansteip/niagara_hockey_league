@@ -8,8 +8,8 @@
   let { games, teams } = $derived(data);
 </script>
 
-<div class="min-h-screen bg-background">
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
+<div class="min-h-screen bg-background w-full">
+  <div class="container mx-auto px-4 py-8 w-full">
     <!-- Header Section -->
     <div class="text-left mb-5">
       <h1 class="text-3xl font-bold text-foreground mb-2">Upcoming Games</h1>

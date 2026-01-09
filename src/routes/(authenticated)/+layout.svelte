@@ -1,50 +1,28 @@
 <script lang="ts">
   import '../../app.css';
-  import { goto, invalidate } from '$app/navigation'
-  import { onMount } from 'svelte'
+  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import AppSidebar from "$lib/components/layout/web/AppSidebar/app-sidebar.svelte";
+	import SiteHeader from "$lib/components/layout/web/AppSidebar/site-header.svelte";
 
   let { data, children } = $props();
-  let profile = $derived(data.profile);
-
-  /**
-   * We use the $derived rune so that
-   * `supabase` and `session` are updated
-   * during invalidation. $state doesn't do this.
-   * 
-   * An updated supabase client isn't typically needed,
-   * but the ssr libary returns a cached client
-   * for us during invalidation. Otherwise we'd be
-   * initializing a client during every invalidation.
-   */
-  let { supabase, session } = $derived(data);
-
-  onMount(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, _session) => {
-      /**
-       * Instead of invalidating, you could call
-       * `session = _session` below and you wouldn't
-       * necessarily need to call `invalidate`.
-       */
-      if (_session?.expires_at !== session?.expires_at) {
-        /**
-         * We typically only call `signOut()` on the server side,
-         * but if `_session` is null - from the user
-         * being deleted or the supabase client
-         * failing to refresh a token, for example -
-         * the SIGNED_OUT event is fired, and
-         * calling `goto` ensures the user's screen 
-         * reflects that they're logged out.
-         * Note that the invalidation still happens.
-         */
-        if (event === 'SIGNED_OUT') await goto('/');
-        invalidate('supabase:auth')
-      }
-    })
-
-    return () => subscription.unsubscribe();
-  })
+  let profile = $derived(data?.profile);
+  let supabase = $derived(data?.supabase);
+  let session = $derived(data?.session);
 </script>
 
-{@render children()}
+<Sidebar.Provider
+	style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);"
+>
+	<AppSidebar variant="inset" />
+	<Sidebar.Inset>
+		<SiteHeader />
+		<div class="flex flex-1 flex-col">
+			<div class="@container/main flex flex-1 flex-col gap-2">
+				<div class="flex flex-col gap-4 p-4 md:gap-6 md:py-6 items-center">
+					{@render children?.()}
+				</div>
+			</div>
+		</div>
+	</Sidebar.Inset>
+</Sidebar.Provider>
+
