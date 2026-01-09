@@ -20,8 +20,8 @@
  const getStandingStyles = (index: number) => {
   switch(index) {
     case 0: return "ring-2 ring-primary bg-linear-to-br from-primary/20 to-transparent";
-    case 1: return "bg-linear-to-br from-zinc-300/20 to-transparent"
-    case 2: return "bg-linear-to-br from-amber-300/20 to-transparent"
+    case 1: return "ring-2 ring-zinc-300/30 bg-linear-to-br from-zinc-300/20 to-transparent"
+    case 2: return "ring-2 ring-amber-500/30 bg-linear-to-br from-amber-500/20 to-transparent"
     default: return ""
   }
  }
@@ -40,7 +40,7 @@
         <!-- Left: Rank & Team -->
         <div class="flex items-center gap-4">
           <!-- Rank Badge -->
-          <div class="flex h-12 w-12 items-center justify-center rounded-full shrink-0 {i === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full shrink-0 bg-muted text-foreground {i === 0 ? ' ring-2 ring-primary' : ''} {i === 1 ? ' ring-2 ring-zinc-300/30' : ''} {i === 2 ? ' ring-2 ring-amber-500/30' : ''}">
               <span class="text-xl font-bold">{i + 1}</span>
           </div>
 

@@ -45,7 +45,7 @@
 					</Button>
 					<Button variant="ghost" size="sm" href="/games">
 						<Calendar />
-						All Games
+						Upcoming Games
 					</Button>
 					<Button variant="ghost" size="sm" href="/games/history">
 						<NotebookPen />
@@ -100,7 +100,7 @@
 								</Button>
 								<Button variant="ghost" class="w-full justify-start h-11" href="/games" onclick={closeMobileMenu}>
 									<Calendar class="size-4" />
-									All Games
+									Upcoming Games
 								</Button>
 								<Button variant="ghost" class="w-full justify-start h-11" href="/games/history" onclick={closeMobileMenu}>
 									<NotebookPen class="size-4" />
