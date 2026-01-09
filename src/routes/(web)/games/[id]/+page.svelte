@@ -65,7 +65,7 @@
           <!-- Home Team -->
           <div class="flex flex-col items-center justify-center space-x-2 sm:space-x-3">
             <Avatar class="w-20 h-20">
-              <AvatarImage src={game.homeTeamLogoUrl} alt={game.homeTeamName} />
+              <AvatarImage src={game?.homeTeamLogoUrl} alt={game.homeTeamName} />
               <AvatarFallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">
                 {getTeamInitials(game.homeTeamName)}
               </AvatarFallback>
@@ -76,7 +76,7 @@
           </div>
 
           <!-- Score or VS -->
-          <div class="flex flex-col items-center mx-2 sm:mx-4 flex-shrink-0">
+          <div class="flex flex-col items-center mx-2 sm:mx-4 shrink-0">
             {#if game.status === 'final'}
               <div class="text-center">
                 <div class="text-4xl font-bold text-foreground">
@@ -140,7 +140,6 @@
           <!-- Home Team Stats -->
           <div class="bg-card rounded-lg p-4 border border-border">
             <div class="flex items-center gap-1 mb-4">
-              {game?.homeTeamLogoUrl}
               <Avatar class="w-10 h-10">
                 <AvatarImage src={game?.homeTeamLogoUrl} alt={game.homeTeamName} />
                 <AvatarFallback class="text-sm">{getTeamInitials(game.homeTeamName)}</AvatarFallback>
@@ -156,8 +155,8 @@
                 <div class="text-lg font-bold text-foreground">{game.homeTeamStandings.points}</div>
                 <div class="text-xs text-muted-foreground">Points</div>
               </div>
-              <div class="text-center bg-background rounded-lg p-3">
-                <div class="text-lg font-bold text-foreground">{formatRecord(game.homeTeamStandings)}</div>
+              <div class="text-center bg-background rounded-lg p-3 flex flex-col gap-2">
+                <div class="text-sm font-bold text-foreground">{formatRecord(game.homeTeamStandings)}</div>
                 <div class="text-xs text-muted-foreground">W - L - T</div>
               </div>
               <div class="text-center bg-background rounded-lg p-3">
@@ -189,7 +188,7 @@
           <div class="bg-card rounded-lg p-4 border border-border">
             <div class="flex items-center gap-2 mb-4">
               <Avatar class="w-10 h-10">
-                <AvatarImage src={game.awayTeamLogoUrl} alt={game.awayTeamName} />
+                <AvatarImage src={game?.awayTeamLogoUrl} alt={game.awayTeamName} />
                 <AvatarFallback class="text-sm">{getTeamInitials(game.awayTeamName)}</AvatarFallback>
               </Avatar>
               <div>
@@ -203,8 +202,8 @@
                 <div class="text-lg font-bold text-foreground">{game.awayTeamStandings.points}</div>
                 <div class="text-xs text-muted-foreground">Points</div>
               </div>
-              <div class="text-center bg-background rounded-lg p-3">
-                <div class="text-lg font-bold text-foreground">{formatRecord(game.awayTeamStandings)}</div>
+              <div class="text-center bg-background rounded-lg p-3 flex flex-col gap-2">
+                <div class="text-sm font-bold text-foreground">{formatRecord(game.awayTeamStandings)}</div>
                 <div class="text-xs text-muted-foreground">W - L - T</div>
               </div>
               <div class="text-center bg-background rounded-lg p-3">
@@ -240,7 +239,7 @@
             <div class="bg-card rounded-lg p-6 border border-border">
               <div class="flex justify-center items-center gap-3 mb-6">
                 <Avatar class="w-12 h-12">
-                  <AvatarImage src={game.homeTeamLogoUrl} alt={game.homeTeamName} />
+                  <AvatarImage src={game?.homeTeamLogoUrl} alt={game.homeTeamName} />
                   <AvatarFallback class="text-sm">{getTeamInitials(game.homeTeamName)}</AvatarFallback>
                 </Avatar>
               </div>
@@ -304,7 +303,7 @@
             <div class="bg-card rounded-lg p-6 border border-border">
               <div class="flex items-center justify-center gap-3 mb-6">
                 <Avatar class="w-12 h-12">
-                  <AvatarImage src={game.awayTeamLogoUrl} alt={game.awayTeamName} />
+                  <AvatarImage src={game?.awayTeamLogoUrl} alt={game.awayTeamName} />
                   <AvatarFallback class="text-sm">{getTeamInitials(game.awayTeamName)}</AvatarFallback>
                 </Avatar>
               </div>
