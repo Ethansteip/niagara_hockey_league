@@ -18,7 +18,7 @@
    * initializing a client during every invalidation.
    */
   let { supabase, session } = $derived(data);
-  let profile = data.profile;
+  let profile = $derived(data.profile);
 
   onMount(() => {
     const {

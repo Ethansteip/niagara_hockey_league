@@ -100,7 +100,7 @@
           <!-- Away Team -->
           <div class="flex flex-col items-center justify-center space-x-2 sm:space-x-3">
             <Avatar class="w-20 h-20">
-              <AvatarImage src={game.awayTeamLogoUrl} alt={game.awayTeamName} />
+              <AvatarImage src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
               <AvatarFallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">
                 {getTeamInitials(game.awayTeamName)}
               </AvatarFallback>
@@ -140,8 +140,9 @@
           <!-- Home Team Stats -->
           <div class="bg-card rounded-lg p-4 border border-border">
             <div class="flex items-center gap-1 mb-4">
+              {game?.homeTeamLogoUrl}
               <Avatar class="w-10 h-10">
-                <AvatarImage src={game.homeTeamLogoUrl} alt={game.homeTeamName} />
+                <AvatarImage src={game?.homeTeamLogoUrl} alt={game.homeTeamName} />
                 <AvatarFallback class="text-sm">{getTeamInitials(game.homeTeamName)}</AvatarFallback>
               </Avatar>
               <div>
