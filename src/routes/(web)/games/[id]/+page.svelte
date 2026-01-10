@@ -32,7 +32,7 @@
   <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-4xl">
     <!-- Header Section -->
     <div class="flex items-center justify-between mb-4 sm:mb-2">
-      <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground ml-2">Week #{game.weekNumber}</h1>
+      <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground ml-2">Week #{game?.weekNumber}</h1>
       <Button variant="outline" size="sm" href="/games">
         <ArrowLeft class="w-4 h-4" />
       </Button>
@@ -44,15 +44,15 @@
             <CardTitle class="font-bold text-foreground mb-2 flex items-center justify-between w-full">
               <div class="flex items-center gap-2 text-muted-foreground">
                 <Calendar class="w-4 h-4" />
-                <span class="font-medium">{formatGameTime(game.startsAt.toString())}</span>
+                <span class="font-medium">{formatGameTime(game?.startsAt.toString())}</span>
               </div>
               {#if game.status !== 'final'}
               <Badge variant="secondary" class="hidden sm:flex">
-                {game.status.charAt(0).toUpperCase() + game.status.slice(1)}
+                {game?.status.charAt(0).toUpperCase() + game?.status.slice(1)}
               </Badge>
               {:else}
               <Badge variant="default">
-                {game.status.charAt(0).toUpperCase() + game.status.slice(1)}
+                {game?.status.charAt(0).toUpperCase() + game?.status.slice(1)}
               </Badge>
               {/if}
             </CardTitle>
@@ -65,9 +65,9 @@
           <!-- Home Team -->
           <div class="flex flex-col items-center justify-center space-x-2 sm:space-x-3">
             <Avatar class="w-20 h-20">
-              <AvatarImage src={game?.homeTeamLogoUrl} alt={game.homeTeamName} />
+              <AvatarImage src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
               <AvatarFallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">
-                {getTeamInitials(game.homeTeamName)}
+                {getTeamInitials(game?.homeTeamName)}
               </AvatarFallback>
             </Avatar>
             <div class="flex flex-col min-w-0">
@@ -77,15 +77,15 @@
 
           <!-- Score or VS -->
           <div class="flex flex-col items-center mx-2 sm:mx-4 shrink-0">
-            {#if game.status === 'final'}
+            {#if game?.status === 'final'}
               <div class="text-center">
                 <div class="text-4xl font-bold text-foreground">
-                  {game.homeScore} - {game.awayScore}
+                  {game?.homeScore} - {game?.awayScore}
                 </div>
-                {#if game.decidedIn}
+                {#if game?.decidedIn}
                   <p class="text-xs text-muted-foreground mt-1">
-                    {game.decidedIn === 'overtime' ? 'OT' : 
-                     game.decidedIn === 'shootout' ? 'SO' : 
+                    {game?.decidedIn === 'overtime' ? 'OT' : 
+                     game?.decidedIn === 'shootout' ? 'SO' : 
                      'Regulation'}
                   </p>
                 {/if}
@@ -102,7 +102,7 @@
             <Avatar class="w-20 h-20">
               <AvatarImage src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
               <AvatarFallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">
-                {getTeamInitials(game.awayTeamName)}
+                {getTeamInitials(game?.awayTeamName)}
               </AvatarFallback>
             </Avatar>
             <div class="flex flex-col min-w-0">
@@ -112,14 +112,14 @@
         </div>
 
         <!-- Arena Info -->
-        {#if game.arenaName}
+        {#if game?.arenaName}
           <Separator class="my-4" />
           <div class="flex items-center gap-2 text-muted-foreground">
             <MapPin class="w-4 h-4" />
-            <span class="font-medium">{game.arenaName}</span>
-            {#if game.arenaCity && game.arenaProvince}
+            <span class="font-medium">{game?.arenaName}</span>
+            {#if game?.arenaCity && game?.arenaProvince}
               <span class="text-muted-foreground">•</span>
-              <span class="text-sm">{game.arenaCity}, {game.arenaProvince}</span>
+              <span class="text-sm">{game?.arenaCity}, {game?.arenaProvince}</span>
             {/if}
           </div>
         {/if}
@@ -141,27 +141,27 @@
           <div class="bg-card rounded-lg p-4 border border-border">
             <div class="flex items-center gap-1 mb-4">
               <Avatar class="w-10 h-10">
-                <AvatarImage src={game?.homeTeamLogoUrl} alt={game.homeTeamName} />
-                <AvatarFallback class="text-sm">{getTeamInitials(game.homeTeamName)}</AvatarFallback>
+                <AvatarImage src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+                <AvatarFallback class="text-sm">{getTeamInitials(game?.homeTeamName)}</AvatarFallback>
               </Avatar>
               <div>
-                <h4 class="font-semibold text-foreground">{game.homeTeamName}</h4>
+                <h4 class="font-semibold text-foreground">{game?.homeTeamName}</h4>
               </div>
             </div>
             
             <!-- Key Stats Row -->
             <div class="grid grid-cols-3 gap-3 mb-4">
               <div class="text-center bg-background rounded-lg p-3">
-                <div class="text-lg font-bold text-foreground">{game.homeTeamStandings.points}</div>
+                <div class="text-lg font-bold text-foreground">{game?.homeTeamStandings?.points}</div>
                 <div class="text-xs text-muted-foreground">Points</div>
               </div>
               <div class="text-center bg-background rounded-lg p-3 flex flex-col gap-2">
-                <div class="text-sm font-bold text-foreground">{formatRecord(game.homeTeamStandings)}</div>
+                <div class="text-sm font-bold text-foreground">{formatRecord(game?.homeTeamStandings)}</div>
                 <div class="text-xs text-muted-foreground">W - L - T</div>
               </div>
               <div class="text-center bg-background rounded-lg p-3">
-                <div class="text-lg font-bold {getGoalDifferential(game.homeTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
-                  {formatGoalDifferential(game.homeTeamStandings)}
+                <div class="text-lg font-bold {getGoalDifferential(game?.homeTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
+                  {formatGoalDifferential(game?.homeTeamStandings)}
                 </div>
                 <div class="text-xs text-muted-foreground">Goal Diff.</div>
               </div>
@@ -171,15 +171,15 @@
             <div class="space-y-2 text-sm">
               <div class="flex justify-between py-1">
                 <span class="text-muted-foreground">Goals For:</span>
-                <span class="font-medium">{game.homeTeamStandings.goalsFor}</span>
+                <span class="font-medium">{game?.homeTeamStandings?.goalsFor}</span>
               </div>
               <div class="flex justify-between py-1">
                 <span class="text-muted-foreground">Goals Against:</span>
-                <span class="font-medium">{game.homeTeamStandings.goalsAgainst}</span>
+                <span class="font-medium">{game?.homeTeamStandings?.goalsAgainst}</span>
               </div>
               <div class="flex justify-between py-1">
                 <span class="text-muted-foreground">Games Played:</span>
-                <span class="font-medium">{game.homeTeamStandings.gamesPlayed}</span>
+                <span class="font-medium">{game?.homeTeamStandings?.gamesPlayed}</span>
               </div>
             </div>
           </div>
@@ -188,27 +188,27 @@
           <div class="bg-card rounded-lg p-4 border border-border">
             <div class="flex items-center gap-2 mb-4">
               <Avatar class="w-10 h-10">
-                <AvatarImage src={game?.awayTeamLogoUrl} alt={game.awayTeamName} />
-                <AvatarFallback class="text-sm">{getTeamInitials(game.awayTeamName)}</AvatarFallback>
+                <AvatarImage src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
+                <AvatarFallback class="text-sm">{getTeamInitials(game?.awayTeamName)}</AvatarFallback>
               </Avatar>
               <div>
-                <h4 class="font-semibold text-foreground">{game.awayTeamName}</h4>
+                <h4 class="font-semibold text-foreground">{game?.awayTeamName}</h4>
               </div>
             </div>
             
             <!-- Key Stats Row -->
             <div class="grid grid-cols-3 gap-3 mb-4">
               <div class="text-center bg-background rounded-lg p-3">
-                <div class="text-lg font-bold text-foreground">{game.awayTeamStandings.points}</div>
+                <div class="text-lg font-bold text-foreground">{game?.awayTeamStandings?.points}</div>
                 <div class="text-xs text-muted-foreground">Points</div>
               </div>
               <div class="text-center bg-background rounded-lg p-3 flex flex-col gap-2">
-                <div class="text-sm font-bold text-foreground">{formatRecord(game.awayTeamStandings)}</div>
+                <div class="text-sm font-bold text-foreground">{formatRecord(game?.awayTeamStandings)}</div>
                 <div class="text-xs text-muted-foreground">W - L - T</div>
               </div>
               <div class="text-center bg-background rounded-lg p-3">
-                <div class="text-lg font-bold {getGoalDifferential(game.awayTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
-                  {formatGoalDifferential(game.awayTeamStandings)}
+                <div class="text-lg font-bold {getGoalDifferential(game?.awayTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
+                  {formatGoalDifferential(game?.awayTeamStandings)}
                 </div>
                 <div class="text-xs text-muted-foreground">Goal Diff.</div>
               </div>
@@ -218,15 +218,15 @@
             <div class="space-y-2 text-sm">
               <div class="flex justify-between py-1">
                 <span class="text-muted-foreground">Goals For:</span>
-                <span class="font-medium">{game.awayTeamStandings.goalsFor}</span>
+                <span class="font-medium">{game?.awayTeamStandings?.goalsFor}</span>
               </div>
               <div class="flex justify-between py-1">
                 <span class="text-muted-foreground">Goals Against:</span>
-                <span class="font-medium">{game.awayTeamStandings.goalsAgainst}</span>
+                <span class="font-medium">{game?.awayTeamStandings?.goalsAgainst}</span>
               </div>
               <div class="flex justify-between py-1">
                 <span class="text-muted-foreground">Games Played:</span>
-                <span class="font-medium">{game.awayTeamStandings.gamesPlayed}</span>
+                <span class="font-medium">{game?.awayTeamStandings?.gamesPlayed}</span>
               </div>
             </div>
           </div>
@@ -239,24 +239,24 @@
             <div class="bg-card rounded-lg p-6 border border-border">
               <div class="flex justify-center items-center gap-3 mb-6">
                 <Avatar class="w-12 h-12">
-                  <AvatarImage src={game?.homeTeamLogoUrl} alt={game.homeTeamName} />
-                  <AvatarFallback class="text-sm">{getTeamInitials(game.homeTeamName)}</AvatarFallback>
+                  <AvatarImage src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+                  <AvatarFallback class="text-sm">{getTeamInitials(game?.homeTeamName)}</AvatarFallback>
                 </Avatar>
               </div>
               
               <!-- Key Stats Row -->
               <div class="grid grid-cols-3 gap-4 mb-6">
                 <div class="text-center bg-background rounded-lg p-4">
-                  <div class="text-xl font-bold text-foreground">{game.homeTeamStandings.points}</div>
+                  <div class="text-xl font-bold text-foreground">{game?.homeTeamStandings?.points}</div>
                   <div class="text-xs text-muted-foreground">Points</div>
                 </div>
                 <div class="text-center bg-background rounded-lg p-4">
-                  <div class="text-xl font-bold text-foreground">{formatRecord(game.homeTeamStandings)}</div>
+                  <div class="text-xl font-bold text-foreground">{formatRecord(game?.homeTeamStandings)}</div>
                   <div class="text-xs text-muted-foreground">W - L - T</div>
                 </div>
                 <div class="text-center bg-background rounded-lg p-4">
-                  <div class="text-xl font-bold {getGoalDifferential(game.homeTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
-                    {formatGoalDifferential(game.homeTeamStandings)}
+                  <div class="text-xl font-bold {getGoalDifferential(game?.homeTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
+                    {formatGoalDifferential(game?.homeTeamStandings)}
                   </div>
                   <div class="text-xs text-muted-foreground">Goal Diff.</div>
                 </div>
@@ -266,34 +266,34 @@
               <div class="space-y-3 text-sm">
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Goals For:</span>
-                  <span class="font-medium">{game.homeTeamStandings.goalsFor}</span>
+                  <span class="font-medium">{game?.homeTeamStandings?.goalsFor}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Goals Against:</span>
-                  <span class="font-medium">{game.homeTeamStandings.goalsAgainst}</span>
+                  <span class="font-medium">{game?.homeTeamStandings?.goalsAgainst}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Games Played:</span>
-                  <span class="font-medium">{game.homeTeamStandings.gamesPlayed}</span>
+                  <span class="font-medium">{game?.homeTeamStandings?.gamesPlayed}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Wins:</span>
-                  <span class="font-medium text-success">{game.homeTeamStandings.wins}</span>
+                  <span class="font-medium text-success">{game?.homeTeamStandings?.wins}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Losses:</span>
-                  <span class="font-medium text-destructive">{game.homeTeamStandings.losses}</span>
+                  <span class="font-medium text-destructive">{game?.homeTeamStandings?.losses}</span>
                 </div>
-                {#if game.homeTeamStandings.ties > 0}
+                {#if game?.homeTeamStandings?.ties > 0}
                   <div class="flex justify-between py-2 border-b border-border">
                     <span class="text-muted-foreground">Ties:</span>
-                    <span class="font-medium text-muted-foreground">{game.homeTeamStandings.ties}</span>
+                    <span class="font-medium text-muted-foreground">{game?.homeTeamStandings?.ties}</span>
                   </div>
                 {/if}
-                {#if game.homeTeamStandings.overtimeLosses > 0}
+                {#if game?.homeTeamStandings?.overtimeLosses > 0}
                   <div class="flex justify-between py-2">
                     <span class="text-muted-foreground">OT Losses:</span>
-                    <span class="font-medium text-warning">{game.homeTeamStandings.overtimeLosses}</span>
+                    <span class="font-medium text-warning">{game?.homeTeamStandings?.overtimeLosses}</span>
                   </div>
                 {/if}
               </div>
@@ -303,24 +303,24 @@
             <div class="bg-card rounded-lg p-6 border border-border">
               <div class="flex items-center justify-center gap-3 mb-6">
                 <Avatar class="w-12 h-12">
-                  <AvatarImage src={game?.awayTeamLogoUrl} alt={game.awayTeamName} />
-                  <AvatarFallback class="text-sm">{getTeamInitials(game.awayTeamName)}</AvatarFallback>
+                  <AvatarImage src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
+                  <AvatarFallback class="text-sm">{getTeamInitials(game?.awayTeamName)}</AvatarFallback>
                 </Avatar>
               </div>
               
               <!-- Key Stats Row -->
               <div class="grid grid-cols-3 gap-4 mb-6">
                 <div class="text-center bg-background rounded-lg p-4">
-                  <div class="text-xl font-bold text-foreground">{game.awayTeamStandings.points}</div>
+                  <div class="text-xl font-bold text-foreground">{game?.awayTeamStandings?.points}</div>
                   <div class="text-xs text-muted-foreground">Points</div>
                 </div>
                 <div class="text-center bg-background rounded-lg p-4">
-                  <div class="text-xl font-bold text-foreground">{formatRecord(game.awayTeamStandings)}</div>
+                  <div class="text-xl font-bold text-foreground">{formatRecord(game?.awayTeamStandings)}</div>
                   <div class="text-xs text-muted-foreground">W - L - T</div>
                 </div>
                 <div class="text-center bg-background rounded-lg p-4">
-                  <div class="text-xl font-bold {getGoalDifferential(game.awayTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
-                    {formatGoalDifferential(game.awayTeamStandings)}
+                  <div class="text-xl font-bold {getGoalDifferential(game?.awayTeamStandings) >= 0 ? 'text-success' : 'text-destructive'}">
+                    {formatGoalDifferential(game?.awayTeamStandings)}
                   </div>
                   <div class="text-xs text-muted-foreground">Goal Diff.</div>
                 </div>
@@ -330,34 +330,34 @@
               <div class="space-y-3 text-sm">
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Goals For:</span>
-                  <span class="font-medium">{game.awayTeamStandings.goalsFor}</span>
+                  <span class="font-medium">{game?.awayTeamStandings?.goalsFor}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Goals Against:</span>
-                  <span class="font-medium">{game.awayTeamStandings.goalsAgainst}</span>
+                  <span class="font-medium">{game?.awayTeamStandings?.goalsAgainst}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Games Played:</span>
-                  <span class="font-medium">{game.awayTeamStandings.gamesPlayed}</span>
+                  <span class="font-medium">{game?.awayTeamStandings?.gamesPlayed}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Wins:</span>
-                  <span class="font-medium text-success">{game.awayTeamStandings.wins}</span>
+                  <span class="font-medium text-success">{game?.awayTeamStandings?.wins}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-border">
                   <span class="text-muted-foreground">Losses:</span>
-                  <span class="font-medium text-destructive">{game.awayTeamStandings.losses}</span>
+                  <span class="font-medium text-destructive">{game?.awayTeamStandings?.losses}</span>
                 </div>
-                {#if game.awayTeamStandings.ties > 0}
+                {#if game?.awayTeamStandings?.ties > 0}
                   <div class="flex justify-between py-2 border-b border-border">
                     <span class="text-muted-foreground">Ties:</span>
-                    <span class="font-medium text-muted-foreground">{game.awayTeamStandings.ties}</span>
+                    <span class="font-medium text-muted-foreground">{game?.awayTeamStandings?.ties}</span>
                   </div>
                 {/if}
-                {#if game.awayTeamStandings.overtimeLosses > 0}
+                {#if game?.awayTeamStandings?.overtimeLosses > 0}
                   <div class="flex justify-between py-2">
                     <span class="text-muted-foreground">OT Losses:</span>
-                    <span class="font-medium text-warning">{game.awayTeamStandings.overtimeLosses}</span>
+                    <span class="font-medium text-warning">{game?.awayTeamStandings?.overtimeLosses}</span>
                   </div>
                 {/if}
               </div>
@@ -368,13 +368,13 @@
     </Card>
 
     <!-- Game Notes -->
-    {#if game.notes}
+    {#if game?.notes}
       <Card class="border-border">
         <CardHeader>
           <CardTitle class="text-lg">Game Notes</CardTitle>
         </CardHeader>
         <CardContent>
-          <p class="text-card-foreground whitespace-pre-wrap">{game.notes}</p>
+          <p class="text-card-foreground whitespace-pre-wrap">{game?.notes}</p>
         </CardContent>
       </Card>
     {/if}
