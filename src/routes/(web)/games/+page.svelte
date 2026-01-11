@@ -12,7 +12,7 @@
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <!-- Header Section -->
     <div class="flex items-center justify-between mb-5">
-      <h1 class="text-3xl font-bold text-foreground mb-2">All Games</h1>
+      <h1 class="text-3xl font-bold text-foreground mb-2">All Upcoming Games</h1>
       <Button variant="outline" href="/">
         <ArrowLeft class="w-4 h-4" />
       </Button>

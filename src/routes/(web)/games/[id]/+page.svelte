@@ -2,14 +2,14 @@
   import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { Avatar, AvatarFallback, AvatarImage } from "$lib/components/ui/avatar";
+  import * as Avatar from "$lib/components/ui/avatar/index.js";``
   import { Separator } from "$lib/components/ui/separator";
   import { formatGameTime } from "$lib/utils";
   import { getTeamInitials } from "$lib/utils";
   import { ArrowLeft, Calendar, MapPin, ChartLine } from "@lucide/svelte";
 
   let { data } = $props();
-  let { game } = $derived(data);
+  const game = $derived(data.game);
 
   // Helper function to format record
   function formatRecord(standings: any) {
@@ -64,14 +64,15 @@
         <div class="flex items-center justify-between">
           <!-- Home Team -->
           <div class="flex flex-col items-center justify-center space-x-2 sm:space-x-3">
-            <Avatar class="w-20 h-20">
-              <AvatarImage src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
-              <AvatarFallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">
-                {getTeamInitials(game?.homeTeamName)}
-              </AvatarFallback>
-            </Avatar>
+            <!-- <Avatar.Root class="size-20">
+              <Avatar.Image src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+              <Avatar.Fallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">{getTeamInitials(game?.homeTeamName)}</Avatar.Fallback>
+            </Avatar.Root> -->
+            <div class="size-20 rounded-full">
+              <img src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+            </div>
             <div class="flex flex-col min-w-0">
-              <h3 class="font-bold text-sm sm:text-lg lg:text-xl text-foreground truncate">{game.homeTeamName}</h3>
+              <h3 class="font-bold text-sm sm:text-lg lg:text-xl text-foreground truncate">{game?.homeTeamName}</h3>
             </div>
           </div>
 
@@ -99,14 +100,11 @@
 
           <!-- Away Team -->
           <div class="flex flex-col items-center justify-center space-x-2 sm:space-x-3">
-            <Avatar class="w-20 h-20">
-              <AvatarImage src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
-              <AvatarFallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">
-                {getTeamInitials(game?.awayTeamName)}
-              </AvatarFallback>
-            </Avatar>
+            <div class="size-20 rounded-full">
+              <img src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
+            </div>
             <div class="flex flex-col min-w-0">
-              <h3 class="font-bold text-sm sm:text-lg lg:text-xl text-foreground truncate">{game.awayTeamName}</h3>
+              <h3 class="font-bold text-sm sm:text-lg lg:text-xl text-foreground truncate">{game?.awayTeamName}</h3>
             </div>
           </div>
         </div>
@@ -140,10 +138,13 @@
           <!-- Home Team Stats -->
           <div class="bg-card rounded-lg p-4 border border-border">
             <div class="flex items-center gap-1 mb-4">
-              <Avatar class="w-10 h-10">
-                <AvatarImage src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
-                <AvatarFallback class="text-sm">{getTeamInitials(game?.homeTeamName)}</AvatarFallback>
-              </Avatar>
+            <!-- <Avatar.Root class="size-20">
+              <Avatar.Image src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+              <Avatar.Fallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">{getTeamInitials(game?.homeTeamName)}</Avatar.Fallback>
+            </Avatar.Root> -->
+            <div class="size-20 rounded-full">
+              <img src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+            </div>
               <div>
                 <h4 class="font-semibold text-foreground">{game?.homeTeamName}</h4>
               </div>
@@ -187,10 +188,9 @@
           <!-- Away Team Stats -->
           <div class="bg-card rounded-lg p-4 border border-border">
             <div class="flex items-center gap-2 mb-4">
-              <Avatar class="w-10 h-10">
-                <AvatarImage src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
-                <AvatarFallback class="text-sm">{getTeamInitials(game?.awayTeamName)}</AvatarFallback>
-              </Avatar>
+            <div class="size-20 rounded-full">
+              <img src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
+            </div>
               <div>
                 <h4 class="font-semibold text-foreground">{game?.awayTeamName}</h4>
               </div>
@@ -238,10 +238,13 @@
             <!-- Home Team Stats -->
             <div class="bg-card rounded-lg p-6 border border-border">
               <div class="flex justify-center items-center gap-3 mb-6">
-                <Avatar class="w-12 h-12">
-                  <AvatarImage src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
-                  <AvatarFallback class="text-sm">{getTeamInitials(game?.homeTeamName)}</AvatarFallback>
-                </Avatar>
+                <!-- <Avatar.Root class="size-20">
+                  <Avatar.Image src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+                  <Avatar.Fallback class="bg-muted text-card-foreground font-semibold text-sm sm:text-lg">{getTeamInitials(game?.homeTeamName)}</Avatar.Fallback>
+                </Avatar.Root> -->
+                <div class="size-20 rounded-full">
+                  <img src={game?.homeTeamLogoUrl} alt={game?.homeTeamName} />
+                </div>
               </div>
               
               <!-- Key Stats Row -->
@@ -302,10 +305,9 @@
             <!-- Away Team Stats -->
             <div class="bg-card rounded-lg p-6 border border-border">
               <div class="flex items-center justify-center gap-3 mb-6">
-                <Avatar class="w-12 h-12">
-                  <AvatarImage src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
-                  <AvatarFallback class="text-sm">{getTeamInitials(game?.awayTeamName)}</AvatarFallback>
-                </Avatar>
+                <div class="size-20 rounded-full">
+                  <img src={game?.awayTeamLogoUrl} alt={game?.awayTeamName} />
+                </div>
               </div>
               
               <!-- Key Stats Row -->

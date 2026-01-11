@@ -60,7 +60,7 @@
       </div>
 
       <!-- Score or VS -->
-      <div class="flex flex-col items-center mx-2 sm:mx-4 flex-shrink-0">
+      <div class="flex flex-col items-center mx-2 sm:mx-4 shrink-0">
           <div class="text-center">
             <div class="text-4xl font-bold text-foreground">
               {homeScore} - {awayScore}
