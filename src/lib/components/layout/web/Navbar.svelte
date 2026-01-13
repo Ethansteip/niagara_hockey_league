@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Zap, User, Menu, ChevronRight, Calendar, NotebookPen, House, Wallpaper, UserPen } from '@lucide/svelte';
+	import { Zap, User, Menu, ChevronRight, ChartLine, Calendar, NotebookPen, House, Wallpaper, UserPen } from '@lucide/svelte';
 	import * as Sheet from '$lib/components/ui/sheet/index';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import NavUser from '$lib/components/layout/web/NavUser.svelte';
@@ -50,6 +50,10 @@
 					<Button variant="ghost" size="sm" href="/games/history">
 						<NotebookPen />
 						Game History
+					</Button>
+					<Button variant="ghost" size="sm" href="/player-stats">
+						<ChartLine />
+						Player Stats
 					</Button>
 				</nav>
 			</div>
@@ -105,6 +109,10 @@
 								<Button variant="ghost" class="w-full justify-start h-11" href="/games/history" onclick={closeMobileMenu}>
 									<NotebookPen class="size-4" />
 									Game History
+								</Button>
+								<Button variant="ghost" class="w-full justify-start h-11" href="/player-stats" onclick={closeMobileMenu}>
+									<ChartLine class="size-4" />
+									Player Stats
 								</Button>
 							</div>
 					</nav>

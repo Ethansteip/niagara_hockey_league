@@ -3,6 +3,7 @@
   import { Card, CardContent } from "$lib/components/ui/card";
   import Button from "$lib/components/ui/button/button.svelte";
   import Standings from "$lib/components/layout/web/Standings.svelte";
+  import PlayerStats from "$lib/components/layout/web/PlayerStats.svelte";
 
   let { data } = $props();
   let { games, teams } = $derived(data);
@@ -58,5 +59,6 @@
     </div>
 
     <Standings />
+    <PlayerStats limit={10} hideLink={false} />
   </div>
 </div>
