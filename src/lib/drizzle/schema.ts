@@ -17,17 +17,12 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { updated } from "$app/state";
 
 // =====================
 // ENUMS
 // =====================
-export const positionEnum = pgEnum("position_enum", [
-  "Goalie",
-  "Defence",
-  "Left-wing",
-  "Center",
-  "Right-wing",
-]);
+export const positionEnum = pgEnum("position_enum", ["player", "goalie"]);
 
 export const shotHandEnum = pgEnum("shot_hand_enum", ["L", "R"]);
 
@@ -59,6 +54,9 @@ const id = () => serial("id").primaryKey();
 const createdAt = () =>
   timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
+const updatedAt = () =>
+  timestamp("updated_at", { withTimezone: true }).notNull().defaultNow();
+
 // =====================
 // PROFILES (authenticated users - linked to Supabase Auth)
 // =====================
@@ -79,12 +77,11 @@ export const players = pgTable("players", {
   id: id(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  position: positionEnum(),
-  shoots: shotHandEnum("shoots"),
   profileId: integer("profile_id").references(() => profiles.id, {
     onDelete: "set null",
   }),
   createdAt: createdAt(),
+  updateAt: updatedAt(),
 });
 
 // =====================
@@ -207,9 +204,12 @@ export const rosters = pgTable(
       .references(() => players.id, { onDelete: "restrict" }),
     jerseyNumber: integer("jersey_number"),
     role: rosterRoleEnum("role").notNull().default("player"),
-    isCaptain: boolean("is_captain").notNull().default(false),
-    isAlternate: boolean("is_alternate").notNull().default(false),
+    goals: integer("goals").default(0),
+    assists: integer("assists").default(0),
+    points: integer("points").default(0),
+    pims: integer("penalty_minutes").default(0),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [
     {
@@ -278,41 +278,6 @@ export const games = pgTable(
 // =====================
 // STATS (split tables)
 // =====================
-export const playerGameStats = pgTable(
-  "player_game_stats",
-  {
-    id: id(),
-    gameId: integer("game_id")
-      .notNull()
-      .references(() => games.id, { onDelete: "cascade" }),
-    seasonId: integer("season_id")
-      .notNull()
-      .references(() => seasons.id, { onDelete: "cascade" }),
-    teamSeasonId: integer("team_season_id")
-      .notNull()
-      .references(() => teamSeasons.id, { onDelete: "cascade" }),
-    rosterId: integer("roster_id")
-      .notNull()
-      .references(() => rosters.id, { onDelete: "restrict" }),
-    goals: integer("goals").notNull().default(0),
-    assists: integer("assists").notNull().default(0),
-    shots: integer("shots").notNull().default(0),
-    pim: integer("pim").notNull().default(0),
-    isDressed: boolean("is_dressed").notNull().default(true),
-    isStarter: boolean("is_starter").notNull().default(false),
-    createdAt: createdAt(),
-  },
-  (t) => [
-    {
-      uniqGameRoster: uniqueIndex("player_stats_game_roster_uniq").on(
-        t.gameId,
-        t.rosterId
-      ),
-      idxSeason: index("player_stats_season_idx").on(t.seasonId),
-      idxTeamSeason: index("player_stats_teamseason_idx").on(t.teamSeasonId),
-    },
-  ]
-);
 
 export const goalieGameStats = pgTable(
   "goalie_game_stats",
@@ -412,7 +377,6 @@ export const seasonsRelations = relations(seasons, ({ one, many }) => ({
   divisions: many(divisions),
   teamSeasons: many(teamSeasons),
   games: many(games),
-  skaterStats: many(playerGameStats),
   goalieStats: many(goalieGameStats),
   standings: many(teamStandings),
 }));
@@ -445,7 +409,6 @@ export const teamSeasonsRelations = relations(teamSeasons, ({ one, many }) => ({
   rosters: many(rosters),
   homeGames: many(games, { relationName: "homeTeam" }),
   awayGames: many(games, { relationName: "awayTeam" }),
-  skaterStats: many(playerGameStats),
   goalieStats: many(goalieGameStats),
   standings: many(teamStandings),
 }));
@@ -463,7 +426,6 @@ export const rostersRelations = relations(rosters, ({ one, many }) => ({
     fields: [rosters.playerId],
     references: [players.id],
   }),
-  skaterStats: many(playerGameStats),
   goalieStats: many(goalieGameStats),
 }));
 
@@ -496,31 +458,8 @@ export const gamesRelations = relations(games, ({ one, many }) => ({
     references: [teamSeasons.id],
     relationName: "awayTeam",
   }),
-  skaterStats: many(playerGameStats),
   goalieStats: many(goalieGameStats),
 }));
-
-export const skaterGameStatsRelations = relations(
-  playerGameStats,
-  ({ one }) => ({
-    game: one(games, {
-      fields: [playerGameStats.gameId],
-      references: [games.id],
-    }),
-    season: one(seasons, {
-      fields: [playerGameStats.seasonId],
-      references: [seasons.id],
-    }),
-    teamSeason: one(teamSeasons, {
-      fields: [playerGameStats.teamSeasonId],
-      references: [teamSeasons.id],
-    }),
-    roster: one(rosters, {
-      fields: [playerGameStats.rosterId],
-      references: [rosters.id],
-    }),
-  })
-);
 
 export const goalieGameStatsRelations = relations(
   goalieGameStats,
@@ -582,8 +521,6 @@ export type Roster = typeof rosters.$inferSelect;
 export type NewRoster = typeof rosters.$inferInsert;
 export type Game = typeof games.$inferSelect;
 export type NewGame = typeof games.$inferInsert;
-export type SkaterGameStat = typeof playerGameStats.$inferSelect;
-export type NewSkaterGameStat = typeof playerGameStats.$inferInsert;
 export type GoalieGameStat = typeof goalieGameStats.$inferSelect;
 export type NewGoalieGameStat = typeof goalieGameStats.$inferInsert;
 export type TeamStanding = typeof teamStandings.$inferSelect;

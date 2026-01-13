@@ -1,0 +1,1 @@
+ALTER TABLE "rosters" ADD COLUMN "points" integer DEFAULT 0;
