@@ -9,8 +9,8 @@
 
   let { data } = $props();
   let { games } = $derived(data);
-  let statsData = $derived(await getPlayerStats());
-  let limitedStats = $derived(statsData.slice(0, 10));
+  let { stats, lastUpdated } = $derived(await getPlayerStats());
+  let limitedStats = $derived(stats.slice(0, 10));
   const columns = createColumns({ hidePointsSort: true });
 </script>
 
@@ -64,6 +64,6 @@
     </div>
 
     <Standings />
-    <PlayerStats data={limitedStats} {columns} hideLink={false}/>
+    <PlayerStats data={limitedStats} {columns} hideLink={false} hideSearch={true} {lastUpdated}/>
   </div>
 </div>

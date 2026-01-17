@@ -1,7 +1,7 @@
 import { query } from "$app/server";
 import { db } from "$lib/drizzle/index.js";
 import { rosters, players } from "$lib/drizzle/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, max } from "drizzle-orm";
 
 export const getPlayerStats = query(async () => {
   const stats = await db
@@ -19,5 +19,14 @@ export const getPlayerStats = query(async () => {
     .where(eq(rosters.role, "player"))
     .orderBy(desc(rosters.points));
 
-  return stats;
+  const [{ lastUpdated }] = await db
+    .select({
+      lastUpdated: max(rosters.updatedAt),
+    })
+    .from(rosters)
+    .where(eq(rosters.role, "player"));
+
+  console.log("Last Updated: ", lastUpdated);
+
+  return { stats, lastUpdated };
 });

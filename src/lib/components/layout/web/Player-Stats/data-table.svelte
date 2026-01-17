@@ -1,21 +1,27 @@
 <script lang="ts" generics="TData, TValue">
-  import { type ColumnDef, getCoreRowModel, getSortedRowModel, type SortingState } from "@tanstack/table-core";
+  import { type ColumnDef, getCoreRowModel, getFilteredRowModel, getSortedRowModel, type ColumnFiltersState, type SortingState } from "@tanstack/table-core";
   import {
     createSvelteTable,
     FlexRender
   } from "$lib/components/ui/data-table/index";
   import * as Table from "$lib/components/ui/table/index";
   import Button from "$lib/components/ui/button/button.svelte";
+  import Input from "$lib/components/ui/input/input.svelte";
+  import moment from 'moment';
 
   type DataTableProps<TData, TValue> = {
     columns: ColumnDef<TData, TValue>[];
     data: TData[],
     hideLink: boolean;
+    hideSearch: boolean;
+    lastUpdated: Date | null;
   };
 
-  let { data, columns, hideLink = true }: DataTableProps<TData, TValue> = $props();
+  let { data, columns, hideLink = true, hideSearch = false, lastUpdated }: DataTableProps<TData, TValue> = $props();
 
   let sorting = $state<SortingState>([]);
+  let columnFilters = $state<ColumnFiltersState>([]);
+  let relativeTime = $derived(moment(lastUpdated).fromNow());
 
   const table = createSvelteTable({
     get data() {
@@ -24,6 +30,7 @@
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: (updater) => {
       if (typeof updater === "function") {
         sorting = updater(sorting);
@@ -31,17 +38,45 @@
         sorting = updater;
       }
     },
+    onColumnFiltersChange: (updater) => {
+      if (typeof updater === "function") {
+        columnFilters = updater(columnFilters);
+      } else {
+        columnFilters = updater;
+      }
+    },
     state: {
       get sorting() {
         return sorting;
+      },
+      get columnFilters() {
+        return columnFilters;
       },
     },
   });
 </script>
 
 <section class="mb-20">
-<div class="text-left mt-5 mb-3">
-  <h1 class="text-3xl font-bold text-foreground">Player Stats</h1>
+<div class="flex items-center justify-between mt-5 mb-3">
+  <div>
+    <h1 class="text-3xl font-bold text-foreground">Player Stats</h1>
+    <span class="text-xs text-primary">Last updated {relativeTime}...</span>
+  </div>
+  {#if !hideSearch}
+    <div class="flex items-center py-4">
+      <Input
+        placeholder="Search by name..."
+        value={(table.getColumn("names")?.getFilterValue() as string) ?? ""}
+        onchange={(e) => {
+          table.getColumn("names")?.setFilterValue(e.currentTarget.value);
+        }}
+        oninput={(e) => {
+          table.getColumn("names")?.setFilterValue(e.currentTarget.value);
+        }}
+        class="w-80 hidden md:flex"
+      />
+    </div>
+  {/if}
 </div>
 <div class="">
   <Table.Root class="">

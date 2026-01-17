@@ -14,6 +14,7 @@ export const createColumns = (options?: {
   return [
     {
       accessorKey: "names",
+      accessorFn: (row) => `${row.firstName} ${row.lastName}`,
       header: "Name",
       cell: ({ row }) => {
         const { firstName, lastName } = row.original;
