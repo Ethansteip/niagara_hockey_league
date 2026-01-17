@@ -16,6 +16,7 @@ export const getPlayerStats = query(async () => {
     })
     .from(rosters)
     .innerJoin(players, eq(rosters.playerId, players.id))
+    .where(eq(rosters.role, "player"))
     .orderBy(desc(rosters.points));
 
   return stats;

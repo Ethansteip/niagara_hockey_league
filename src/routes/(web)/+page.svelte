@@ -3,10 +3,15 @@
   import { Card, CardContent } from "$lib/components/ui/card";
   import Button from "$lib/components/ui/button/button.svelte";
   import Standings from "$lib/components/layout/web/Standings.svelte";
-  import PlayerStats from "$lib/components/layout/web/PlayerStats.svelte";
+  import PlayerStats from "$lib/components/layout/web/Player-Stats/data-table.svelte";
+  import { createColumns } from "$lib/components/layout/web/Player-Stats/columns.js";
+  import { getPlayerStats } from "$lib/api/player-stats.remote";
 
   let { data } = $props();
-  let { games, teams } = $derived(data);
+  let { games } = $derived(data);
+  let statsData = $derived(await getPlayerStats());
+  let limitedStats = $derived(statsData.slice(0, 10));
+  const columns = createColumns({ hidePointsSort: true });
 </script>
 
 <div class="min-h-screen bg-background">
@@ -59,6 +64,6 @@
     </div>
 
     <Standings />
-    <PlayerStats limit={10} hideLink={false} />
+    <PlayerStats data={limitedStats} {columns} hideLink={false}/>
   </div>
 </div>

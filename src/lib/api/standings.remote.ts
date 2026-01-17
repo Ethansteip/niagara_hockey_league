@@ -8,7 +8,7 @@ export const getStandings = query(async () => {
     .select()
     .from(teamStandings)
     .innerJoin(teams, eq(teamStandings.teamId, teams.id))
-    .orderBy(desc(teamStandings.points));
+    .orderBy(desc(teamStandings.points), desc(teamStandings.wins));
 
   return standings;
 });
