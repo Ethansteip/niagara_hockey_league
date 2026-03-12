@@ -8,8 +8,8 @@
  const standings = [
   {
     teams: {
-      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/leafs-logo.png",
-      name: "Leafs",
+      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/wings-logo.png",
+      name: "Wings",
     },
     team_standings: {
       wins: 1,
@@ -18,10 +18,10 @@
       points: 2
     }
   },
-  {
+   {
     teams: {
-      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/wings-logo.png",
-      name: "Wings",
+      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/leafs-logo.png",
+      name: "Leafs",
     },
     team_standings: {
       wins: 1,
