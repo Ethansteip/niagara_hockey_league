@@ -3,6 +3,7 @@
   import { Card, CardContent } from "$lib/components/ui/card";
   import Button from "$lib/components/ui/button/button.svelte";
   import Standings from "$lib/components/layout/web/Standings.svelte";
+  import Playoffs from "$lib/components/layout/web/Playoffs.svelte";
   import PlayerStats from "$lib/components/layout/web/Player-Stats/data-table.svelte";
   import { createColumns } from "$lib/components/layout/web/Player-Stats/columns.js";
   import { getPlayerStats } from "$lib/api/player-stats.remote";
@@ -62,7 +63,7 @@
     <div class="flex w-full justify-end">
       <Button variant="link" href="/games">View All Games</Button>
     </div>
-
+    <Playoffs />
     <Standings />
     <PlayerStats data={limitedStats} {columns} hideLink={false} hideSearch={true} {lastUpdated}/>
   </div>

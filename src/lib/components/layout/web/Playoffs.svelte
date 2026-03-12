@@ -1,11 +1,9 @@
 <script lang="ts">
  import { Button } from "$lib/components/ui/button/index.js";
  import * as Card from "$lib/components/ui/card/index.js";
- import { getStandings } from "$lib/api/standings.remote";
  import { Avatar, AvatarFallback, AvatarImage } from "$lib/components/ui/avatar";
  import { cn, getTeamInitials } from "$lib/utils";
 
- // const standings = $derived(await getStandings());
 
  const standings = [
   {
@@ -14,10 +12,10 @@
       name: "Leafs",
     },
     team_standings: {
-      wins: 16,
-      losses: 4,
-      ties: 3,
-      points: 35
+      wins: 1,
+      losses: 0,
+      ties: 0,
+      points: 2
     }
   },
   {
@@ -26,10 +24,10 @@
       name: "Wings",
     },
     team_standings: {
-      wins: 10,
-      losses: 10,
-      ties: 3,
-      points: 23
+      wins: 1,
+      losses: 0,
+      ties: 0,
+      points: 2
     }
   },
   {
@@ -38,10 +36,10 @@
       name: "Habs",
     },
     team_standings: {
-      wins: 8,
-      losses: 14,
-      ties: 1,
-      points: 17
+      wins: 0,
+      losses: 1,
+      ties: 0,
+      points: 0
     }
   },
   {
@@ -50,10 +48,10 @@
       name: "Bruins",
     },
     team_standings: {
-      wins: 7,
-      losses: 13,
-      ties: 3,
-      points: 17
+      wins: 0,
+      losses: 1,
+      ties: 0,
+      points: 0
     }
   }
  ]
@@ -79,19 +77,19 @@
 </script>
 
 <div class="text-left my-5">
-  <h1 class="text-3xl font-bold text-foreground mb-2">Regular Season</h1>
+  <h1 class="text-3xl font-bold text-foreground mb-2">Playoffs</h1>
 </div>
 
 <Card.Root class="w-full">
  <Card.Content class="w-full flex flex-col gap-3 p-6">
   {#each standings as standing, i}
-    <div class={cn("overflow-hidden rounded-lg border border-border bg-card p-4 transition-all hover:shadow-lg", getStandingStyles(i))}>
+    <div class={cn("overflow-hidden rounded-lg border border-border bg-card p-4 transition-all hover:shadow-lg")}>
 
       <div class="flex items-center justify-between relative z-10">
         <!-- Left: Rank & Team -->
         <div class="flex items-center gap-4">
           <!-- Rank Badge -->
-          <div class="flex h-12 w-12 items-center justify-center rounded-full shrink-0 bg-muted text-foreground {i === 0 ? ' ring-2 ring-primary' : ''} {i === 1 ? ' ring-2 ring-zinc-300/30' : ''} {i === 2 ? ' ring-2 ring-amber-500/30' : ''}">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full shrink-0 bg-muted text-foreground">
               <span class="text-xl font-bold">{i + 1}</span>
           </div>
 
