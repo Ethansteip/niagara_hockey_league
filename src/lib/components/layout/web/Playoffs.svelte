@@ -15,7 +15,7 @@
       wins: 2,
       losses: 0,
       ties: 0,
-      points: 2
+      points: 4
     }
   },
   {
@@ -39,7 +39,7 @@
       wins: 1,
       losses: 1,
       ties: 0,
-      points: 0
+      points: 2
     }
   },
     {
