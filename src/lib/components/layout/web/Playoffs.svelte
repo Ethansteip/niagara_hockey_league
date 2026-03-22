@@ -6,6 +6,18 @@
 
 
  const standings = [
+   {
+    teams: {
+      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/leafs-logo.png",
+      name: "Leafs",
+    },
+    team_standings: {
+      wins: 2,
+      losses: 0,
+      ties: 0,
+      points: 2
+    }
+  },
   {
     teams: {
       logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/wings-logo.png",
@@ -13,33 +25,9 @@
     },
     team_standings: {
       wins: 1,
-      losses: 0,
-      ties: 0,
-      points: 2
-    }
-  },
-   {
-    teams: {
-      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/leafs-logo.png",
-      name: "Leafs",
-    },
-    team_standings: {
-      wins: 1,
-      losses: 0,
-      ties: 0,
-      points: 2
-    }
-  },
-  {
-    teams: {
-      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/habs-logo.png",
-      name: "Habs",
-    },
-    team_standings: {
-      wins: 0,
       losses: 1,
       ties: 0,
-      points: 0
+      points: 2
     }
   },
   {
@@ -48,8 +36,20 @@
       name: "Bruins",
     },
     team_standings: {
-      wins: 0,
+      wins: 1,
       losses: 1,
+      ties: 0,
+      points: 0
+    }
+  },
+    {
+    teams: {
+      logoUrl: "https://ldvojuueriraazjpzggg.supabase.co/storage/v1/object/public/logos/habs-logo.png",
+      name: "Habs",
+    },
+    team_standings: {
+      wins: 0,
+      losses: 2,
       ties: 0,
       points: 0
     }
