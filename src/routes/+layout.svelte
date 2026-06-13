@@ -5,7 +5,7 @@
   import { goto, invalidate } from '$app/navigation'
   import { onMount } from 'svelte'
 
-  let { data, children } = $props();
+  let { children } = $props();
 
   /**
    * We use the $derived rune so that
@@ -17,40 +17,40 @@
    * for us during invalidation. Otherwise we'd be
    * initializing a client during every invalidation.
    */
-  let { supabase, session } = $derived(data);
-  let profile = $derived(data.profile);
+  // let { supabase, session } = $derived(data);
+  // let profile = $derived(data.profile);
 
-  onMount(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, _session) => {
-      /**
-       * Instead of invalidating, you could call
-       * `session = _session` below and you wouldn't
-       * necessarily need to call `invalidate`.
-       */
-      if (_session?.expires_at !== session?.expires_at) {
-        /**
-         * We typically only call `signOut()` on the server side,
-         * but if `_session` is null - from the user
-         * being deleted or the supabase client
-         * failing to refresh a token, for example -
-         * the SIGNED_OUT event is fired, and
-         * calling `goto` ensures the user's screen 
-         * reflects that they're logged out.
-         * Note that the invalidation still happens.
-         */
-        if (event === 'SIGNED_OUT') await goto('/');
-        invalidate('supabase:auth')
-      }
-    })
+  // onMount(() => {
+  //   const {
+  //     data: { subscription },
+  //   } = supabase.auth.onAuthStateChange(async (event, _session) => {
+  //     /**
+  //      * Instead of invalidating, you could call
+  //      * `session = _session` below and you wouldn't
+  //      * necessarily need to call `invalidate`.
+  //      */
+  //     if (_session?.expires_at !== session?.expires_at) {
+  //       /**
+  //        * We typically only call `signOut()` on the server side,
+  //        * but if `_session` is null - from the user
+  //        * being deleted or the supabase client
+  //        * failing to refresh a token, for example -
+  //        * the SIGNED_OUT event is fired, and
+  //        * calling `goto` ensures the user's screen 
+  //        * reflects that they're logged out.
+  //        * Note that the invalidation still happens.
+  //        */
+  //       if (event === 'SIGNED_OUT') await goto('/');
+  //       invalidate('supabase:auth')
+  //     }
+  //   })
 
-    return () => subscription.unsubscribe();
-  })
+  //   return () => subscription.unsubscribe();
+  // })
 </script>
 
-<Toaster />
-<Navbar {session} {profile}/>
+<!-- <Toaster />
+<Navbar {session} {profile}/> -->
 <main class="w-full h-[calc(100vh-3.8rem)]">
   {@render children?.()}
 </main>
