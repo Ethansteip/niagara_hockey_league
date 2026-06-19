@@ -2,7 +2,7 @@ name: Deploy to Railway staging environment
 
 on:
   push:
-    branches: [staging]
+    branches: [main]
 
 jobs:
   deploy:
