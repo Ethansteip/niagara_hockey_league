@@ -10,14 +10,15 @@
 
 	let { data } = $props();
 
-	const teams = data.teams;
-	let teamsSelectData = teams.map((team) => {
-		return { value: team.name, label: team.name, img_url: team.logoUrl }
-	});
+	const teams = $derived(data.teams);
 
-	let teamCode = data.teamCode ?? "";
-	let preSelectedTeam = data.preSelectedTeam
-	let selectedTeam = $state(preSelectedTeam || "");
+	let teamsSelectData = $derived(teams.map((team) => {
+		return { value: team.name, label: team.name, img_url: team.logoUrl }
+	}));
+
+	let teamCode = $derived(data.teamCode ?? "");
+	let preSelectedTeam = $derived(data.preSelectedTeam)
+	let selectedTeam = $derived(preSelectedTeam || "");
   let password = $state('');
   let confirmPassword = $state('');
 

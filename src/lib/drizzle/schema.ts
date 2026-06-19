@@ -51,6 +51,7 @@ export const rosterRoleEnum = pgEnum("roster_role_enum", ["player", "goalie"]);
 
 // Helpers
 const id = () => serial("id").primaryKey();
+
 const createdAt = () =>
   timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
@@ -109,10 +110,10 @@ export const seasons = pgTable(
     {
       uniqLeagueName: uniqueIndex("seasons_league_name_uniq").on(
         t.leagueId,
-        t.name
+        t.name,
       ),
     },
-  ]
+  ],
 );
 
 export const divisions = pgTable(
@@ -129,10 +130,10 @@ export const divisions = pgTable(
     {
       uniqSeasonName: uniqueIndex("divisions_season_name_uniq").on(
         t.seasonId,
-        t.name
+        t.name,
       ),
     },
-  ]
+  ],
 );
 
 export const teams = pgTable(
@@ -152,10 +153,10 @@ export const teams = pgTable(
     {
       uniqLeagueName: uniqueIndex("teams_league_name_uniq").on(
         t.leagueId,
-        t.name
+        t.name,
       ),
     },
-  ]
+  ],
 );
 
 export const teamSeasons = pgTable(
@@ -177,10 +178,10 @@ export const teamSeasons = pgTable(
     {
       uniqTeamSeason: uniqueIndex("team_seasons_team_season_uniq").on(
         t.teamId,
-        t.seasonId
+        t.seasonId,
       ),
     },
-  ]
+  ],
 );
 
 export const arenas = pgTable("arenas", {
@@ -215,14 +216,14 @@ export const rosters = pgTable(
     {
       uniqRoster: uniqueIndex("rosters_teamseason_player_uniq").on(
         t.teamSeasonId,
-        t.playerId
+        t.playerId,
       ),
       idxTeamSeasonPlayer: index("rosters_teamseason_player_idx").on(
         t.teamSeasonId,
-        t.playerId
+        t.playerId,
       ),
     },
-  ]
+  ],
 );
 
 // =====================
@@ -269,10 +270,10 @@ export const games = pgTable(
       idxSchedule: index("games_schedule_idx").on(
         t.seasonId,
         t.divisionId,
-        t.startsAt
+        t.startsAt,
       ),
     },
-  ]
+  ],
 );
 
 // =====================
@@ -307,12 +308,12 @@ export const goalieGameStats = pgTable(
     {
       uniqGameRoster: uniqueIndex("goalie_stats_game_roster_uniq").on(
         t.gameId,
-        t.rosterId
+        t.rosterId,
       ),
       idxSeason: index("goalie_stats_season_idx").on(t.seasonId),
       idxTeamSeason: index("goalie_stats_teamseason_idx").on(t.teamSeasonId),
     },
-  ]
+  ],
 );
 
 // =====================
@@ -350,15 +351,15 @@ export const teamStandings = pgTable(
       uniqStanding: uniqueIndex("team_standings_uniq").on(
         t.seasonId,
         t.divisionId,
-        t.teamSeasonId
+        t.teamSeasonId,
       ),
       idxTable: index("team_standings_table_idx").on(
         t.seasonId,
         t.divisionId,
-        t.points
+        t.points,
       ),
     },
-  ]
+  ],
 );
 
 // =====================
@@ -480,7 +481,7 @@ export const goalieGameStatsRelations = relations(
       fields: [goalieGameStats.rosterId],
       references: [rosters.id],
     }),
-  })
+  }),
 );
 
 export const teamStandingsRelations = relations(teamStandings, ({ one }) => ({

@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "db-generate": "npx drizzle-kit generate",
-    "db-migrate": "npx drizzle-kit migrate",
+    "db-generate": "npx drizzle-kit generate --config=src/lib/drizzle/drizzle.config.ts",
+    "db-migrate": "npx drizzle-kit migrate --config=src/lib/drizzle/drizzle.config.ts",
     "build": "vite build",
     "start": "node build/index.js",
     "preview": "vite preview",

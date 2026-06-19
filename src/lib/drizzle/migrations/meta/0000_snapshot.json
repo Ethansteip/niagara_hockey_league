@@ -1,5 +1,5 @@
 {
-  "id": "046b23e0-e6af-437b-b64d-f4e2e4aad7e1",
+  "id": "c7cf590a-c08d-41f1-b140-e2932d88f54c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -128,8 +128,22 @@
           "primaryKey": false,
           "notNull": true
         },
-        "game_number": {
-          "name": "game_number",
+        "home_team_id": {
+          "name": "home_team_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "away_team_id": {
+          "name": "away_team_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "week_number": {
+          "name": "week_number",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -222,6 +236,32 @@
           "tableTo": "divisions",
           "columnsFrom": [
             "division_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "games_home_team_id_teams_id_fk": {
+          "name": "games_home_team_id_teams_id_fk",
+          "tableFrom": "games",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "home_team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "games_away_team_id_teams_id_fk": {
+          "name": "games_away_team_id_teams_id_fk",
+          "tableFrom": "games",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "away_team_id"
           ],
           "columnsTo": [
             "id"
@@ -452,151 +492,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.player_game_stats": {
-      "name": "player_game_stats",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "game_id": {
-          "name": "game_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "season_id": {
-          "name": "season_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "team_season_id": {
-          "name": "team_season_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "roster_id": {
-          "name": "roster_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "goals": {
-          "name": "goals",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "assists": {
-          "name": "assists",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "shots": {
-          "name": "shots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "pim": {
-          "name": "pim",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "is_dressed": {
-          "name": "is_dressed",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
-        "is_starter": {
-          "name": "is_starter",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "player_game_stats_game_id_games_id_fk": {
-          "name": "player_game_stats_game_id_games_id_fk",
-          "tableFrom": "player_game_stats",
-          "tableTo": "games",
-          "columnsFrom": [
-            "game_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "player_game_stats_season_id_seasons_id_fk": {
-          "name": "player_game_stats_season_id_seasons_id_fk",
-          "tableFrom": "player_game_stats",
-          "tableTo": "seasons",
-          "columnsFrom": [
-            "season_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "player_game_stats_team_season_id_team_seasons_id_fk": {
-          "name": "player_game_stats_team_season_id_team_seasons_id_fk",
-          "tableFrom": "player_game_stats",
-          "tableTo": "team_seasons",
-          "columnsFrom": [
-            "team_season_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "player_game_stats_roster_id_rosters_id_fk": {
-          "name": "player_game_stats_roster_id_rosters_id_fk",
-          "tableFrom": "player_game_stats",
-          "tableTo": "rosters",
-          "columnsFrom": [
-            "roster_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.players": {
       "name": "players",
       "schema": "",
@@ -619,41 +514,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "preferred_name": {
-          "name": "preferred_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "phone": {
-          "name": "phone",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "birthdate": {
-          "name": "birthdate",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "position": {
-          "name": "position",
-          "type": "position_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "shoots": {
-          "name": "shoots",
-          "type": "shot_hand_enum",
-          "typeSchema": "public",
+        "profile_id": {
+          "name": "profile_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -663,12 +526,99 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "players_profile_id_profiles_id_fk": {
+          "name": "players_profile_id_profiles_id_fk",
+          "tableFrom": "players",
+          "tableTo": "profiles",
+          "columnsFrom": [
+            "profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.profiles": {
+      "name": "profiles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "profile_role_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'player'"
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "profiles_user_id_unique": {
+          "name": "profiles_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -709,22 +659,43 @@
           "notNull": true,
           "default": "'player'"
         },
-        "is_captain": {
-          "name": "is_captain",
-          "type": "boolean",
+        "goals": {
+          "name": "goals",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": false
+          "notNull": false,
+          "default": 0
         },
-        "is_alternate": {
-          "name": "is_alternate",
-          "type": "boolean",
+        "assists": {
+          "name": "assists",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": false
+          "notNull": false,
+          "default": 0
+        },
+        "points": {
+          "name": "points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "penalty_minutes": {
+          "name": "penalty_minutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
         },
         "created_at": {
           "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
@@ -942,29 +913,43 @@
           "primaryKey": false,
           "notNull": true
         },
-        "gp": {
-          "name": "gp",
+        "team_id": {
+          "name": "team_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "games_played": {
+          "name": "games_played",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 0
         },
-        "w": {
-          "name": "w",
+        "wins": {
+          "name": "wins",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 0
         },
-        "l": {
-          "name": "l",
+        "ties": {
+          "name": "ties",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 0
         },
-        "otl": {
-          "name": "otl",
+        "losses": {
+          "name": "losses",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "overtime_losses": {
+          "name": "overtime_losses",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -977,15 +962,15 @@
           "notNull": true,
           "default": 0
         },
-        "gf": {
-          "name": "gf",
+        "goals_for": {
+          "name": "goals_for",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 0
         },
-        "ga": {
-          "name": "ga",
+        "goals_against": {
+          "name": "goals_against",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -1039,6 +1024,19 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "team_standings_team_id_teams_id_fk": {
+          "name": "team_standings_team_id_teams_id_fk",
+          "tableFrom": "team_standings",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1071,6 +1069,18 @@
         },
         "short_name": {
           "name": "short_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "logo_url": {
+          "name": "logo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "code": {
+          "name": "code",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1132,11 +1142,17 @@
       "name": "position_enum",
       "schema": "public",
       "values": [
-        "G",
-        "D",
-        "LW",
-        "C",
-        "RW"
+        "player",
+        "goalie"
+      ]
+    },
+    "public.profile_role_enum": {
+      "name": "profile_role_enum",
+      "schema": "public",
+      "values": [
+        "player",
+        "captain",
+        "admin"
       ]
     },
     "public.roster_role_enum": {
