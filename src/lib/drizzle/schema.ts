@@ -1,8 +1,3 @@
-// drizzle-schema.ts
-// Drizzle ORM schema for a simplified men's hockey league app on Supabase/Postgres
-// Matches the latest SQL you approved: leagues/seasons/divisions/teams/team_seasons,
-// arenas, players, rosters, games, skater_game_stats, goalie_game_stats, team_standings.
-
 import {
   pgTable,
   text,
@@ -14,18 +9,10 @@ import {
   index,
   uniqueIndex,
   serial,
-  uuid,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { updated } from "$app/state";
+import { sql } from "drizzle-orm";
 
-// =====================
-// ENUMS
-// =====================
-export const positionEnum = pgEnum("position_enum", ["player", "goalie"]);
-
-export const shotHandEnum = pgEnum("shot_hand_enum", ["L", "R"]);
-
+/* Enums */
 export const gameStatusEnum = pgEnum("game_status_enum", [
   "scheduled",
   "in_progress",
@@ -41,15 +28,14 @@ export const decidedInEnum = pgEnum("decided_in_enum", [
   "shootout",
 ]);
 
-export const profileRoleEnum = pgEnum("profile_role_enum", [
-  "player",
-  "captain",
-  "admin",
+export const playerRoleEnum = pgEnum("player_role_enum", ["player", "goalie"]);
+
+export const gameTypeEnum = pgEnum("game_type_enum", [
+  "regular season",
+  "playoff",
 ]);
 
-export const rosterRoleEnum = pgEnum("roster_role_enum", ["player", "goalie"]);
-
-// Helpers
+/* Helpers */
 const id = () => serial("id").primaryKey();
 
 const createdAt = () =>
@@ -58,107 +44,58 @@ const createdAt = () =>
 const updatedAt = () =>
   timestamp("updated_at", { withTimezone: true }).notNull().defaultNow();
 
-// =====================
-// PROFILES (authenticated users - linked to Supabase Auth)
-// =====================
-export const profiles = pgTable("profiles", {
-  id: id(),
-  userId: uuid("user_id").notNull().unique(),
-  email: text("email").default("").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  avatarUrl: text("avatar_url"),
-  role: profileRoleEnum("role").notNull().default("player"),
-});
-
-// =====================
-// PLAYERS (non-authenticated player data - for historical/imported players)
-// =====================
+/* Players */
 export const players = pgTable("players", {
   id: id(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  profileId: integer("profile_id").references(() => profiles.id, {
-    onDelete: "set null",
-  }),
+  role: playerRoleEnum("role").notNull().default("player"),
   createdAt: createdAt(),
-  updateAt: updatedAt(),
+  updatedAt: updatedAt(),
 });
 
-// =====================
-// CORE ENTITIES
-// =====================
-export const leagues = pgTable("leagues", {
-  id: id(),
-  name: text("name").notNull(),
-  createdAt: createdAt(),
-});
-
+/* Seasons */
 export const seasons = pgTable(
   "seasons",
   {
     id: id(),
-    leagueId: integer("league_id")
-      .notNull()
-      .references(() => leagues.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    startsOn: date("starts_on").notNull(),
-    endsOn: date("ends_on").notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    active: boolean("active").notNull().default(false),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [
     {
-      uniqLeagueName: uniqueIndex("seasons_league_name_uniq").on(
-        t.leagueId,
-        t.name,
-      ),
+      uniqueSeasonName: uniqueIndex("unique_season_name").on(t.name),
+      uniqueActiveSeason: uniqueIndex("unique_active_season")
+        .on(t.active)
+        .where(sql`active = true`),
     },
   ],
 );
 
-export const divisions = pgTable(
-  "divisions",
-  {
-    id: id(),
-    seasonId: integer("season_id")
-      .notNull()
-      .references(() => seasons.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    createdAt: createdAt(),
-  },
-  (t) => [
-    {
-      uniqSeasonName: uniqueIndex("divisions_season_name_uniq").on(
-        t.seasonId,
-        t.name,
-      ),
-    },
-  ],
-);
-
+/* Teams */
 export const teams = pgTable(
   "teams",
   {
     id: id(),
-    leagueId: integer("league_id")
-      .notNull()
-      .references(() => leagues.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     shortName: text("short_name"),
     logoUrl: text("logo_url"),
-    code: text(),
+    code: text("code"),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [
     {
-      uniqLeagueName: uniqueIndex("teams_league_name_uniq").on(
-        t.leagueId,
-        t.name,
-      ),
+      uniqueTeamName: uniqueIndex("unique_team_name").on(t.name),
     },
   ],
 );
 
+/* Team Seasons */
 export const teamSeasons = pgTable(
   "team_seasons",
   {
@@ -169,14 +106,12 @@ export const teamSeasons = pgTable(
     seasonId: integer("season_id")
       .notNull()
       .references(() => seasons.id, { onDelete: "cascade" }),
-    divisionId: integer("division_id")
-      .notNull()
-      .references(() => divisions.id, { onDelete: "cascade" }),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [
     {
-      uniqTeamSeason: uniqueIndex("team_seasons_team_season_uniq").on(
+      uniqTeamSeason: uniqueIndex("team_seasons_team_season_unique").on(
         t.teamId,
         t.seasonId,
       ),
@@ -184,15 +119,11 @@ export const teamSeasons = pgTable(
   ],
 );
 
-export const arenas = pgTable("arenas", {
-  id: id(),
-  name: text("name").notNull(),
-  address: text("address"),
-  city: text("city"),
-  province: text("province"),
-  createdAt: createdAt(),
-});
-
+/*
+ * -- Rosters --
+ * Used to track players assigned to teams
+ * over multiple seasons.
+ */
 export const rosters = pgTable(
   "rosters",
   {
@@ -204,21 +135,12 @@ export const rosters = pgTable(
       .notNull()
       .references(() => players.id, { onDelete: "restrict" }),
     jerseyNumber: integer("jersey_number"),
-    role: rosterRoleEnum("role").notNull().default("player"),
-    goals: integer("goals").default(0),
-    assists: integer("assists").default(0),
-    points: integer("points").default(0),
-    pims: integer("penalty_minutes").default(0),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (t) => [
     {
-      uniqRoster: uniqueIndex("rosters_teamseason_player_uniq").on(
-        t.teamSeasonId,
-        t.playerId,
-      ),
-      idxTeamSeasonPlayer: index("rosters_teamseason_player_idx").on(
+      uniqueRoster: uniqueIndex("rosters_teamseason_player_unique").on(
         t.teamSeasonId,
         t.playerId,
       ),
@@ -226,9 +148,7 @@ export const rosters = pgTable(
   ],
 );
 
-// =====================
-// GAMES / SCHEDULING
-// =====================
+/* Games */
 export const games = pgTable(
   "games",
   {
@@ -236,22 +156,14 @@ export const games = pgTable(
     seasonId: integer("season_id")
       .notNull()
       .references(() => seasons.id, { onDelete: "cascade" }),
-    divisionId: integer("division_id")
-      .notNull()
-      .references(() => divisions.id, { onDelete: "cascade" }),
     homeTeamId: integer("home_team_id")
       .notNull()
-      .default(1)
       .references(() => teams.id, { onDelete: "cascade" }),
     awayTeamId: integer("away_team_id")
       .notNull()
-      .default(1)
       .references(() => teams.id, { onDelete: "cascade" }),
     weekNumber: integer("week_number"),
-    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
-    arenaId: integer("arena_id").references(() => arenas.id, {
-      onDelete: "set null",
-    }),
+    startDate: timestamp("start_date", { withTimezone: true }).notNull(),
     homeTeamSeasonId: integer("home_team_season_id")
       .notNull()
       .references(() => teamSeasons.id, { onDelete: "restrict" }),
@@ -259,276 +171,150 @@ export const games = pgTable(
       .notNull()
       .references(() => teamSeasons.id, { onDelete: "restrict" }),
     status: gameStatusEnum("status").notNull().default("scheduled"),
+    gameType: gameTypeEnum("game_type").notNull().default("regular season"),
     homeScore: integer("home_score").notNull().default(0),
     awayScore: integer("away_score").notNull().default(0),
     decidedIn: decidedInEnum("decided_in"),
     notes: text("notes"),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [
     {
-      idxSchedule: index("games_schedule_idx").on(
-        t.seasonId,
-        t.divisionId,
-        t.startsAt,
-      ),
+      idxSchedule: index("games_schedule_idx").on(t.seasonId, t.startDate),
     },
   ],
 );
 
-// =====================
-// STATS (split tables)
-// =====================
-
-export const goalieGameStats = pgTable(
-  "goalie_game_stats",
+/*
+ * -- Goalie Games --
+ * Tracks which goalie played in which game.
+ * Goals against is derived from games.homeScore / games.awayScore
+ * using teamId to determine which side of the ice the goalie played for.
+ */
+export const goalieGames = pgTable(
+  "goalies_games",
   {
     id: id(),
+    playerId: integer("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "cascade" }),
     gameId: integer("game_id")
       .notNull()
       .references(() => games.id, { onDelete: "cascade" }),
-    seasonId: integer("season_id")
+    teamId: integer("team_id")
       .notNull()
-      .references(() => seasons.id, { onDelete: "cascade" }),
-    teamSeasonId: integer("team_season_id")
-      .notNull()
-      .references(() => teamSeasons.id, { onDelete: "cascade" }),
-    rosterId: integer("roster_id")
-      .notNull()
-      .references(() => rosters.id, { onDelete: "restrict" }),
-    saves: integer("saves").notNull().default(0),
-    shotsAgainst: integer("shots_against").notNull().default(0),
-    goalsAgainst: integer("goals_against").notNull().default(0),
-    minutesPlayed: integer("minutes_played").notNull().default(0),
-    isDressed: boolean("is_dressed").notNull().default(true),
-    isStarter: boolean("is_starter").notNull().default(false),
-    createdAt: createdAt(),
+      .references(() => teams.id, { onDelete: "restrict" }),
   },
   (t) => [
     {
-      uniqGameRoster: uniqueIndex("goalie_stats_game_roster_uniq").on(
+      idxGoalieGames: index("goalie_games_idx").on(t.playerId, t.gameId),
+      uniqueGoalieGame: uniqueIndex("goalie_games_unique").on(
+        t.playerId,
         t.gameId,
-        t.rosterId,
       ),
-      idxSeason: index("goalie_stats_season_idx").on(t.seasonId),
-      idxTeamSeason: index("goalie_stats_teamseason_idx").on(t.teamSeasonId),
     },
   ],
 );
 
-// =====================
-// STANDINGS
-// =====================
-export const teamStandings = pgTable(
-  "team_standings",
+/* Team Standings */
+export const standings = pgTable(
+  "standings",
   {
     id: id(),
     seasonId: integer("season_id")
       .notNull()
       .references(() => seasons.id, { onDelete: "cascade" }),
-    divisionId: integer("division_id")
-      .notNull()
-      .references(() => divisions.id, { onDelete: "cascade" }),
     teamSeasonId: integer("team_season_id")
       .notNull()
       .references(() => teamSeasons.id, { onDelete: "cascade" }),
     teamId: integer("team_id")
       .notNull()
-      .references(() => teams.id, { onDelete: "cascade" })
-      .default(1),
-    gamesPlayed: integer("games_played").notNull().default(0),
-    wins: integer("wins").notNull().default(0),
-    ties: integer("ties").notNull().default(0),
-    losses: integer("losses").notNull().default(0),
-    overtimeLosses: integer("overtime_losses").notNull().default(0),
-    points: integer("points").notNull().default(0),
-    goalsFor: integer("goals_for").notNull().default(0),
-    goalsAgainst: integer("goals_against").notNull().default(0),
+      .references(() => teams.id, { onDelete: "cascade" }),
+    regularSeasonGamesPlayed: integer("regular_season_games_played")
+      .notNull()
+      .default(0),
+    regularSeasonWins: integer("regular_season_wins").notNull().default(0),
+    regularSeasonTies: integer("regular_season_ties").notNull().default(0),
+    regularSeasonLosses: integer("regular_season_losses").notNull().default(0),
+    regularSeasonPoints: integer("regular_season_points").notNull().default(0),
+    regularSeasonGoalsFor: integer("regular_season_goals_for")
+      .notNull()
+      .default(0),
+    regularSeasonGoalsAgainst: integer("regular_season_goals_against")
+      .notNull()
+      .default(0),
+    playoffGamesPlayed: integer("playoff_games_played").notNull().default(0),
+    playoffWins: integer("playoff_wins").notNull().default(0),
+    playoffTies: integer("playoff_ties").notNull().default(0),
+    playoffLosses: integer("playoff_losses").notNull().default(0),
+    playoffPoints: integer("playoff_points").notNull().default(0),
+    playoffGoalsFor: integer("playoff_goals_for").notNull().default(0),
+    playoffGoalsAgainst: integer("playoff_goals_against").notNull().default(0),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [
     {
-      uniqStanding: uniqueIndex("team_standings_uniq").on(
+      uniqueStanding: uniqueIndex("team_standings_unique").on(
         t.seasonId,
-        t.divisionId,
         t.teamSeasonId,
       ),
-      idxTable: index("team_standings_table_idx").on(
+      idxRegularSeasonPoints: index("regular_season_points_idx").on(
         t.seasonId,
-        t.divisionId,
-        t.points,
+        t.regularSeasonPoints,
+      ),
+      idxPlayoffPoints: index("playoff_points_idx").on(
+        t.seasonId,
+        t.playoffPoints,
       ),
     },
   ],
 );
 
-// =====================
-// RELATIONS (optional but handy for joins & type inference)
-// =====================
-export const leaguesRelations = relations(leagues, ({ many }) => ({
-  seasons: many(seasons),
-  teams: many(teams),
-}));
-
-export const seasonsRelations = relations(seasons, ({ one, many }) => ({
-  league: one(leagues, {
-    fields: [seasons.leagueId],
-    references: [leagues.id],
-  }),
-  divisions: many(divisions),
-  teamSeasons: many(teamSeasons),
-  games: many(games),
-  goalieStats: many(goalieGameStats),
-  standings: many(teamStandings),
-}));
-
-export const divisionsRelations = relations(divisions, ({ one, many }) => ({
-  season: one(seasons, {
-    fields: [divisions.seasonId],
-    references: [seasons.id],
-  }),
-  teamSeasons: many(teamSeasons),
-  games: many(games),
-  standings: many(teamStandings),
-}));
-
-export const teamsRelations = relations(teams, ({ one, many }) => ({
-  league: one(leagues, { fields: [teams.leagueId], references: [leagues.id] }),
-  teamSeasons: many(teamSeasons),
-}));
-
-export const teamSeasonsRelations = relations(teamSeasons, ({ one, many }) => ({
-  team: one(teams, { fields: [teamSeasons.teamId], references: [teams.id] }),
-  season: one(seasons, {
-    fields: [teamSeasons.seasonId],
-    references: [seasons.id],
-  }),
-  division: one(divisions, {
-    fields: [teamSeasons.divisionId],
-    references: [divisions.id],
-  }),
-  rosters: many(rosters),
-  homeGames: many(games, { relationName: "homeTeam" }),
-  awayGames: many(games, { relationName: "awayTeam" }),
-  goalieStats: many(goalieGameStats),
-  standings: many(teamStandings),
-}));
-
-export const arenasRelations = relations(arenas, ({ many }) => ({
-  games: many(games),
-}));
-
-export const rostersRelations = relations(rosters, ({ one, many }) => ({
-  teamSeason: one(teamSeasons, {
-    fields: [rosters.teamSeasonId],
-    references: [teamSeasons.id],
-  }),
-  player: one(players, {
-    fields: [rosters.playerId],
-    references: [players.id],
-  }),
-  goalieStats: many(goalieGameStats),
-}));
-
-export const playersRelations = relations(players, ({ one, many }) => ({
-  rosters: many(rosters),
-  profile: one(profiles, {
-    fields: [players.profileId],
-    references: [profiles.id],
-  }),
-}));
-
-export const profilesRelations = relations(profiles, ({ many }) => ({
-  players: many(players),
-}));
-
-export const gamesRelations = relations(games, ({ one, many }) => ({
-  season: one(seasons, { fields: [games.seasonId], references: [seasons.id] }),
-  division: one(divisions, {
-    fields: [games.divisionId],
-    references: [divisions.id],
-  }),
-  arena: one(arenas, { fields: [games.arenaId], references: [arenas.id] }),
-  homeTeam: one(teamSeasons, {
-    fields: [games.homeTeamSeasonId],
-    references: [teamSeasons.id],
-    relationName: "homeTeam",
-  }),
-  awayTeam: one(teamSeasons, {
-    fields: [games.awayTeamSeasonId],
-    references: [teamSeasons.id],
-    relationName: "awayTeam",
-  }),
-  goalieStats: many(goalieGameStats),
-}));
-
-export const goalieGameStatsRelations = relations(
-  goalieGameStats,
-  ({ one }) => ({
-    game: one(games, {
-      fields: [goalieGameStats.gameId],
-      references: [games.id],
-    }),
-    season: one(seasons, {
-      fields: [goalieGameStats.seasonId],
-      references: [seasons.id],
-    }),
-    teamSeason: one(teamSeasons, {
-      fields: [goalieGameStats.teamSeasonId],
-      references: [teamSeasons.id],
-    }),
-    roster: one(rosters, {
-      fields: [goalieGameStats.rosterId],
-      references: [rosters.id],
-    }),
-  }),
+/* Player Stats */
+export const playerStats = pgTable(
+  "players_stats",
+  {
+    id: id(),
+    playerId: integer("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "cascade" }),
+    gameId: integer("game_id")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    goals: integer("goals").notNull().default(0),
+    assists: integer("assists").notNull().default(0),
+    penaltyMinutes: integer("penalty_minutes").notNull().default(0),
+  },
+  (t) => [
+    {
+      uniquePlayerGame: uniqueIndex("player_game_unique").on(
+        t.playerId,
+        t.gameId,
+      ),
+      idxPlayerId: index("player_stat_idx").on(t.playerId),
+      idxGameId: index("game_stat_idx").on(t.gameId),
+    },
+  ],
 );
 
-export const teamStandingsRelations = relations(teamStandings, ({ one }) => ({
-  season: one(seasons, {
-    fields: [teamStandings.seasonId],
-    references: [seasons.id],
-  }),
-  division: one(divisions, {
-    fields: [teamStandings.divisionId],
-    references: [divisions.id],
-  }),
-  teamSeason: one(teamSeasons, {
-    fields: [teamStandings.teamSeasonId],
-    references: [teamSeasons.id],
-  }),
-}));
-
-// =====================
-// TYPES (handy for service layer)
-// =====================
-export type Profile = typeof profiles.$inferSelect;
-export type NewProfile = typeof profiles.$inferInsert;
+/* Types */
 export type Player = typeof players.$inferSelect;
 export type NewPlayer = typeof players.$inferInsert;
-export type League = typeof leagues.$inferSelect;
-export type NewLeague = typeof leagues.$inferInsert;
 export type Season = typeof seasons.$inferSelect;
 export type NewSeason = typeof seasons.$inferInsert;
-export type Division = typeof divisions.$inferSelect;
-export type NewDivision = typeof divisions.$inferInsert;
 export type Team = typeof teams.$inferSelect;
 export type NewTeam = typeof teams.$inferInsert;
 export type TeamSeason = typeof teamSeasons.$inferSelect;
 export type NewTeamSeason = typeof teamSeasons.$inferInsert;
-export type Arena = typeof arenas.$inferSelect;
-export type NewArena = typeof arenas.$inferInsert;
 export type Roster = typeof rosters.$inferSelect;
 export type NewRoster = typeof rosters.$inferInsert;
 export type Game = typeof games.$inferSelect;
 export type NewGame = typeof games.$inferInsert;
-export type GoalieGameStat = typeof goalieGameStats.$inferSelect;
-export type NewGoalieGameStat = typeof goalieGameStats.$inferInsert;
-export type TeamStanding = typeof teamStandings.$inferSelect;
-export type NewTeamStanding = typeof teamStandings.$inferInsert;
-
-// =====================
-// NOTES
-// - Keep seasonId/teamSeasonId in stats rows to make season aggregates simple.
-// - Consider lightweight checks in app logic: ensure stats.seasonId == game.seasonId and stats.teamSeasonId == roster.teamSeasonId.
-// - Supabase migration: export this file, then generate SQL via drizzle-kit.
+export type Standing = typeof standings.$inferSelect;
+export type NewStanding = typeof standings.$inferInsert;
+export type GoalieGame = typeof goalieGames.$inferSelect;
+export type NewGoalieGame = typeof goalieGames.$inferInsert;
+export type PlayerStat = typeof playerStats.$inferSelect;
+export type NewPlayerStat = typeof playerStats.$inferInsert;
