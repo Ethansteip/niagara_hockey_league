@@ -189,8 +189,7 @@ export const games = pgTable(
 /*
  * -- Goalie Games --
  * Tracks which goalie played in which game.
- * Goals against is derived from games.homeScore / games.awayScore
- * using teamId to determine which side of the ice the goalie played for.
+ * Goals against is derived from total games played by goalie / total goals against.
  */
 export const goalieGames = pgTable(
   "goalies_games",
@@ -205,6 +204,8 @@ export const goalieGames = pgTable(
     teamId: integer("team_id")
       .notNull()
       .references(() => teams.id, { onDelete: "restrict" }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [
     {
@@ -217,7 +218,10 @@ export const goalieGames = pgTable(
   ],
 );
 
-/* Team Standings */
+/*
+ * Team Standings
+ * Used to collect season long statistics per team
+ */
 export const standings = pgTable(
   "standings",
   {
@@ -267,6 +271,29 @@ export const standings = pgTable(
       idxPlayoffPoints: index("playoff_points_idx").on(
         t.seasonId,
         t.playoffPoints,
+      ),
+    },
+  ],
+);
+
+/* Points */
+export const points = pgTable(
+  "points",
+  {
+    id: id(),
+    teamId: integer("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "cascade" }),
+    gameId: integer("game_id")
+      .notNull()
+      .references(() => games.id),
+    points: integer("points").notNull(),
+  },
+  (t) => [
+    {
+      uniqueTeamGame: uniqueIndex("team_game_points_unique").on(
+        t.gameId,
+        t.teamId,
       ),
     },
   ],
