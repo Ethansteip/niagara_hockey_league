@@ -15,19 +15,19 @@
       <Menu />
     </Button>
   </Popover.Trigger>
-  <Popover.Content sideOffset={25} class="mr-[3vw]">
+  <Popover.Content sideOffset={25} class="mr-[3vw] border-secondary">
     <Button href="/" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>
       <CalendarCheck />
       Upcoming Games
     </Button>
     <Button href="/" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>
-      <CalendarCheck />
+      <Calendar />
       All Games
     </Button>
     <Separator />
     <Button href="/" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>
       <ChartColumn />
-      Stats
+      Player Stats
     </Button>
   </Popover.Content>
 </Popover.Root>
