@@ -14,23 +14,23 @@ Your profile data is now globally available across all pages and components via 
 
 ```svelte
 <script lang="ts">
-  import { page } from '$app/stores';
+	import { page } from '$app/stores';
 
-  // Access profile data
-  $: profile = $page.data.profile;
-  $: session = $page.data.session;
+	// Access profile data
+	$: profile = $page.data.profile;
+	$: session = $page.data.session;
 </script>
 
 {#if profile}
-  <div>
-    <h1>Welcome, {profile.firstName} {profile.lastName}!</h1>
-    {#if profile.avatarUrl}
-      <img src={profile.avatarUrl} alt="Avatar" />
-    {/if}
-    {#if profile.position}
-      <p>Position: {profile.position}</p>
-    {/if}
-  </div>
+	<div>
+		<h1>Welcome, {profile.firstName} {profile.lastName}!</h1>
+		{#if profile.avatarUrl}
+			<img src={profile.avatarUrl} alt="Avatar" />
+		{/if}
+		{#if profile.position}
+			<p>Position: {profile.position}</p>
+		{/if}
+	</div>
 {/if}
 ```
 
@@ -48,21 +48,23 @@ In `Navbar.svelte`, you should update line 64 to pass profile data:
 
 ```svelte
 <script lang="ts">
-  import { page } from '$app/stores';
+	import { page } from '$app/stores';
 
-  let { session } = $props();
-  $: profile = $page.data.profile;
+	let { session } = $props();
+	$: profile = $page.data.profile;
 </script>
 
 <!-- Then in the template -->
 {#if profile}
-  <NavUser user={{
-    id: profile.userId,
-    firstName: profile.firstName,
-    lastName: profile.lastName,
-    email: session?.user?.email || '',
-    avatar: profile.avatarUrl || ''
-  }} />
+	<NavUser
+		user={{
+			id: profile.userId,
+			firstName: profile.firstName,
+			lastName: profile.lastName,
+			email: session?.user?.email || '',
+			avatar: profile.avatarUrl || ''
+		}}
+	/>
 {/if}
 ```
 
@@ -73,14 +75,14 @@ You can also access profile in server-side load functions:
 ```typescript
 // +page.server.ts
 export const load = async ({ locals: { getProfile } }) => {
-  const profile = await getProfile();
+	const profile = await getProfile();
 
-  // Do something with profile
-  if (!profile) {
-    redirect(303, "/complete-profile");
-  }
+	// Do something with profile
+	if (!profile) {
+		redirect(303, '/complete-profile');
+	}
 
-  return { profile };
+	return { profile };
 };
 ```
 
@@ -90,20 +92,23 @@ When you update a user's profile, use `invalidateAll()` to refresh the data:
 
 ```svelte
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
-  import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+	import { enhance } from '$app/forms';
 </script>
 
-<form method="POST" use:enhance={() => {
-  return async ({ result }) => {
-    if (result.type === 'success') {
-      await invalidateAll(); // This will refetch the profile
-    }
-  };
-}}>
-  <input name="firstName" />
-  <input name="lastName" />
-  <button type="submit">Update Profile</button>
+<form
+	method="POST"
+	use:enhance={() => {
+		return async ({ result }) => {
+			if (result.type === 'success') {
+				await invalidateAll(); // This will refetch the profile
+			}
+		};
+	}}
+>
+	<input name="firstName" />
+	<input name="lastName" />
+	<button type="submit">Update Profile</button>
 </form>
 ```
 
@@ -112,7 +117,7 @@ When you update a user's profile, use `invalidateAll()` to refresh the data:
 Thanks to the types in `app.d.ts`, you get full autocomplete:
 
 ```typescript
-import type { Profile } from "$lib/drizzle/schema";
+import type { Profile } from '$lib/drizzle/schema';
 
 // Your profile will have these properties:
 // - id: number

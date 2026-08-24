@@ -1,8 +1,8 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import { connectionDetails } from "./drizzle.config";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { connectionDetails } from './connection';
 
 export const db = drizzle({
-  connection: {
-    ...connectionDetails,
-  },
+	connection: {
+		...connectionDetails
+	}
 });
