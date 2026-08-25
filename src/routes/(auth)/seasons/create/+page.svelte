@@ -8,6 +8,8 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import { createSeason } from '../seasons.remote';
+	import { onNavigate } from '$app/navigation';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 
 	let startDateOpen = $state(false);
 	let startDateValue = $state<CalendarDate | undefined>();
@@ -20,10 +22,17 @@
 	let seasonNameIssues = $derived(createSeason.fields.seasonName.issues());
 	let startDateIssues = $derived(createSeason.fields.startDate.issues());
 	let endDateIssues = $derived(createSeason.fields.endDate.issues());
+
+	let form: HTMLFormElement;
+	let submitting = $derived<boolean>(!!createSeason.pending);
+
+	onNavigate(() => {
+		form.reset();
+	});
 </script>
 
 <main class="flex flex-col items-center justify-center gap-3">
-	<form {...createSeason} class="w-full">
+	<form {...createSeason} bind:this={form} class="w-full">
 		<!-- Custom components (Calendar, Checkbox) don't render named form controls,
 		     so hidden inputs carry their values into the submitted form data -->
 		<input {...createSeason.fields.startDate.as('hidden', startDateValue?.toString() ?? '')} />
@@ -127,7 +136,13 @@
 			</Field.Set>
 			<Field.Separator />
 			<Field.Field orientation="horizontal">
-				<Button type="submit" disabled={!!createSeason.pending}>Submit</Button>
+				<Button type="submit" class="min-w-20" disabled={!!createSeason.pending}>
+					{#if submitting}
+						<Spinner />
+					{:else}
+						Submit
+					{/if}
+				</Button>
 				<Button variant="outline" type="button" href="/seasons">Cancel</Button>
 			</Field.Field>
 		</Field.Group>

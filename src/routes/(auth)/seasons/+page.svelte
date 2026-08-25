@@ -1,11 +1,50 @@
 <script lang="ts">
-	import { getSeasons, type Season } from './seasons.remote';
+	import { getSeasons, type Season, deleteSeason } from './seasons.remote';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { List, Plus, SearchAlert, SquarePen } from '@lucide/svelte';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
+	import { List, Plus, SearchAlert, SquarePen, Trash } from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
+	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 
 	const seasons: Season[] = $derived(await getSeasons());
-	$inspect(seasons);
+	let created = $derived(page.url.searchParams.get('created'));
+
+	let deleteId = $state<number>();
+	let deleteSeasonName = $state<string>('');
+	let alertDialogOpen = $state<boolean>(false);
+
+	const prepDelete = (seasonName: string, seasonId: number) => {
+		alertDialogOpen = true;
+		deleteId = seasonId;
+		deleteSeasonName = seasonName;
+	};
+
+	const removeSeason = async (seasonId: number) => {
+		if (!seasonId) {
+			toast.warning('Season id is required');
+			return;
+		}
+
+		try {
+			await deleteSeason({ seasonId });
+			await getSeasons().refresh();
+			alertDialogOpen = false;
+			toast.success('Season deleted successfully');
+			deleteId = 0;
+			deleteSeasonName = '';
+		} catch (e) {
+			toast.error('Unable to delete seasons');
+		}
+	};
+
+	onMount(() => {
+		if (created) {
+			toast.success('New Season Created');
+		}
+	});
 </script>
 
 <main class="flex flex-col items-center justify-center gap-3">
@@ -22,7 +61,6 @@
 	</div>
 	{#if seasons.length}
 		<Table.Root>
-			<Table.Caption>A list of all Niagara Hockey League seasons</Table.Caption>
 			<Table.Header>
 				<Table.Row>
 					<Table.Head class="w-25">Id</Table.Head>
@@ -30,6 +68,7 @@
 					<Table.Head>Active</Table.Head>
 					<Table.Head>Start Date</Table.Head>
 					<Table.Head>End Date</Table.Head>
+					<Table.Head>Delete</Table.Head>
 					<Table.Head class="text-end">Edit</Table.Head>
 				</Table.Row>
 			</Table.Header>
@@ -41,10 +80,19 @@
 						<Table.Cell>{season.active}</Table.Cell>
 						<Table.Cell>{season.startDate}</Table.Cell>
 						<Table.Cell>{season.endDate}</Table.Cell>
+						<Table.Cell>
+							<Button
+								size="icon"
+								variant="outline"
+								onclick={() => prepDelete(season.name, season.id)}
+							>
+								<Trash />
+							</Button>
+						</Table.Cell>
 						<Table.Cell class="flex justify-end">
-							<SquarePen
-								class="trasnition-transform size-5 cursor-pointer text-muted-foreground duration-200 hover:text-secondary-foreground"
-							/>
+							<Button size="icon" variant="outline">
+								<SquarePen />
+							</Button>
 						</Table.Cell>
 					</Table.Row>
 				{/each}
@@ -70,3 +118,20 @@
 		</div>
 	{/if}
 </main>
+
+<AlertDialog.Root bind:open={alertDialogOpen}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+			<AlertDialog.Description>
+				This action cannot be undone. This will permanently delete season: <span class="font-bold"
+					>{deleteSeasonName}</span
+				>
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel onclick={() => (alertDialogOpen = false)}>Cancel</AlertDialog.Cancel>
+			<AlertDialog.Action onclick={() => removeSeason(deleteId)}>Continue</AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
