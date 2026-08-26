@@ -7,17 +7,26 @@ import { redirect } from '@sveltejs/kit';
 
 export type Season = InferSelectModel<typeof seasons>;
 
-const SeasonCreate = z
-	.object({
-		seasonName: z.string().trim().min(1, 'Season name is required'),
-		startDate: z.iso.date('Select a start date'),
-		endDate: z.iso.date('Select an end date'),
-		isActive: z.boolean().default(false)
-	})
-	.refine((season) => season.endDate > season.startDate, {
-		path: ['endDate'],
-		error: 'End date must be after the start date'
-	});
+const SeasonFields = z.object({
+	seasonName: z.string().trim().min(1, 'Season name is required'),
+	startDate: z.iso.date('Select a start date'),
+	endDate: z.iso.date('Select an end date'),
+	isActive: z.boolean().default(false)
+});
+
+const endAfterStart = {
+	path: ['endDate'],
+	error: 'End date must be after the start date'
+};
+
+const SeasonCreate = SeasonFields.refine(
+	(season) => season.endDate > season.startDate,
+	endAfterStart
+);
+
+const SeasonUpdate = SeasonFields.extend({
+	id: z.int().nonnegative()
+}).refine((season) => season.endDate > season.startDate, endAfterStart);
 
 const SeasonDelete = z.object({
 	seasonId: z.int().nonnegative().nonoptional()
@@ -39,6 +48,23 @@ export const createSeason = form(
 
 		await db.insert(seasons).values({ name: seasonName, startDate, endDate, active: isActive });
 		redirect(303, '/seasons?created=true');
+	}
+);
+
+/* Update an existing season */
+export const updateSeason = form(
+	SeasonUpdate,
+	async ({ id, seasonName, startDate, endDate, isActive }) => {
+		if (isActive) {
+			// Disable the current active season.
+			await db.update(seasons).set({ active: false }).where(eq(seasons.active, true));
+		}
+
+		await db
+			.update(seasons)
+			.set({ name: seasonName, startDate, endDate, active: isActive, updatedAt: new Date() })
+			.where(eq(seasons.id, id));
+		redirect(303, '/seasons?updated=true');
 	}
 );
 

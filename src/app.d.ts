@@ -10,9 +10,9 @@ declare global {
 			getProfile(): Promise<Profile | null>;
 		}
 		interface PageData {
-			session: Session | null;
-			profile: Profile | null;
-			supabase: SupabaseClient;
+			session?: Session | null;
+			profile?: Profile | null;
+			supabase?: SupabaseClient<Database>;
 		}
 		// interface Error {}
 		// interface Platform {}

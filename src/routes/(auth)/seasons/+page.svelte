@@ -82,7 +82,7 @@
 							</Button>
 						</Table.Cell>
 						<Table.Cell class="flex justify-end">
-							<Button size="icon" variant="outline">
+							<Button size="icon" variant="outline" href="/seasons/{season.id}/edit">
 								<SquarePen />
 							</Button>
 						</Table.Cell>
