@@ -41,7 +41,6 @@
 			const url = new URL(page.url);
 			url.searchParams.delete('updated');
 			replaceState(url, {});
-			console.log("small change")
 		}
 	});
 </script>

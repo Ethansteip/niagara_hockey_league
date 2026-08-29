@@ -1,4 +1,4 @@
-import { teams, type Team, type NewTeam } from '$lib/drizzle/schema';
+import { teams, type Team, type NewTeam, seasons, teamSeasons } from '$lib/drizzle/schema';
 import { query, command, form } from '$app/server';
 import { db } from '$lib/drizzle';
 import { eq } from 'drizzle-orm';
@@ -22,8 +22,25 @@ export const getTeams = query(async (): Promise<Team[]> => {
 
 /* Create new team */
 export const createTeam = form(TeamFields, async ({ teamName, teamCode, logoUrl }) => {
-	await db.insert(teams).values({ name: teamName, code: teamCode, logoUrl });
-	redirect(303, '/teams?created=true');
+	const [newTeam] = await db
+		.insert(teams)
+		.values({ name: teamName, code: teamCode, logoUrl })
+		.returning({ insertId: teams.id });
+
+	/* Assign team-season */
+	if (newTeam.insertId) {
+		const [activeSeason] = await db
+			.select({ seasonId: seasons.id })
+			.from(seasons)
+			.where(eq(seasons.active, true))
+			.limit(1);
+
+		await db
+			.insert(teamSeasons)
+			.values({ teamId: newTeam.insertId, seasonId: activeSeason.seasonId });
+
+		redirect(303, '/teams?created=true');
+	}
 });
 
 /* Delete a team */
