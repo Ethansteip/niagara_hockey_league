@@ -39,7 +39,7 @@
 			},
 			{
 				title: 'Teams',
-				url: '#',
+				url: '/teams',
 				icon: ShirtSport
 			},
 			{
