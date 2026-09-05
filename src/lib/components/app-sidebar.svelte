@@ -29,7 +29,7 @@
 		navMain: [
 			{
 				title: 'Games',
-				url: '#',
+				url: '/games',
 				icon: CalendarWeek
 			},
 			{

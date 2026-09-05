@@ -1,6 +1,6 @@
 import { query, form, command } from '$app/server';
 import { db } from '$lib/drizzle';
-import { seasons } from '$lib/drizzle/schema';
+import { seasons, teams, teamSeasons, type Team } from '$lib/drizzle/schema';
 import { desc, eq, type InferSelectModel } from 'drizzle-orm';
 import * as z from 'zod';
 import { redirect } from '@sveltejs/kit';
@@ -46,7 +46,22 @@ export const createSeason = form(
 			await db.update(seasons).set({ active: false }).where(eq(seasons.active, true));
 		}
 
-		await db.insert(seasons).values({ name: seasonName, startDate, endDate, active: isActive });
+		const [season] = await db
+			.insert(seasons)
+			.values({ name: seasonName, startDate, endDate, active: isActive })
+			.returning({ insertId: seasons.id });
+
+		/* Create team_season records */
+		if (season.insertId) {
+			const teamsResult: Team[] = await db.select().from(teams);
+
+			await db.insert(teamSeasons).values(
+				teamsResult.map((team) => {
+					return { teamId: team.id, seasonId: season.insertId };
+				})
+			);
+		}
+
 		redirect(303, '/seasons?created=true');
 	}
 );

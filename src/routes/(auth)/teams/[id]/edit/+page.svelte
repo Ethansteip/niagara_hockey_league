@@ -2,16 +2,22 @@
 	import * as Field from '$lib/components/ui/field/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { createTeam } from '../teams.remote';
 	import { onNavigate } from '$app/navigation';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import { updateTeam } from '../../teams.remote';
 
-	let teamNameIssues = $derived(createTeam.fields.teamName.issues());
-	let teamCodeIssues = $derived(createTeam.fields.teamCode.issues());
-	let logoUrlIssues = $derived(createTeam.fields.logoUrl.issues());
+	let { data } = $props();
+	let team = $derived(data?.team);
+	let { name, code, logoUrl, id } = $derived(team ?? {});
+
+	const editTeam = $derived(updateTeam.for(id));
+
+	let teamNameIssues = $derived(editTeam.fields.teamName.issues());
+	let teamCodeIssues = $derived(editTeam.fields.teamCode.issues());
+	let logoUrlIssues = $derived(editTeam.fields.logoUrl.issues());
 
 	let form: HTMLFormElement;
-	let submitting = $derived<boolean>(!!createTeam.pending);
+	let submitting = $derived<boolean>(!!editTeam.pending);
 
 	onNavigate(() => {
 		form.reset();
@@ -19,21 +25,26 @@
 </script>
 
 <main class="flex flex-col items-center justify-center gap-3">
-	<form {...createTeam} bind:this={form} class="w-full">
+	<form {...editTeam} bind:this={form} class="w-full">
+		<input {...editTeam.fields.id.as('hidden', id)} />
 		<Field.Group>
 			<Field.Set>
-				<Field.Legend>Create A New Team</Field.Legend>
+				<Field.Legend>Edit Team</Field.Legend>
 				<Field.Group>
 					<Field.Field data-invalid={teamNameIssues ? true : undefined}>
-						<Field.Label for="season-name">Team Name</Field.Label>
-						<Input id="team-name" {...createTeam.fields.teamName.as('text')} placeholder="Leafs" />
+						<Field.Label for="team-name">Team Name</Field.Label>
+						<Input
+							id="team-name"
+							{...editTeam.fields.teamName.as('text', name)}
+							placeholder="Leafs"
+						/>
 						<Field.Error errors={teamNameIssues} />
 					</Field.Field>
 					<Field.Field data-invalid={teamCodeIssues ? true : undefined}>
 						<Field.Label for="team-code">Team Code</Field.Label>
 						<Input
 							id="team-code"
-							{...createTeam.fields.teamCode.as('text')}
+							{...editTeam.fields.teamCode.as('text', code ?? '')}
 							placeholder="L$@fs_1102"
 						/>
 						<Field.Error errors={teamCodeIssues} />
@@ -42,7 +53,7 @@
 						<Field.Label for="logo-url">Logo URL</Field.Label>
 						<Input
 							id="logo-url"
-							{...createTeam.fields.logoUrl.as('text')}
+							{...editTeam.fields.logoUrl.as('text', logoUrl ?? '')}
 							placeholder="https://railway.storage/leafs-icon"
 						/>
 						<Field.Error errors={logoUrlIssues} />
@@ -50,7 +61,7 @@
 				</Field.Group>
 			</Field.Set>
 			<Field.Field orientation="horizontal">
-				<Button type="submit" class="min-w-20" disabled={!!createTeam.pending}>
+				<Button type="submit" class="min-w-20" disabled={submitting}>
 					{#if submitting}
 						<Spinner />
 					{:else}

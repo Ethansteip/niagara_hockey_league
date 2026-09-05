@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Field from '$lib/components/ui/field/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
@@ -10,6 +9,7 @@
 	import { createSeason } from '../seasons.remote';
 	import { onNavigate } from '$app/navigation';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import { Switch } from '$lib/components/ui/switch/index.js';
 
 	let startDateOpen = $state(false);
 	let startDateValue = $state<CalendarDate | undefined>();
@@ -29,6 +29,8 @@
 	onNavigate(() => {
 		form.reset();
 	});
+
+	$inspect(isActiveChecked);
 </script>
 
 <main class="flex flex-col items-center justify-center gap-3">
@@ -124,10 +126,9 @@
 			<Field.Separator />
 			<Field.Set>
 				<Field.Legend>Current Active Season</Field.Legend>
-				<Field.Description>Assign this season as the currently active season.</Field.Description>
 				<Field.Group>
 					<Field.Field orientation="horizontal">
-						<Checkbox bind:checked={isActiveChecked} id="season-active" />
+						<Switch bind:checked={isActiveChecked} id="season-active" />
 						<Field.Label for="season-active" class="font-normal">
 							Assign as current active season
 						</Field.Label>

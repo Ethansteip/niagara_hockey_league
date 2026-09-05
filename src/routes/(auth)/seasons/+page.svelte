@@ -48,10 +48,12 @@
 <main class="flex flex-col items-center justify-center gap-3">
 	<div class="flex w-full items-center justify-between">
 		<h2 class="text-left text-lg font-bold md:text-2xl xl:text-3xl">Seasons</h2>
-		<Button href="/seasons/create">
-			New
-			<Plus />
-		</Button>
+		{#if seasons.length}
+			<Button href="/seasons/create">
+				New
+				<Plus />
+			</Button>
+		{/if}
 	</div>
 	<div class="flex w-full items-center justify-start gap-2">
 		<List class="size-5" />
