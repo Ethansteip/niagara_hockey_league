@@ -20,7 +20,7 @@
         "@dnd-kit/abstract": "^0.5.0",
         "@dnd-kit/helpers": "^0.5.0",
         "@internationalized/date": "^3.12.3",
-        "@lucide/svelte": "^1.37.0",
+        "@lucide/svelte": "^1.41.0",
         "@sveltejs/adapter-node": "^5.5.7",
         "@sveltejs/kit": "^2.70.3",
         "@sveltejs/vite-plugin-svelte": "^5.1.1",
@@ -160,7 +160,7 @@
 
     "@layerstack/utils": ["@layerstack/utils@2.0.0-next.19", "", { "dependencies": { "d3-array": "^3.2.4", "d3-time": "^3.1.0", "d3-time-format": "^4.1.0" } }, "sha512-HyXCEz9pge4rFWklrSgFr3YIwdE1gP8WM6GPetmnKPDfYLF1/oetRFKI9FqiE+dw4brnULGPKJsVhjM3vQfD4A=="],
 
-    "@lucide/svelte": ["@lucide/svelte@1.37.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-AxaiSxeuErlt4fNmmN28oaL5R7yVoQLsfSeiAONxCEK+l0/SrLAjRktQ0DkTQpomv1oRzOA3hohWY0ZHTZCMmw=="],
+    "@lucide/svelte": ["@lucide/svelte@1.41.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-N5dInvHWGxNcnu3VJvbO2zOJA832Uy4he6qGwcqd8i3m8iYGlLoebp+e+X8NfncXXLnXkYvru5BnkUVdNdo1xg=="],
 
     "@napi-rs/lzma-linux-x64-gnu": ["@napi-rs/lzma-linux-x64-gnu@1.5.1", "", { "os": "linux", "cpu": "x64" }, "sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ=="],
 

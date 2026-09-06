@@ -15,22 +15,27 @@ const StatusSchema = z
 const TypeSchema = z.enum(['regular season', 'playoff']).nonoptional('Please select a game type');
 const DecidedInSchema = z.enum(['regulation', 'overtime', 'shootout']).optional();
 
-const GameCreateFields = z.object({
-	seasonId: z.string().min(1, 'Please select a season'),
-	homeTeamId: z.string().min(1, 'Please select a home team'),
-	awayTeamId: z.string().min(1, 'Please select an away team'),
-	weekNumber: z
-		.int('Please enter a week number')
-		.nonnegative('Please enter a non-negative number')
-		.nonoptional('Please select a week number'),
-	startDate: z.iso.datetime('Select a game date and time'),
-	gameStatus: StatusSchema,
-	gameType: TypeSchema,
-	homeScore: z.int().nonnegative().nonoptional('Please add a home team final score'),
-	awayScore: z.int().nonnegative().nonoptional('Please add an away team score.'),
-	decidedIn: DecidedInSchema,
-	notes: z.string().max(255, 'Note needs to be shorter than 255 characters').optional()
-});
+const GameCreateFields = z
+	.object({
+		seasonId: z.string().min(1, 'Please select a season'),
+		homeTeamId: z.string().min(1, 'Please select a home team'),
+		awayTeamId: z.string().min(1, 'Please select an away team'),
+		weekNumber: z
+			.int('Please enter a week number')
+			.nonnegative('Please enter a non-negative number')
+			.nonoptional('Please select a week number'),
+		startDate: z.iso.datetime('Select a game date and time'),
+		gameStatus: StatusSchema,
+		gameType: TypeSchema,
+		homeScore: z.int().nonnegative().nonoptional('Please add a home team final score'),
+		awayScore: z.int().nonnegative().nonoptional('Please add an away team score.'),
+		decidedIn: DecidedInSchema,
+		notes: z.string().max(255, 'Note needs to be shorter than 255 characters').optional()
+	})
+	.refine((data) => data.homeTeamId !== data.awayTeamId, {
+		message: 'Home and Away teams cant be the same',
+		path: ['awayTeamId']
+	});
 
 export type GameData = Game & {
 	homeTeam: Team;
@@ -69,7 +74,7 @@ export const createGame = form(
 		decidedIn,
 		notes
 	}) => {
-		// Get the team season ids
+		/* Get the team season ids */
 		const getTeamSeasonId = async (teamId: number, seasonId: number) => {
 			const [row] = await db
 				.select({ id: teamSeasons.id })

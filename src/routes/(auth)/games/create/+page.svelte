@@ -134,7 +134,7 @@
 						<Field.Field data-invalid={seasonIdIssues ? true : undefined}>
 							<Field.Label for="seasonId">Season</Field.Label>
 							<Select.Root type="single" name="seasonId" bind:value={seasonId}>
-								<Select.Trigger class="">
+								<Select.Trigger aria-invalid={seasonIdIssues ? 'true' : undefined}>
 									{seasonTriggerContent}
 								</Select.Trigger>
 								<Select.Content>
@@ -156,7 +156,10 @@
 						<Field.Field data-invalid={homeTeamIdIssues ? true : undefined}>
 							<Field.Label for="homeTeamId">Home Team</Field.Label>
 							<Select.Root type="single" name="homeTeamId" bind:value={homeTeamId}>
-								<Select.Trigger class="flex items-center">
+								<Select.Trigger
+									class="flex items-center"
+									aria-invalid={homeTeamIdIssues ? 'true' : undefined}
+								>
 									{homeTeamIdTriggerContent}
 								</Select.Trigger>
 								<Select.Content>
@@ -176,7 +179,7 @@
 						<Field.Field data-invalid={awayTeamIdIssues ? true : undefined}>
 							<Field.Label for="awayTeamId">Away Team</Field.Label>
 							<Select.Root type="single" name="awayTeamId" bind:value={awayTeamId}>
-								<Select.Trigger class="">
+								<Select.Trigger class="" aria-invalid={awayTeamIdIssues ? 'true' : undefined}>
 									{awayTeamIdTriggerContent}
 								</Select.Trigger>
 								<Select.Content>
@@ -242,7 +245,7 @@
 						<Field.Field data-invalid={gameTypeIssues ? true : undefined}>
 							<Field.Label for="gameType">Game Type</Field.Label>
 							<Select.Root type="single" name="gameType" bind:value={gameType}>
-								<Select.Trigger class="">
+								<Select.Trigger class="" aria-invalid={gameTypeIssues ? 'true' : undefined}>
 									{gameTypeTriggerContent}
 								</Select.Trigger>
 								<Select.Content>
