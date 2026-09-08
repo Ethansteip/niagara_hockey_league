@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { getActiveSeasonGames, type GameData } from './games.remote';
+	import { getPlayers } from './players.remote';
+	import type { Player } from '$lib/drizzle/schema';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -11,47 +12,25 @@
 	import { onMount } from 'svelte';
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
 
-	const games: GameData[] = $derived(await getActiveSeasonGames());
+	const players: Player[] = $derived(await getPlayers());
 
 	/* Pagination */
 	const perPage = 10;
 	let currentPage = $state(1);
-	const paginatedGames = $derived(games.slice((currentPage - 1) * perPage, currentPage * perPage));
-
-	const gameDateFormat = new Intl.DateTimeFormat('en-CA', {
-		weekday: 'short',
-		month: 'short',
-		day: 'numeric',
-		year: 'numeric',
-		hour: 'numeric',
-		minute: '2-digit',
-		timeZone: 'America/Toronto'
-	});
-
-	const mobileGameDateFormat = new Intl.DateTimeFormat('en-CA', {
-		month: 'short',
-		day: 'numeric',
-		year: 'numeric',
-		hour: 'numeric'
-	});
-
-	function capitalizeWords(sentence: string) {
-		return sentence
-			.split(' ')
-			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ');
-	}
+	const paginatedPlayers = $derived(
+		players.slice((currentPage - 1) * perPage, currentPage * perPage)
+	);
 
 	onMount(() => {
 		if (page.url.searchParams.get('created')) {
-			toast.success('New Game Created');
+			toast.success('New Player Created');
 			const url = new URL(page.url);
 			url.searchParams.delete('created');
 			replaceState(url, {});
 		}
 
 		if (page.url.searchParams.get('updated')) {
-			toast.success('Game Edited Successfully');
+			toast.success('PLayer Edited Successfully');
 			const url = new URL(page.url);
 			url.searchParams.delete('updated');
 			replaceState(url, {});
@@ -61,9 +40,9 @@
 
 <main class="flex flex-col items-center justify-center gap-3">
 	<div class="flex w-full items-center justify-between">
-		<h2 class="text-left text-lg font-bold md:text-2xl xl:text-3xl">Games</h2>
-		{#if games.length}
-			<Button href="/games/create">
+		<h2 class="text-left text-lg font-bold md:text-2xl xl:text-3xl">Players</h2>
+		{#if players.length}
+			<Button href="/players/create">
 				New
 				<Plus />
 			</Button>
@@ -71,62 +50,46 @@
 	</div>
 	<div class="flex w-full items-center justify-start gap-2">
 		<List class="size-5" />
-		<p>{games.length} game(s)</p>
+		<p>{players.length} player(s)</p>
 	</div>
-	{#if games.length}
+	{#if players.length}
 		<Table.Root>
 			<Table.Header>
 				<Table.Row>
-					<Table.Head class="">Week</Table.Head>
-					<Table.Head class="hidden md:table-cell">Home Team</Table.Head>
-					<Table.Head class="hidden md:table-cell">Away Team</Table.Head>
-					<Table.Head class="md:hidden">Matchup</Table.Head>
-					<Table.Head>Date</Table.Head>
-					<Table.Head>Type</Table.Head>
+					<Table.Head class="">Id</Table.Head>
+					<Table.Head class="">Last Name</Table.Head>
+					<Table.Head class="">First Name</Table.Head>
+					<Table.Head class="">Role</Table.Head>
+					<Table.Head>Delete</Table.Head>
 					<Table.Head class="text-end">Edit</Table.Head>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{#each paginatedGames as game (game.id)}
+				{#each players as player (player.id)}
 					<Table.Row>
-						<Table.Cell class="font-medium">{game.weekNumber}</Table.Cell>
-						<Table.Cell class="hidden md:table-cell">
-							<Logo name={game.homeTeam.name as TeamName} />
+						<Table.Cell class="font-medium">{player.id}</Table.Cell>
+						<Table.Cell>
+							{player.lastName}
 						</Table.Cell>
-						<Table.Cell class="hidden md:table-cell">
-							<Logo name={game.awayTeam.name as TeamName} />
+						<Table.Cell>
+							{player.firstName}
 						</Table.Cell>
 						<Table.Cell class="md:hidden">
-							<div class="flex items-center gap-x-2">
-								<Logo name={game.homeTeam.name as TeamName} />
-								<span class="text-sm">vs</span>
-								<Logo name={game.awayTeam.name as TeamName} />
-							</div>
-						</Table.Cell>
-						<Table.Cell class="hidden md:table-cell"
-							>{gameDateFormat.format(game.startDate)}</Table.Cell
-						>
-						<Table.Cell class="table-cell md:hidden"
-							>{mobileGameDateFormat.format(game.startDate)}</Table.Cell
-						>
-						<Table.Cell>
-							<Badge variant="outline">
-								{capitalizeWords(game.gameType)}
-							</Badge>
+							<Badge>{player.role}</Badge>
 						</Table.Cell>
 						<Table.Cell class="text-end">
-							<Button size="icon" variant="outline" href="/games/{game.id}/edit">
+							<Button size="icon" variant="outline" href="/players/{player.id}/edit">
 								<SquarePen />
 							</Button>
 						</Table.Cell>
 					</Table.Row>
 				{/each}
 			</Table.Body>
-			{#if games.length > perPage}
+			{#if players.length > perPage}
 				<Table.Footer>
 					<Table.Row>
-						<Table.Cell colspan={7}>
-							<Pagination.Root count={games.length} {perPage} bind:page={currentPage}>
+						<Table.Cell colspan={6}>
+							<Pagination.Root count={players.length} {perPage} bind:page={currentPage}>
 								{#snippet children({ pages, currentPage })}
 									<Pagination.Content>
 										<Pagination.Item>
@@ -162,10 +125,10 @@
 		>
 			<p class="semi-bold flex items-center gap-1 text-secondary-foreground italic">
 				<SearchAlert class="size-4" />
-				No games found.
+				No players found.
 			</p>
-			<Button href="/games/create">
-				Create New Game <Plus />
+			<Button href="/players/create">
+				Create New Player <Plus />
 			</Button>
 		</div>
 	{/if}

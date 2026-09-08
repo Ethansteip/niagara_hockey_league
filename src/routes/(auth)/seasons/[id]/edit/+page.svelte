@@ -147,7 +147,7 @@
 					{#if submitting}
 						<Spinner />
 					{:else}
-						Submit
+						Save
 					{/if}
 				</Button>
 				<Button variant="outline" type="button" href="/seasons">Cancel</Button>

@@ -1,4 +1,4 @@
-import { query, form, command } from '$app/server';
+import { query, form } from '$app/server';
 import { db } from '$lib/drizzle';
 import { alias } from 'drizzle-orm/pg-core';
 import { games, seasons, teams, teamSeasons, type Game, type Team } from '$lib/drizzle/schema';
@@ -15,8 +15,9 @@ const StatusSchema = z
 const TypeSchema = z.enum(['regular season', 'playoff']).nonoptional('Please select a game type');
 const DecidedInSchema = z.enum(['regulation', 'overtime', 'shootout']).optional();
 
-const GameCreateFields = z
+const GameFields = z
 	.object({
+		id: z.int().nonnegative().optional(),
 		seasonId: z.string().min(1, 'Please select a season'),
 		homeTeamId: z.string().min(1, 'Please select a home team'),
 		awayTeamId: z.string().min(1, 'Please select an away team'),
@@ -58,9 +59,19 @@ export const getActiveSeasonGames = query(async (): Promise<GameData[]> => {
 		.orderBy(games.startDate);
 });
 
+export const getGame = query(
+	z.object({
+		id: z.int().nonnegative().nonoptional()
+	}),
+	async ({ id }): Promise<Game> => {
+		const [game] = await db.select().from(games).where(eq(games.id, id)).limit(1);
+		return game;
+	}
+);
+
 /* Create new game */
 export const createGame = form(
-	GameCreateFields,
+	GameFields,
 	async ({
 		seasonId,
 		homeTeamId,
@@ -74,17 +85,6 @@ export const createGame = form(
 		decidedIn,
 		notes
 	}) => {
-		/* Get the team season ids */
-		const getTeamSeasonId = async (teamId: number, seasonId: number) => {
-			const [row] = await db
-				.select({ id: teamSeasons.id })
-				.from(teamSeasons)
-				.where(and(eq(teamSeasons.teamId, teamId), eq(teamSeasons.seasonId, seasonId)))
-				.limit(1);
-
-			return row?.id;
-		};
-
 		const seasonIdInt = parseInt(seasonId, 10);
 		const homeTeamIdInt = parseInt(homeTeamId, 10);
 		const awayTeamIdInt = parseInt(awayTeamId, 10);
@@ -103,22 +103,6 @@ export const createGame = form(
 			console.error('awayTeamSeasonId not found');
 			return;
 		}
-
-		console.log(
-			JSON.stringify({
-				seasonId,
-				homeTeamId,
-				awayTeamId,
-				weekNumber,
-				startDate,
-				gameStatus,
-				gameType,
-				homeScore,
-				awayScore,
-				decidedIn,
-				notes
-			})
-		);
 
 		await db.insert(games).values({
 			seasonId: seasonIdInt,
@@ -139,3 +123,77 @@ export const createGame = form(
 		redirect(303, '/games?created=true');
 	}
 );
+
+/* Edit an existing game */
+export const updateGame = form(
+	GameFields,
+	async ({
+		id,
+		seasonId,
+		homeTeamId,
+		awayTeamId,
+		weekNumber,
+		startDate,
+		gameStatus,
+		gameType,
+		homeScore,
+		awayScore,
+		decidedIn,
+		notes
+	}) => {
+		if (!id) {
+			throw new Error('Game id is required');
+		}
+
+		const seasonIdInt = parseInt(seasonId, 10);
+		const homeTeamIdInt = parseInt(homeTeamId, 10);
+		const awayTeamIdInt = parseInt(awayTeamId, 10);
+
+		const [homeTeamSeasonId, awayTeamSeasonId] = await Promise.all([
+			getTeamSeasonId(homeTeamIdInt, seasonIdInt),
+			getTeamSeasonId(awayTeamIdInt, seasonIdInt)
+		]);
+
+		if (!homeTeamSeasonId) {
+			console.error('homeTeamSeasonId not found');
+			return;
+		}
+
+		if (!awayTeamSeasonId) {
+			console.error('awayTeamSeasonId not found');
+			return;
+		}
+
+		await db
+			.update(games)
+			.set({
+				seasonId: seasonIdInt,
+				homeTeamId: homeTeamIdInt,
+				homeTeamSeasonId,
+				awayTeamSeasonId,
+				awayTeamId: awayTeamIdInt,
+				weekNumber,
+				startDate: new Date(startDate),
+				status: gameStatus,
+				gameType,
+				homeScore,
+				awayScore,
+				decidedIn,
+				notes
+			})
+			.where(eq(games.id, id));
+
+		redirect(303, '/games?updated=true');
+	}
+);
+
+/* Get the team season ids */
+const getTeamSeasonId = async (teamId: number, seasonId: number) => {
+	const [row] = await db
+		.select({ id: teamSeasons.id })
+		.from(teamSeasons)
+		.where(and(eq(teamSeasons.teamId, teamId), eq(teamSeasons.seasonId, seasonId)))
+		.limit(1);
+
+	return row?.id;
+};

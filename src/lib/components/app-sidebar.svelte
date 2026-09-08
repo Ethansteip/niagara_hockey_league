@@ -34,7 +34,7 @@
 			},
 			{
 				title: 'Players',
-				url: '#',
+				url: '/players',
 				icon: Users
 			},
 			{

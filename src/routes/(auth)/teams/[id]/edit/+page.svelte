@@ -18,10 +18,6 @@
 
 	let form: HTMLFormElement;
 	let submitting = $derived<boolean>(!!editTeam.pending);
-
-	onNavigate(() => {
-		form.reset();
-	});
 </script>
 
 <main class="flex flex-col items-center justify-center gap-3">
@@ -65,7 +61,7 @@
 					{#if submitting}
 						<Spinner />
 					{:else}
-						Submit
+						Save
 					{/if}
 				</Button>
 				<Button variant="outline" type="button" href="/teams">Cancel</Button>
