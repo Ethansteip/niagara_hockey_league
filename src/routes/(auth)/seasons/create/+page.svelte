@@ -43,7 +43,7 @@
 
 		<Field.Group>
 			<Field.Set>
-				<Field.Legend>Create A New Hockey Season</Field.Legend>
+				<Field.Legend>Create A New Season</Field.Legend>
 				<Field.Description>Assign games to a season once it has been created.</Field.Description>
 				<Field.Group>
 					<Field.Field data-invalid={seasonNameIssues ? true : undefined}>

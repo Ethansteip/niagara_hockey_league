@@ -5,12 +5,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
-	import { List, Plus, SearchAlert, SquarePen } from '@lucide/svelte';
+	import { List, Plus, SearchAlert, SquarePen, Trash } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/state';
 	import { replaceState } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
 
 	const players: Player[] = $derived(await getPlayers());
 
@@ -74,8 +73,13 @@
 						<Table.Cell>
 							{player.firstName}
 						</Table.Cell>
-						<Table.Cell class="md:hidden">
+						<Table.Cell>
 							<Badge>{player.role}</Badge>
+						</Table.Cell>
+						<Table.Cell>
+							<Button size="icon" variant="outline">
+								<Trash />
+							</Button>
 						</Table.Cell>
 						<Table.Cell class="text-end">
 							<Button size="icon" variant="outline" href="/players/{player.id}/edit">
