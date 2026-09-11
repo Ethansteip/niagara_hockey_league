@@ -37,7 +37,7 @@
 		<input {...editPlayer.fields.active.as('hidden', isActiveChecked)} />
 		<Field.Group>
 			<Field.Set>
-				<Field.Legend>Create A New Player</Field.Legend>
+				<Field.Legend>Edit A Player</Field.Legend>
 				<Field.Group>
 					<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 						<Field.Field data-invalid={firstNameIssues ? true : undefined}>
@@ -99,7 +99,7 @@
 					{#if submitting}
 						<Spinner />
 					{:else}
-						Submit
+						Save
 					{/if}
 				</Button>
 				<Button variant="outline" type="button" href="/players">Cancel</Button>
