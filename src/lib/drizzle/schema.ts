@@ -41,6 +41,7 @@ export const players = pgTable('players', {
 	firstName: text('first_name').notNull(),
 	lastName: text('last_name').notNull(),
 	role: playerRoleEnum('role').notNull().default('player'),
+	active: boolean().default(true),
 	createdAt: createdAt(),
 	updatedAt: updatedAt()
 });
@@ -120,7 +121,7 @@ export const rosters = pgTable(
 			.references(() => teamSeasons.id, { onDelete: 'cascade' }),
 		playerId: integer('player_id')
 			.notNull()
-			.references(() => players.id, { onDelete: 'restrict' }),
+			.references(() => players.id, { onDelete: 'cascade' }),
 		jerseyNumber: integer('jersey_number'),
 		createdAt: createdAt(),
 		updatedAt: updatedAt()

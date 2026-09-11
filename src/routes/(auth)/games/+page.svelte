@@ -10,6 +10,7 @@
 	import { replaceState } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
+	import { capitalizeWords } from '$lib/utils';
 
 	const games: GameData[] = $derived(await getActiveSeasonGames());
 
@@ -34,13 +35,6 @@
 		year: 'numeric',
 		hour: 'numeric'
 	});
-
-	function capitalizeWords(sentence: string) {
-		return sentence
-			.split(' ')
-			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ');
-	}
 
 	onMount(() => {
 		if (page.url.searchParams.get('created')) {

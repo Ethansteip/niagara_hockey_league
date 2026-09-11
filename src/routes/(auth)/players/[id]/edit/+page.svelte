@@ -3,38 +3,38 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { createPlayer } from '../players.remote';
-	import { onNavigate } from '$app/navigation';
+	import { getPlayer, updatePlayer } from '../../players.remote';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 
-	let firstNameIssues = $derived(createPlayer.fields.firstName.issues());
-	let lastNameIssues = $derived(createPlayer.fields.lastName.issues());
+	let { params } = $props();
+	const id = $derived(parseInt(params.id, 10));
+	let editPlayer = $derived(updatePlayer.for(id));
 
-	let isActiveChecked = $state(true);
-	let roleIssues = $derived(createPlayer.fields.role.issues());
-	let role = $state<string>();
+	let player = $derived(await getPlayer({ id: id }));
 
+	let firstNameIssues = $derived(editPlayer.fields.firstName.issues());
+	let lastNameIssues = $derived(editPlayer.fields.lastName.issues());
+
+	let isActiveChecked = $derived(player.active ?? true);
+	let roleIssues = $derived(editPlayer.fields.role.issues());
 	let roles = [
 		{ value: 'player', label: 'Player' },
 		{ value: 'goalie', label: 'Goalie' }
 	];
+	let role = $derived<string>(roles.find((r) => r.value === player.role)?.value ?? 'player');
 
 	let roleTriggerContent = $derived(
 		roles.find((r) => r.value === role)?.label ?? 'Select a player role'
 	);
 
 	let form: HTMLFormElement;
-	let submitting = $derived<boolean>(!!createPlayer.pending);
-
-	onNavigate(() => {
-		form.reset();
-	});
+	let submitting = $derived<boolean>(!!editPlayer.pending);
 </script>
 
 <main class="flex flex-col items-center justify-center gap-3">
-	<form {...createPlayer} bind:this={form} class="w-full">
-		<input {...createPlayer.fields.active.as('hidden', isActiveChecked)} />
+	<form {...editPlayer} bind:this={form} class="w-full">
+		<input {...editPlayer.fields.active.as('hidden', isActiveChecked)} />
 		<Field.Group>
 			<Field.Set>
 				<Field.Legend>Create A New Player</Field.Legend>
@@ -44,14 +44,18 @@
 							<Field.Label for="firstName">First Name</Field.Label>
 							<Input
 								id="firstName"
-								{...createPlayer.fields.firstName.as('text')}
+								{...editPlayer.fields.firstName.as('text', player.firstName)}
 								placeholder="John"
 							/>
 							<Field.Error errors={firstNameIssues} />
 						</Field.Field>
 						<Field.Field data-invalid={lastNameIssues ? true : undefined}>
 							<Field.Label for="lastName">Last Name</Field.Label>
-							<Input id="lastName" {...createPlayer.fields.lastName.as('text')} placeholder="Doe" />
+							<Input
+								id="lastName"
+								{...editPlayer.fields.lastName.as('text', player.lastName)}
+								placeholder="Doe"
+							/>
 							<Field.Error errors={lastNameIssues} />
 						</Field.Field>
 					</div>

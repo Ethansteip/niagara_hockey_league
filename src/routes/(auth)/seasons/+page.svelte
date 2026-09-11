@@ -97,12 +97,6 @@
 					</Table.Row>
 				{/each}
 			</Table.Body>
-			<!-- <Table.Footer>
-				<Table.Row>
-					<Table.Cell colspan={5}>Total</Table.Cell>
-					<Table.Cell class="text-end">$2,500.00</Table.Cell>
-				</Table.Row>
-			</Table.Footer> -->
 		</Table.Root>
 	{:else}
 		<div

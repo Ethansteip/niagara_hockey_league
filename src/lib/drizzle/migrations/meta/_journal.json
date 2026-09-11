@@ -15,6 +15,13 @@
       "when": 1787963947084,
       "tag": "0001_slim_colleen_wing",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789084167855,
+      "tag": "0002_unknown_liz_osborn",
+      "breakpoints": true
     }
   ]
 }
