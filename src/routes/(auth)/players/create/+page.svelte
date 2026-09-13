@@ -5,6 +5,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { createPlayer } from '../players.remote';
 	import { onNavigate } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 
@@ -27,7 +28,7 @@
 	let form: HTMLFormElement;
 	let submitting = $derived<boolean>(!!createPlayer.pending);
 
-	onNavigate(() => {
+	onMount(() => {
 		form.reset();
 	});
 </script>
@@ -44,6 +45,7 @@
 							<Field.Label for="firstName">First Name</Field.Label>
 							<Input
 								id="firstName"
+								enterkeyhint="next"
 								{...createPlayer.fields.firstName.as('text')}
 								placeholder="John"
 							/>
@@ -51,7 +53,12 @@
 						</Field.Field>
 						<Field.Field data-invalid={lastNameIssues ? true : undefined}>
 							<Field.Label for="lastName">Last Name</Field.Label>
-							<Input id="lastName" {...createPlayer.fields.lastName.as('text')} placeholder="Doe" />
+							<Input
+								id="lastName"
+								enterkeyhint="next"
+								{...createPlayer.fields.lastName.as('text')}
+								placeholder="Doe"
+							/>
 							<Field.Error errors={lastNameIssues} />
 						</Field.Field>
 					</div>

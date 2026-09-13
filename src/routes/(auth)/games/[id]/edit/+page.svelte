@@ -225,6 +225,7 @@
 							<Field.Label for="homeTeamScore">Home Team Score</Field.Label>
 							<Input
 								id="homeTeamScore"
+								enterkeyhint="next"
 								{...editGame.fields.homeScore.as('number', homeScore)}
 								min="0"
 								placeholder="1"
@@ -235,6 +236,7 @@
 							<Field.Label for="homeTeamScore">Away Team Score</Field.Label>
 							<Input
 								id="homeTeamScore"
+								enterkeyhint="next"
 								{...editGame.fields.awayScore.as('number', awayScore)}
 								min="0"
 								placeholder="1"

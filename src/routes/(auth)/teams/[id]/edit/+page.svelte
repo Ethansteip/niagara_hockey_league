@@ -30,6 +30,7 @@
 					<Field.Field data-invalid={teamNameIssues ? true : undefined}>
 						<Field.Label for="team-name">Team Name</Field.Label>
 						<Input
+							enterkeyhint="next"
 							id="team-name"
 							{...editTeam.fields.teamName.as('text', name)}
 							placeholder="Leafs"
@@ -39,6 +40,7 @@
 					<Field.Field data-invalid={teamCodeIssues ? true : undefined}>
 						<Field.Label for="team-code">Team Code</Field.Label>
 						<Input
+							enterkeyhint="next"
 							id="team-code"
 							{...editTeam.fields.teamCode.as('text', code ?? '')}
 							placeholder="L$@fs_1102"
@@ -48,6 +50,7 @@
 					<Field.Field data-invalid={logoUrlIssues ? true : undefined}>
 						<Field.Label for="logo-url">Logo URL</Field.Label>
 						<Input
+							enterkeyhint="next"
 							id="logo-url"
 							{...editTeam.fields.logoUrl.as('text', logoUrl ?? '')}
 							placeholder="https://railway.storage/leafs-icon"

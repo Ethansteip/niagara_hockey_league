@@ -26,12 +26,18 @@
 				<Field.Group>
 					<Field.Field data-invalid={teamNameIssues ? true : undefined}>
 						<Field.Label for="season-name">Team Name</Field.Label>
-						<Input id="team-name" {...createTeam.fields.teamName.as('text')} placeholder="Leafs" />
+						<Input
+							enterkeyhint="next"
+							id="team-name"
+							{...createTeam.fields.teamName.as('text')}
+							placeholder="Leafs"
+						/>
 						<Field.Error errors={teamNameIssues} />
 					</Field.Field>
 					<Field.Field data-invalid={teamCodeIssues ? true : undefined}>
 						<Field.Label for="team-code">Team Code</Field.Label>
 						<Input
+							enterkeyhint="next"
 							id="team-code"
 							{...createTeam.fields.teamCode.as('text')}
 							placeholder="L$@fs_1102"

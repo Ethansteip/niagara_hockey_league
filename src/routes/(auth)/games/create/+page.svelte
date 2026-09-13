@@ -126,6 +126,7 @@
 							<Field.Label for="weekNumber">Week Number</Field.Label>
 							<Input
 								id="weekNumber"
+								enterkeyhint="next"
 								{...createGame.fields.weekNumber.as('number')}
 								placeholder="1"
 							/>

@@ -58,7 +58,7 @@
 		}
 
 		if (page.url.searchParams.get('updated')) {
-			toast.success('PLayer Edited Successfully');
+			toast.success('Player Edited Successfully');
 			const url = new URL(page.url);
 			url.searchParams.delete('updated');
 			replaceState(url, {});

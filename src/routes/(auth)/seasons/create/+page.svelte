@@ -50,6 +50,7 @@
 						<Field.Label for="season-name">Season Name</Field.Label>
 						<Input
 							id="season-name"
+							enterkeyhint="next"
 							{...createSeason.fields.seasonName.as('text')}
 							placeholder="2026-2027 season"
 						/>
