@@ -2,8 +2,8 @@
 	import * as Field from '$lib/components/ui/field/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { createTeam } from '../teams.remote';
-	import { onNavigate } from '$app/navigation';
+	import { createTeam } from '$lib/remote/teams/teams.remote';
+	import { onMount } from 'svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 
 	let teamNameIssues = $derived(createTeam.fields.teamName.issues());
@@ -13,7 +13,7 @@
 	let form: HTMLFormElement;
 	let submitting = $derived<boolean>(!!createTeam.pending);
 
-	onNavigate(() => {
+	onMount(() => {
 		form.reset();
 	});
 </script>

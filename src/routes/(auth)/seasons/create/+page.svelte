@@ -6,8 +6,8 @@
 	import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
-	import { createSeason } from '../seasons.remote';
-	import { onNavigate } from '$app/navigation';
+	import { createSeason } from '$lib/remote/seasons/seasons.remote';
+	import { onMount } from 'svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 
@@ -26,7 +26,7 @@
 	let form: HTMLFormElement;
 	let submitting = $derived<boolean>(!!createSeason.pending);
 
-	onNavigate(() => {
+	onMount(() => {
 		form.reset();
 	});
 

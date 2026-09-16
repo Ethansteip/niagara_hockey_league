@@ -44,7 +44,7 @@
 			},
 			{
 				title: 'Rosters',
-				url: '#',
+				url: '/rosters',
 				icon: UsersGroup
 			},
 			{

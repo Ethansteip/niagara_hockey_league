@@ -20,8 +20,8 @@
 	import { getGame, updateGame } from '../../games.remote';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
-	import { getSeasons } from '../../../seasons/seasons.remote';
-	import { getTeams } from '../../../teams/teams.remote';
+	import { getSeasons } from '$lib/remote/seasons/seasons.remote';
+	import { getTeams } from '$lib/remote/teams/teams.remote';
 
 	let { params } = $props();
 	const id = $derived(parseInt(params.id, 10));

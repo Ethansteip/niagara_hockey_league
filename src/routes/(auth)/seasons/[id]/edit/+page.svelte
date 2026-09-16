@@ -1,14 +1,13 @@
 <script lang="ts">
 	import * as Field from '$lib/components/ui/field/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { getLocalTimeZone, parseDate, today, type CalendarDate } from '@internationalized/date';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
-	import { updateSeason } from '../../seasons.remote';
+	import { updateSeason } from '$lib/remote/seasons/seasons.remote.js';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 
 	let { data } = $props();

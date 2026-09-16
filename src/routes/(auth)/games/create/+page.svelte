@@ -15,9 +15,8 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import { createGame } from '../games.remote';
-	import { onNavigate } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
-	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { type PageProps } from './$types';
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
 
@@ -102,7 +101,7 @@
 	let form = createGame.element;
 	let submitting = $derived<boolean>(!!createGame.pending);
 
-	onNavigate(() => {
+	onMount(() => {
 		form?.reset();
 	});
 </script>

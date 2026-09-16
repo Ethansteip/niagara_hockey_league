@@ -2,9 +2,8 @@
 	import * as Field from '$lib/components/ui/field/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { onNavigate } from '$app/navigation';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
-	import { updateTeam } from '../../teams.remote';
+	import { updateTeam } from '$lib/remote/teams/teams.remote';
 
 	let { data } = $props();
 	let team = $derived(data?.team);

@@ -119,6 +119,23 @@ export const rosters = pgTable(
 		teamSeasonId: integer('team_season_id')
 			.notNull()
 			.references(() => teamSeasons.id, { onDelete: 'cascade' }),
+		createdAt: createdAt(),
+		updatedAt: updatedAt()
+	},
+	(t) => [
+		{
+			uniqueTeamSeason: uniqueIndex('roster_team_season_unique').on(t.teamSeasonId)
+		}
+	]
+);
+
+export const rostersPlayers = pgTable(
+	'rosters_players',
+	{
+		id: id(),
+		rosterId: integer('roster_id')
+			.notNull()
+			.references(() => rosters.id, { onDelete: 'cascade' }),
 		playerId: integer('player_id')
 			.notNull()
 			.references(() => players.id, { onDelete: 'cascade' }),
@@ -128,7 +145,7 @@ export const rosters = pgTable(
 	},
 	(t) => [
 		{
-			uniqueRoster: uniqueIndex('rosters_teamseason_player_unique').on(t.teamSeasonId, t.playerId)
+			uniqueRoster: uniqueIndex('roster_player_unique').on(t.rosterId, t.playerId)
 		}
 	]
 );

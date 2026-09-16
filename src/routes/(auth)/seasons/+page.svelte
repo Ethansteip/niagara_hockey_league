@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getSeasons, type Season, deleteSeason } from './seasons.remote';
+	import { getSeasons, type Season, deleteSeason } from '$lib/remote/seasons/seasons.remote';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
@@ -123,9 +123,12 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This action cannot be undone. This will permanently delete season: <span class="font-bold"
-					>{seasonToDelete?.name}</span
-				>
+				<p>This action cannot be undone. This will permanently delete:</p>
+				<ul class="mt-2 flex flex-col gap-1">
+					<li class="underline">Season: <span class="font-bold">{seasonToDelete?.name}</span></li>
+					<li>- Any Rosters associated with this season</li>
+					<li>- Any Games associated with this season</li>
+				</ul>
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>

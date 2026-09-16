@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getTeams } from './teams.remote';
+	import { getTeams } from '$lib/remote/teams/teams.remote';
 	import type { Team } from '$lib/drizzle/schema';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
