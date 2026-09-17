@@ -11,7 +11,11 @@
 	import { getTeams } from '$lib/remote/teams/teams.remote';
 	import { getPlayers } from '$lib/remote/players/players.remote';
 	import type { Player } from '$lib/drizzle/schema';
-	import { createRoster } from '$lib/remote/rosters/rosters.remote';
+	import {
+		createRoster,
+		getRoster,
+		type RosterAndPlayers
+	} from '$lib/remote/rosters/rosters.remote';
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
 	import { Trash, UserRoundPlus } from '@lucide/svelte';
 	import CheckIcon from '@lucide/svelte/icons/check';
@@ -19,6 +23,12 @@
 	import { tick } from 'svelte';
 	import * as Command from '$lib/components/ui/command/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
+
+	let { params } = $props();
+	const id = $derived(parseInt(params.id, 10));
+
+	let roster = $derived<RosterAndPlayers>(await getRoster({ id }));
+	// let editPlayer = $derived(updatePlayer.for(id));
 
 	/* Seasons */
 	let seasons = $derived(await getSeasons());

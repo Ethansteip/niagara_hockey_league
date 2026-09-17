@@ -22,8 +22,12 @@ export type RosterData = Roster & {
 	season: Season;
 };
 
+export type RosterPlayer = Player & {
+	jerseyNumber: number | null;
+};
+
 export interface RosterAndPlayers extends RosterData {
-	players: Player[];
+	players: RosterPlayer[];
 }
 
 const CreateRosterSchema = z.object({
@@ -31,6 +35,40 @@ const CreateRosterSchema = z.object({
 	seasonId: z.string().min(1, 'Please select a season').nonempty(),
 	players: z.array(z.string()).optional()
 });
+
+export const getRoster = query(
+	z.object({ id: z.int().nonoptional() }),
+	async ({ id }): Promise<RosterAndPlayers> => {
+		const [roster] = await db
+			.select({
+				...getTableColumns(rosters),
+				team: { ...getTableColumns(teams) },
+				season: { ...getTableColumns(seasons) }
+			})
+			.from(rosters)
+			.innerJoin(teamSeasons, eq(teamSeasons.id, rosters.teamSeasonId))
+			.innerJoin(teams, eq(teamSeasons.teamId, teams.id))
+			.innerJoin(seasons, eq(teamSeasons.seasonId, seasons.id))
+			.where(eq(rosters.id, id))
+			.limit(1);
+
+		if (!roster) {
+			error(404, `Roster with id ${id} not found`);
+		}
+
+		const rosterPlayers = await db
+			.select({
+				...getTableColumns(players),
+				jerseyNumber: rostersPlayers.jerseyNumber
+			})
+			.from(rostersPlayers)
+			.innerJoin(players, eq(rostersPlayers.playerId, players.id))
+			.where(eq(rostersPlayers.rosterId, id))
+			.orderBy(asc(players.lastName), asc(players.firstName));
+
+		return { ...roster, players: rosterPlayers };
+	}
+);
 
 export const getRosters = query(async (): Promise<RosterData[]> => {
 	return await db
@@ -62,8 +100,6 @@ export const createRoster = form(CreateRosterSchema, async ({ teamId, seasonId, 
 			`Unable to find corresponding team season using season id: ${seasonIdInt} and team id: ${teamIdInt}`
 		);
 	}
-
-	console.log('in Here!');
 
 	const [rosterResult] = await db
 		.insert(rosters)
