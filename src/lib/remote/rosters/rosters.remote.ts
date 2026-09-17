@@ -29,7 +29,7 @@ export interface RosterAndPlayers extends RosterData {
 const CreateRosterSchema = z.object({
 	teamId: z.string().min(1, 'Please select a team').nonempty(),
 	seasonId: z.string().min(1, 'Please select a season').nonempty(),
-	players: z.array(z.string())
+	players: z.array(z.string()).optional()
 });
 
 export const getRosters = query(async (): Promise<RosterData[]> => {
@@ -49,7 +49,7 @@ export const getRosters = query(async (): Promise<RosterData[]> => {
 export const createRoster = form(CreateRosterSchema, async ({ teamId, seasonId, players }) => {
 	const teamIdInt = parseInt(teamId, 10);
 	const seasonIdInt = parseInt(seasonId, 10);
-	const playerIds = players.map((id) => parseInt(id, 10));
+	const playerIds = players?.length ? players?.map((id) => parseInt(id, 10)) : undefined;
 
 	const [teamSeason] = await db
 		.select()
@@ -63,6 +63,8 @@ export const createRoster = form(CreateRosterSchema, async ({ teamId, seasonId, 
 		);
 	}
 
+	console.log('in Here!');
+
 	const [rosterResult] = await db
 		.insert(rosters)
 		.values({
@@ -70,7 +72,7 @@ export const createRoster = form(CreateRosterSchema, async ({ teamId, seasonId, 
 		})
 		.returning({ insertId: rosters.id });
 
-	if (rosterResult?.insertId && playerIds.length > 0) {
+	if (rosterResult?.insertId && playerIds) {
 		await db
 			.insert(rostersPlayers)
 			.values(playerIds.map((id) => ({ rosterId: rosterResult.insertId, playerId: id })));

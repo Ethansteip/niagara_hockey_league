@@ -43,6 +43,13 @@
       "when": 1789520521729,
       "tag": "0005_great_joystick",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789606230809,
+      "tag": "0006_add_unique_indexes",
+      "breakpoints": true
     }
   ]
 }

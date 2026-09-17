@@ -68,8 +68,8 @@
 					<Table.Head>Active</Table.Head>
 					<Table.Head>Start Date</Table.Head>
 					<Table.Head>End Date</Table.Head>
-					<Table.Head>Delete</Table.Head>
-					<Table.Head class="text-end">Edit</Table.Head>
+					<Table.Head>Edit</Table.Head>
+					<Table.Head class="text-end">Delete</Table.Head>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -85,13 +85,13 @@
 						<Table.Cell>{season.startDate}</Table.Cell>
 						<Table.Cell>{season.endDate}</Table.Cell>
 						<Table.Cell>
-							<Button size="icon" variant="outline" onclick={() => (seasonToDelete = season)}>
-								<Trash />
+							<Button size="icon" variant="outline" href="/seasons/{season.id}/edit">
+								<SquarePen />
 							</Button>
 						</Table.Cell>
 						<Table.Cell class="flex justify-end">
-							<Button size="icon" variant="outline" href="/seasons/{season.id}/edit">
-								<SquarePen />
+							<Button size="icon" variant="destructive" onclick={() => (seasonToDelete = season)}>
+								<Trash />
 							</Button>
 						</Table.Cell>
 					</Table.Row>

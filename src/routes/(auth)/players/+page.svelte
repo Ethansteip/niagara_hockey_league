@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getPlayers, deletePlayer } from './players.remote';
+	import { getPlayers, deletePlayer } from '$lib/remote/players/players.remote';
 	import type { Player } from '$lib/drizzle/schema';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
