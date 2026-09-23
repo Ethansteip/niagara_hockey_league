@@ -1,416 +1,146 @@
 /*
- * Seeds a full schedule for every season plus results for games in the past:
- *   - games            round-robin regular season (Sundays, 2 games/night) + playoffs
- *   - players_stats    goals / assists / PIM for every rostered skater in a final game
- *   - goalies_games    which goalie played for each team
- *   - points           team points per game (win 2, tie 1, loss 0)
- *   - standings        recomputed from the seeded results
+ * Seeds the real (unplayed) Tuesday night schedule from
+ * src/data/tuesday_hockey_schedule_2026_27.json:
+ *   - games        one row per scheduled game, status 'scheduled', scores 0
+ *   - standings    reset to zero for every team season (no games have been played)
  *
- * Games dated before "now" are marked final with generated scores; later games
- * stay scheduled. Player/goalie stats are only generated for teams that have a
- * roster in that season, so a season without rosters just gets a schedule.
+ * Mapping from the JSON:
+ *   - team_a -> home, team_b -> away (the source sheet doesn't mark home/away)
+ *   - phase 'regular_season' -> 'regular season', 'playoffs' / 'finals' -> 'playoff'
+ *   - date + time are local America/Toronto times
+ *   - weekNumber is the game night's position in the schedule (1 = first night,
+ *     Sep 22 2026; the Christmas break between Dec 22 and Jan 5 doesn't count)
+ *   - each date must fall on its listed day_of_week (all Tuesdays), or the seed fails
+ *   - games whose teams are still TBD are skipped, since a game needs both teams
  *
- * Requires: teams, seasons (team_seasons). Rosters are optional but recommended.
+ * Requires: teams, seasons (team_seasons) with a season matching the JSON's season.
  * NOTE: truncating games cascades to players_stats, goalies_games and points.
  */
 import { eq } from 'drizzle-orm';
-import {
-	games,
-	goalieGames,
-	players,
-	playerStats,
-	points,
-	rosters,
-	rostersPlayers,
-	seasons,
-	standings,
-	teams,
-	teamSeasons,
-	type NewGame,
-	type NewGoalieGame,
-	type NewPlayerStat,
-	type NewStanding
-} from '../schema';
-import { db, chunk, createRng, truncate, log, runStandalone, type Rng } from './shared';
+import { games, seasons, standings, teams, teamSeasons, type NewGame } from '../schema';
+import { db, chunk, truncate, log, runStandalone } from './shared';
+import schedule from '../../../data/tuesday_hockey_schedule_2026_27.json';
 
-const REGULAR_SEASON_WEEKS = 20;
-const GAME_TIMES: [number, number][] = [
-	[20, 0],
-	[21, 15]
-];
-/** Relative likelihood of a team scoring 0..7 goals in a game. */
-const GOAL_WEIGHTS = [4, 10, 16, 18, 14, 9, 5, 2];
+type ScheduleGame = (typeof schedule.games)[number];
 
-type TeamEntry = { teamId: number; teamSeasonId: number; name: string };
-type RosterEntry = { skaters: number[]; goalies: number[] };
-type Result = { home: number; away: number; decidedIn: 'regulation' | 'overtime' | 'shootout' };
-type SeededGame = NewGame & { key: string };
-type StatRow = Required<Pick<NewPlayerStat, 'playerId' | 'gameId'>> &
-	Record<'goals' | 'assists' | 'penaltyMinutes', number>;
+const GAME_TYPES: Record<string, NewGame['gameType']> = {
+	regular_season: 'regular season',
+	playoffs: 'playoff',
+	finals: 'playoff'
+};
 
-/* ---------- Date helpers ---------- */
-
-function addDays(dateStr: string, days: number) {
-	const d = new Date(`${dateStr}T00:00:00Z`);
-	d.setUTCDate(d.getUTCDate() + days);
-	return d.toISOString().slice(0, 10);
+/** "2026-27" -> "2026-2027", matching the season names in shared.ts. */
+function seasonName(jsonSeason: string) {
+	const [start, end] = jsonSeason.split('-');
+	return `${start}-${start.slice(0, 2)}${end}`;
 }
 
-function isHolidayWeek(dateStr: string) {
-	const [, month, day] = dateStr.split('-').map(Number);
-	return (month === 12 && day >= 20) || (month === 1 && day <= 2);
+/** Converts a local wall-clock date + time in the schedule's timezone to an absolute Date. */
+function localTime(dateStr: string, time: string, timeZone: string) {
+	const guess = new Date(`${dateStr}T${time}:00Z`);
+	const offset = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'longOffset' })
+		.formatToParts(guess)
+		.find((p) => p.type === 'timeZoneName')!
+		.value.replace('GMT', '');
+	return new Date(`${dateStr}T${time}:00${offset || 'Z'}`);
 }
 
-/** Eastern time, approximating DST by month (EST Nov-Mar, EDT otherwise). */
-function gameTime(dateStr: string, [hour, minute]: [number, number]) {
-	const month = Number(dateStr.slice(5, 7));
-	const offset = month >= 11 || month <= 3 ? '-05:00' : '-04:00';
-	const hh = String(hour).padStart(2, '0');
-	const mm = String(minute).padStart(2, '0');
-	return new Date(`${dateStr}T${hh}:${mm}:00${offset}`);
+function weekday(dateStr: string) {
+	return new Date(`${dateStr}T12:00:00Z`).toLocaleDateString('en-US', {
+		weekday: 'long',
+		timeZone: 'UTC'
+	});
 }
 
-/** Game-night dates for a season, skipping the holiday break. */
-function gameNights(startDate: string, count: number) {
-	const nights: string[] = [];
-	let date = startDate;
-	while (nights.length < count) {
-		if (!isHolidayWeek(date)) nights.push(date);
-		date = addDays(date, 7);
-	}
-	return nights;
+function isTbd(game: ScheduleGame) {
+	return game.team_a === 'TBD' || game.team_b === 'TBD';
 }
-
-/* ---------- Schedule helpers ---------- */
-
-/** Circle-method round robin: each round has every team playing exactly once. */
-function roundRobin<T>(entries: T[]): [T, T][][] {
-	const list = [...entries];
-	if (list.length % 2 === 1) throw new Error('Round robin needs an even number of teams');
-	const rounds: [T, T][][] = [];
-	const n = list.length;
-	for (let r = 0; r < n - 1; r++) {
-		const round: [T, T][] = [];
-		for (let i = 0; i < n / 2; i++) {
-			const a = list[i];
-			const b = list[n - 1 - i];
-			// Flip home/away every other round so both sides get home games.
-			round.push(r % 2 === 0 ? [a, b] : [b, a]);
-		}
-		rounds.push(round);
-		list.splice(1, 0, list.pop()!);
-	}
-	return rounds;
-}
-
-function generateResult(rng: Rng, playoff: boolean): Result {
-	let home = rng.weighted(GOAL_WEIGHTS);
-	let away = rng.weighted(GOAL_WEIGHTS);
-	if (home !== away) return { home, away, decidedIn: 'regulation' };
-
-	// Tied after regulation. Beer league regular season allows ties; playoffs don't.
-	if (!playoff && rng.chance(0.3)) return { home, away, decidedIn: 'regulation' };
-	if (rng.chance(0.5)) home += 1;
-	else away += 1;
-	return { home, away, decidedIn: rng.chance(0.65) ? 'overtime' : 'shootout' };
-}
-
-/* ---------- Stats helpers ---------- */
-
-function skaterStats(rng: Rng, skaters: number[], goals: number, gameId: number): StatRow[] {
-	const byPlayer = new Map<number, StatRow>(
-		skaters.map((playerId) => [
-			playerId,
-			{ playerId, gameId, goals: 0, assists: 0, penaltyMinutes: 0 }
-		])
-	);
-	if (skaters.length === 0) return [];
-
-	for (let g = 0; g < goals; g++) {
-		const scorer = rng.pick(skaters);
-		byPlayer.get(scorer)!.goals += 1;
-
-		const assistCount = rng.weighted([2, 4, 4]); // 0, 1 or 2 assists
-		const helpers = rng.shuffle(skaters.filter((id) => id !== scorer)).slice(0, assistCount);
-		for (const helper of helpers) byPlayer.get(helper)!.assists += 1;
-	}
-
-	for (const stat of byPlayer.values()) {
-		if (rng.chance(0.03)) stat.penaltyMinutes = 4;
-		else if (rng.chance(0.1)) stat.penaltyMinutes = 2;
-	}
-
-	return [...byPlayer.values()];
-}
-
-type StatKey = `${'regularSeason' | 'playoff'}${
-	'GamesPlayed' | 'Wins' | 'Ties' | 'Losses' | 'Points' | 'GoalsFor' | 'GoalsAgainst'}`;
-type Standing = NewStanding & Record<StatKey, number>;
-
-function blankStanding(seasonId: number, team: TeamEntry): Standing {
-	return {
-		seasonId,
-		teamSeasonId: team.teamSeasonId,
-		teamId: team.teamId,
-		regularSeasonGamesPlayed: 0,
-		regularSeasonWins: 0,
-		regularSeasonTies: 0,
-		regularSeasonLosses: 0,
-		regularSeasonPoints: 0,
-		regularSeasonGoalsFor: 0,
-		regularSeasonGoalsAgainst: 0,
-		playoffGamesPlayed: 0,
-		playoffWins: 0,
-		playoffTies: 0,
-		playoffLosses: 0,
-		playoffPoints: 0,
-		playoffGoalsFor: 0,
-		playoffGoalsAgainst: 0
-	};
-}
-
-function applyResult(s: Standing, goalsFor: number, goalsAgainst: number, playoff: boolean) {
-	const won = goalsFor > goalsAgainst;
-	const tied = goalsFor === goalsAgainst;
-	const p = playoff ? 'playoff' : 'regularSeason';
-	s[`${p}GamesPlayed`] += 1;
-	s[`${p}Wins`] += won ? 1 : 0;
-	s[`${p}Ties`] += tied ? 1 : 0;
-	s[`${p}Losses`] += !won && !tied ? 1 : 0;
-	s[`${p}Points`] += won ? 2 : tied ? 1 : 0;
-	s[`${p}GoalsFor`] += goalsFor;
-	s[`${p}GoalsAgainst`] += goalsAgainst;
-}
-
-function sortByRegularSeason(rows: Standing[]) {
-	return [...rows].sort(
-		(a, b) =>
-			b.regularSeasonPoints - a.regularSeasonPoints ||
-			b.regularSeasonWins - a.regularSeasonWins ||
-			b.regularSeasonGoalsFor -
-				b.regularSeasonGoalsAgainst -
-				(a.regularSeasonGoalsFor - a.regularSeasonGoalsAgainst) ||
-			b.regularSeasonGoalsFor - a.regularSeasonGoalsFor
-	);
-}
-
-/* ---------- Main ---------- */
 
 export async function seedGames() {
-	const rng = createRng(1967);
-	const now = new Date();
-
-	const allSeasons = await db.select().from(seasons).orderBy(seasons.startDate);
-	if (allSeasons.length === 0) {
-		throw new Error('No seasons found. Run `bun run seed:seasons` first.');
+	const name = seasonName(schedule.season);
+	const [season] = await db.select().from(seasons).where(eq(seasons.name, name));
+	if (!season) {
+		throw new Error(`Season "${name}" not found. Run \`bun run seed:seasons\` first.`);
 	}
 
-	const allTeamSeasons = await db
-		.select({
-			teamSeasonId: teamSeasons.id,
-			teamId: teams.id,
-			seasonId: teamSeasons.seasonId,
-			name: teams.name
-		})
+	const seasonTeams = await db
+		.select({ teamSeasonId: teamSeasons.id, teamId: teams.id, name: teams.name })
 		.from(teamSeasons)
 		.innerJoin(teams, eq(teams.id, teamSeasons.teamId))
-		.orderBy(teams.id);
+		.where(eq(teamSeasons.seasonId, season.id));
 
-	// teamSeasonId -> rostered skaters / goalies
-	const rosterByTeamSeason = new Map<number, RosterEntry>();
-	const rosterRows = await db
-		.select({ teamSeasonId: rosters.teamSeasonId, playerId: players.id, role: players.role })
-		.from(rosters)
-		.innerJoin(rostersPlayers, eq(rostersPlayers.rosterId, rosters.id))
-		.innerJoin(players, eq(players.id, rostersPlayers.playerId));
-	for (const row of rosterRows) {
-		const entry = rosterByTeamSeason.get(row.teamSeasonId) ?? { skaters: [], goalies: [] };
-		(row.role === 'goalie' ? entry.goalies : entry.skaters).push(row.playerId);
-		rosterByTeamSeason.set(row.teamSeasonId, entry);
+	// Schedule uses upper-case names ("LEAFS"), the DB uses "Leafs".
+	const teamByName = new Map(seasonTeams.map((t) => [t.name.toUpperCase(), t]));
+	const findTeam = (jsonName: string, gameNumber: number) => {
+		const team = teamByName.get(jsonName.toUpperCase());
+		if (!team) {
+			throw new Error(`Game ${gameNumber}: team "${jsonName}" is not registered in ${name}`);
+		}
+		return team;
+	};
+
+	// Week number = position of the game night in the schedule (holiday break doesn't count).
+	const nights = [...new Set(schedule.games.map((g) => g.date))].sort();
+	const weekByDate = new Map(nights.map((date, i) => [date, i + 1]));
+
+	const rows: NewGame[] = [];
+	for (const game of schedule.games) {
+		if (isTbd(game)) {
+			log(`Skipping game ${game.game_number} (${game.phase}, ${game.date}): teams are TBD`);
+			continue;
+		}
+		if (game.team_a_score !== null || game.team_b_score !== null) {
+			throw new Error(`Game ${game.game_number} has a score, but the schedule should be unplayed`);
+		}
+		if (!game.time) throw new Error(`Game ${game.game_number} has no start time`);
+		if (weekday(game.date) !== game.day_of_week) {
+			throw new Error(
+				`Game ${game.game_number}: ${game.date} is a ${weekday(game.date)}, not a ${game.day_of_week}`
+			);
+		}
+
+		const gameType = GAME_TYPES[game.phase];
+		if (!gameType) throw new Error(`Game ${game.game_number}: unknown phase "${game.phase}"`);
+
+		const home = findTeam(game.team_a, game.game_number);
+		const away = findTeam(game.team_b, game.game_number);
+
+		rows.push({
+			seasonId: season.id,
+			homeTeamId: home.teamId,
+			awayTeamId: away.teamId,
+			homeTeamSeasonId: home.teamSeasonId,
+			awayTeamSeasonId: away.teamSeasonId,
+			weekNumber: weekByDate.get(game.date)!,
+			startDate: localTime(game.date, game.time, schedule.timezone),
+			gameType,
+			status: 'scheduled',
+			homeScore: 0,
+			awayScore: 0
+		});
 	}
 
 	log('Clearing games (and player stats, goalie games, points) + standings');
 	await truncate(games, standings);
 
-	const allGames: SeededGame[] = [];
-	const resultsByKey = new Map<string, Result>();
-	const standingRows: Standing[] = [];
+	for (const batch of chunk(rows)) await db.insert(games).values(batch);
+	const playoffs = rows.filter((g) => g.gameType === 'playoff').length;
+	log(
+		`${name}: inserted ${rows.length} games (${rows.length - playoffs} regular season, ${playoffs} playoff)`
+	);
 
-	for (const season of allSeasons) {
-		const seasonTeams: TeamEntry[] = allTeamSeasons.filter((t) => t.seasonId === season.id);
-		if (seasonTeams.length < 2) {
-			log(`${season.name}: fewer than 2 teams registered, skipping`);
-			continue;
-		}
-
-		const standingByTeamSeason = new Map(
-			seasonTeams.map((t) => [t.teamSeasonId, blankStanding(season.id, t)])
+	// Nothing has been played, so every team season starts with a zeroed standings row.
+	const allTeamSeasons = await db.select().from(teamSeasons);
+	if (allTeamSeasons.length > 0) {
+		await db.insert(standings).values(
+			allTeamSeasons.map((ts) => ({
+				seasonId: ts.seasonId,
+				teamSeasonId: ts.id,
+				teamId: ts.teamId
+			}))
 		);
-		const seasonGames: SeededGame[] = [];
-
-		const addGame = (
-			home: TeamEntry,
-			away: TeamEntry,
-			date: string,
-			time: [number, number],
-			weekNumber: number,
-			gameType: NewGame['gameType']
-		) => {
-			const startDate = gameTime(date, time);
-			const key = `${season.id}:${weekNumber}:${home.teamId}-${away.teamId}`;
-			const game: SeededGame = {
-				key,
-				seasonId: season.id,
-				homeTeamId: home.teamId,
-				awayTeamId: away.teamId,
-				homeTeamSeasonId: home.teamSeasonId,
-				awayTeamSeasonId: away.teamSeasonId,
-				weekNumber,
-				startDate,
-				gameType,
-				status: 'scheduled'
-			};
-
-			if (startDate < now) {
-				const result = generateResult(rng, gameType === 'playoff');
-				resultsByKey.set(key, result);
-				Object.assign(game, {
-					status: 'final',
-					homeScore: result.home,
-					awayScore: result.away,
-					decidedIn: result.decidedIn
-				});
-				applyResult(
-					standingByTeamSeason.get(home.teamSeasonId)!,
-					result.home,
-					result.away,
-					gameType === 'playoff'
-				);
-				applyResult(
-					standingByTeamSeason.get(away.teamSeasonId)!,
-					result.away,
-					result.home,
-					gameType === 'playoff'
-				);
-			}
-
-			seasonGames.push(game);
-			return game;
-		};
-
-		// Regular season: cycle through the round-robin rounds, one round per week.
-		const rounds = roundRobin(seasonTeams);
-		const nights = gameNights(season.startDate, REGULAR_SEASON_WEEKS + 2);
-		for (let week = 0; week < REGULAR_SEASON_WEEKS; week++) {
-			const round = rounds[week % rounds.length];
-			const flip = Math.floor(week / rounds.length) % 2 === 1;
-			round.forEach(([a, b], slot) => {
-				const [home, away] = flip ? [b, a] : [a, b];
-				addGame(
-					home,
-					away,
-					nights[week],
-					GAME_TIMES[slot % GAME_TIMES.length],
-					week + 1,
-					'regular season'
-				);
-			});
-		}
-
-		// Playoffs (4 teams): only once the regular season is complete.
-		const regularSeasonDone = seasonGames.every((g) => g.status === 'final');
-		if (regularSeasonDone && seasonTeams.length === 4) {
-			const seeded = sortByRegularSeason([...standingByTeamSeason.values()]).map((s) =>
-				seasonTeams.find((t) => t.teamSeasonId === s.teamSeasonId)!
-			);
-			const [seed1, seed2, seed3, seed4] = seeded;
-			const semiWeek = REGULAR_SEASON_WEEKS + 1;
-			const finalWeek = REGULAR_SEASON_WEEKS + 2;
-
-			const semi1 = addGame(seed1, seed4, nights[semiWeek - 1], GAME_TIMES[0], semiWeek, 'playoff');
-			const semi2 = addGame(seed2, seed3, nights[semiWeek - 1], GAME_TIMES[1], semiWeek, 'playoff');
-
-			const winner = (g: SeededGame, home: TeamEntry, away: TeamEntry) =>
-				(resultsByKey.get(g.key)?.home ?? 0) > (resultsByKey.get(g.key)?.away ?? 0)
-					? [home, away]
-					: [away, home];
-			const [semi1Winner, semi1Loser] = winner(semi1, seed1, seed4);
-			const [semi2Winner, semi2Loser] = winner(semi2, seed2, seed3);
-
-			addGame(semi1Loser, semi2Loser, nights[finalWeek - 1], GAME_TIMES[0], finalWeek, 'playoff');
-			addGame(semi1Winner, semi2Winner, nights[finalWeek - 1], GAME_TIMES[1], finalWeek, 'playoff');
-		}
-
-		const finals = seasonGames.filter((g) => g.status === 'final').length;
-		log(
-			`${season.name}: ${seasonGames.length} games (${finals} final, ${seasonGames.length - finals} scheduled)`
-		);
-
-		allGames.push(...seasonGames);
-		standingRows.push(...standingByTeamSeason.values());
 	}
-
-	// Insert games and keep the generated ids.
-	const insertedGames: { id: number; key: string }[] = [];
-	for (const batch of chunk(allGames)) {
-		const rows = await db
-			.insert(games)
-			.values(batch.map(({ key: _key, ...game }) => game))
-			.returning({ id: games.id });
-		rows.forEach((row, i) => insertedGames.push({ id: row.id, key: batch[i].key }));
-	}
-	log(`Inserted ${insertedGames.length} games`);
-
-	// Per-game rows for final games: points for both teams, plus stats where rosters exist.
-	const pointRows: (typeof points.$inferInsert)[] = [];
-	const statRows: NewPlayerStat[] = [];
-	const goalieRows: NewGoalieGame[] = [];
-
-	for (const { id: gameId, key } of insertedGames) {
-		const game = allGames.find((g) => g.key === key)!;
-		const result = resultsByKey.get(key);
-		if (!result) continue;
-
-		const sides = [
-			{
-				teamId: game.homeTeamId,
-				teamSeasonId: game.homeTeamSeasonId,
-				goals: result.home,
-				against: result.away
-			},
-			{
-				teamId: game.awayTeamId,
-				teamSeasonId: game.awayTeamSeasonId,
-				goals: result.away,
-				against: result.home
-			}
-		];
-
-		for (const side of sides) {
-			const won = side.goals > side.against;
-			const tied = side.goals === side.against;
-			pointRows.push({ teamId: side.teamId, gameId, points: won ? 2 : tied ? 1 : 0 });
-
-			const roster = rosterByTeamSeason.get(side.teamSeasonId);
-			if (!roster) continue;
-			statRows.push(...skaterStats(rng, roster.skaters, side.goals, gameId));
-			if (roster.goalies.length > 0) {
-				goalieRows.push({ playerId: rng.pick(roster.goalies), gameId, teamId: side.teamId });
-			}
-		}
-	}
-
-	for (const batch of chunk(pointRows)) await db.insert(points).values(batch);
-	log(`Inserted ${pointRows.length} team point rows`);
-
-	for (const batch of chunk(statRows)) await db.insert(playerStats).values(batch);
-	log(`Inserted ${statRows.length} player stat rows`);
-
-	for (const batch of chunk(goalieRows)) await db.insert(goalieGames).values(batch);
-	log(`Inserted ${goalieRows.length} goalie game rows`);
-
-	if (standingRows.length > 0) await db.insert(standings).values(standingRows);
-	log(`Inserted ${standingRows.length} standings rows`);
+	log(`Inserted ${allTeamSeasons.length} empty standings rows`);
 }
 
 if (import.meta.main) {
