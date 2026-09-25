@@ -15,7 +15,7 @@
 		<Carousel.Root opts={{ align: 'start' }} class="w-full">
 			<Carousel.Content class="-ms-3 py-1">
 				{#each games as game (game.id)}
-					<Carousel.Item class="basis-[45%] ps-3 sm:basis-1/3 md:basis-1/4">
+					<Carousel.Item class="basis-[47%] ps-3 sm:basis-1/3 md:basis-1/4">
 						<GameCard {game} />
 					</Carousel.Item>
 				{/each}

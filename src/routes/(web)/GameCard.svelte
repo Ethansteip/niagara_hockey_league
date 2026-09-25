@@ -37,7 +37,7 @@
 >
 	<header class="flex items-center justify-between gap-2">
 		<span
-			class="rounded-full bg-secondary px-2 py-0.5 text-[0.7rem] font-semibold text-secondary-foreground"
+			class="rounded-full bg-primary px-2 py-0.5 text-[0.7rem] font-semibold text-primary-foreground"
 		>
 			{dateFormat.format(startDate)}
 		</span>
@@ -48,9 +48,7 @@
 
 	<div class="flex items-center justify-center gap-3">
 		{#each [game.homeTeam, game.awayTeam] as team, i (i)}
-			<div class="flex size-14 items-center justify-center rounded-full bg-secondary">
-				<Logo name={team?.teamName as TeamName} />
-			</div>
+			<Logo name={team?.teamName as TeamName} className="size-25" />
 		{/each}
 	</div>
 
