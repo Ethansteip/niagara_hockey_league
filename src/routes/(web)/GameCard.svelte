@@ -1,30 +1,61 @@
 <script lang="ts">
+	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
+	import type { GameCardData, TeamStanding } from '$lib/remote/games/games.remote';
+
+	let { game }: { game: GameCardData } = $props();
+
+	const dateFormat = new Intl.DateTimeFormat('en-CA', {
+		month: 'short',
+		day: 'numeric',
+		timeZone: 'America/Toronto'
+	});
+
+	const timeFormat = new Intl.DateTimeFormat('en-CA', {
+		hour: 'numeric',
+		minute: '2-digit',
+		timeZone: 'America/Toronto'
+	});
+
+	const startDate = $derived(new Date(game.startDate));
 </script>
 
-{#snippet loading(num: number)}
-	{#each Array(num)}
-		<div
-			class="jutsify-start flex h-auto w-full animate-pulse items-center rounded-lg bg-secondary"
-		>
-			<div class="flex w-full flex-col gap-5 p-3 md:p-5">
-				<div class="h-6 w-1/3 rounded-full bg-secondary-foreground/10"></div>
-				<div class="flex w-full items-center justify-center gap-15">
-					<div class="size-25 rounded-lg bg-secondary-foreground/10"></div>
-					<div class="size-25 rounded-lg bg-secondary-foreground/10"></div>
-				</div>
-				<div class="flex w-full justify-end">
-					<div class="h-6 w-1/5 rounded-full bg-secondary-foreground/10"></div>
-				</div>
-			</div>
-		</div>
-	{/each}
+{#snippet teamRow(team: TeamStanding | undefined)}
+	<div class="flex items-center justify-between gap-2">
+		<p class="truncate text-sm font-semibold">{team?.teamName ?? 'TBD'}</p>
+		<p class="text-xs text-muted-foreground tabular-nums">
+			{#if team}
+				{team.regularSeasonWins}-{team.regularSeasonLosses}-{team.regularSeasonTies}
+			{:else}
+				&ndash;
+			{/if}
+		</p>
+	</div>
 {/snippet}
 
-<div class="mt-5 flex w-full flex-col gap-5 md:mt-10">
-	<div>
-		<h1 class="text-xl font-bold text-foreground md:text-4xl">Upcoming Games</h1>
+<article
+	class="flex h-full flex-col gap-4 rounded-2xl border bg-card p-3 text-card-foreground shadow-sm"
+>
+	<header class="flex items-center justify-between gap-2">
+		<span
+			class="rounded-full bg-secondary px-2 py-0.5 text-[0.7rem] font-semibold text-secondary-foreground"
+		>
+			{dateFormat.format(startDate)}
+		</span>
+		<time datetime={startDate.toISOString()} class="text-xs font-medium text-muted-foreground">
+			{timeFormat.format(startDate)}
+		</time>
+	</header>
+
+	<div class="flex items-center justify-center gap-3">
+		{#each [game.homeTeam, game.awayTeam] as team, i (i)}
+			<div class="flex size-14 items-center justify-center rounded-full bg-secondary">
+				<Logo name={team?.teamName as TeamName} />
+			</div>
+		{/each}
 	</div>
-	<div class="flex w-full flex-col gap-5 md:flex-row md:gap-10">
-		{@render loading(2)}
+
+	<div class="flex flex-col gap-1">
+		{@render teamRow(game.homeTeam)}
+		{@render teamRow(game.awayTeam)}
 	</div>
-</div>
+</article>

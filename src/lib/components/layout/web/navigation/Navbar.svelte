@@ -6,7 +6,7 @@
 </script>
 
 <nav
-	class="sticky mx-auto my-4 flex h-18 w-full items-center justify-between rounded-xl border-2 border-secondary bg-background px-3 shadow md:w-full md:px-6"
+	class="sticky mx-auto my-4 flex h-18 w-full items-center justify-between rounded-lg border-2 border-secondary bg-background px-3 md:w-full md:px-6"
 >
 	<!-- Section 1 -->
 	<div class="flex w-1/4 justify-start gap-2 md:w-1/3">

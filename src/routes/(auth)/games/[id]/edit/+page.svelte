@@ -17,7 +17,7 @@
 	} from '@internationalized/date';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
-	import { getGame, updateGame } from '../../games.remote';
+	import { getGame, updateGame } from '$lib/remote/games/games.remote';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
 	import { getSeasons } from '$lib/remote/seasons/seasons.remote';

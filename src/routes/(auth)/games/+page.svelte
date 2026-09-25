@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getActiveSeasonGames, type GameData } from './games.remote';
+	import { getActiveSeasonGames, type GameData } from '$lib/remote/games/games.remote';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';

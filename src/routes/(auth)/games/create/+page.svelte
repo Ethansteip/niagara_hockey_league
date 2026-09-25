@@ -14,7 +14,7 @@
 	} from '@internationalized/date';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
-	import { createGame } from '../games.remote';
+	import { createGame } from '$lib/remote/games/games.remote';
 	import { onMount } from 'svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { type PageProps } from './$types';

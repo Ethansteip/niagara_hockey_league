@@ -1,10 +1,20 @@
 import { query, form } from '$app/server';
 import { db } from '$lib/drizzle';
 import { alias } from 'drizzle-orm/pg-core';
-import { games, seasons, teams, teamSeasons, type Game, type Team } from '$lib/drizzle/schema';
+import {
+	games,
+	seasons,
+	standings,
+	teams,
+	teamSeasons,
+	type Game,
+	type Team,
+	type Standing
+} from '$lib/drizzle/schema';
 import { eq, and, getTableColumns } from 'drizzle-orm';
 import * as z from 'zod';
 import { redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 const homeTeam = alias(teams, 'homeTeam');
 const awayTeam = alias(teams, 'awayTeam');
@@ -43,6 +53,17 @@ export type GameData = Game & {
 	awayTeam: Team;
 };
 
+/* Standings row joined with the team's name and code */
+export type TeamStanding = Standing & {
+	teamName: Team['name'];
+	teamCode: Team['code'];
+};
+
+export type GameCardData = Game & {
+	homeTeam: TeamStanding | undefined;
+	awayTeam: TeamStanding | undefined;
+};
+
 /* Get all active games - sorted by season start date */
 export const getActiveSeasonGames = query(async (): Promise<GameData[]> => {
 	return await db
@@ -58,6 +79,63 @@ export const getActiveSeasonGames = query(async (): Promise<GameData[]> => {
 		.where(eq(seasons.active, true))
 		.orderBy(games.startDate);
 });
+
+/* Get game card data */
+export const getGameCardData = query(
+	z.object({
+		status: StatusSchema,
+		limit: z.int().optional()
+	}),
+	async ({ status, limit = null }): Promise<GameCardData[]> => {
+		const [seasonResult] = await db
+			.select({ id: seasons.id })
+			.from(seasons)
+			.where(eq(seasons.active, true))
+			.limit(1);
+
+		if (!seasonResult?.id) {
+			error(404, 'Active season not found');
+		}
+
+		let gameQuery = db
+			.select()
+			.from(games)
+			.where(and(eq(games.seasonId, seasonResult.id), eq(games.status, status)))
+			.orderBy(games.startDate)
+			.$dynamic();
+
+		if (limit) {
+			gameQuery = gameQuery.limit(limit);
+		}
+
+		const teamStandingsQuery = db
+			.select({
+				...getTableColumns(standings),
+				teamName: teams.name,
+				teamCode: teams.code
+			})
+			.from(standings)
+			.innerJoin(teams, eq(teams.id, standings.teamId))
+			.where(eq(standings.seasonId, seasonResult.id));
+
+		const [gamesResult, teamsStandingsResult] = await Promise.all([
+			gameQuery,
+			teamStandingsQuery
+		]);
+
+		if (!gamesResult.length) {
+			error(404, 'No games found');
+		}
+
+		return gamesResult.map((game) => {
+			return {
+				...game,
+				homeTeam: teamsStandingsResult.find((team) => team.teamId === game.homeTeamId),
+				awayTeam: teamsStandingsResult.find((team) => team.teamId === game.awayTeamId)
+			};
+		});
+	}
+);
 
 export const getGame = query(
 	z.object({
