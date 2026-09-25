@@ -8,8 +8,10 @@
 
 <div class="flex h-screen flex-col items-center justify-start">
 	<section class="mt-5 flex w-full flex-col gap-3 md:mt-10">
-		<h2 class="text-xl font-bold md:text-2xl">Upcoming Games</h2>
-
+		<div class="flex w-full items-baseline justify-between">
+			<h2 class="text-xl font-bold md:text-2xl">Upcoming Games</h2>
+			<h4 class=" tracking-wide text-secondary-foreground">View All</h4>
+		</div>
 		<Carousel.Root opts={{ align: 'start' }} class="w-full">
 			<Carousel.Content class="-ms-3 py-1">
 				{#each games as game (game.id)}
