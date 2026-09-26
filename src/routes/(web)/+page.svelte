@@ -55,8 +55,8 @@
 			{#each games as game, i (game.id)}
 				<div
 					class={[
-						'size-3 rounded-full transition-all duration-50',
-						i === selectedIndex ? 'h-3 w-5 bg-secondary-foreground' : 'bg-secondary'
+						'size-3 rounded-full transition-all duration-500',
+						i === selectedIndex ? 'h-3 w-5 bg-primary' : 'bg-secondary'
 					]}
 				></div>
 			{/each}
