@@ -118,10 +118,7 @@ export const getGameCardData = query(
 			.innerJoin(teams, eq(teams.id, standings.teamId))
 			.where(eq(standings.seasonId, seasonResult.id));
 
-		const [gamesResult, teamsStandingsResult] = await Promise.all([
-			gameQuery,
-			teamStandingsQuery
-		]);
+		const [gamesResult, teamsStandingsResult] = await Promise.all([gameQuery, teamStandingsQuery]);
 
 		if (!gamesResult.length) {
 			error(404, 'No games found');
