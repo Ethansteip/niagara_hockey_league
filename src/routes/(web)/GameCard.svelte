@@ -33,7 +33,7 @@
 </script>
 
 <article
-	class="flex h-full flex-col gap-4 rounded-2xl border border-ring bg-card p-3 text-card-foreground shadow-sm"
+	class="flex h-full flex-col gap-4 rounded-2xl border-2 border-secondary bg-card p-3 text-card-foreground shadow-sm"
 >
 	<header class="flex items-center justify-between gap-2">
 		<Badge class="">{dateFormat.format(startDate)}</Badge>
