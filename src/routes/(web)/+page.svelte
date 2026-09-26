@@ -3,8 +3,11 @@
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import type { CarouselAPI } from '$lib/components/ui/carousel/context.js';
 	import { getGameCardData, type GameCardData } from '$lib/remote/games/games.remote';
+	import { getPointsProgression } from '$lib/remote/standings/standings.remote';
+	import PointsChart from '$lib/components/standings/PointsChart.svelte';
 
 	const games = $derived<GameCardData[]>(await getGameCardData({ status: 'scheduled', limit: 4 }));
+	const pointsProgression = $derived(await getPointsProgression());
 
 	let carouselApi = $state<CarouselAPI>();
 	let selectedIndex = $state(0);
@@ -23,7 +26,7 @@
 	});
 </script>
 
-<div class="flex h-screen flex-col items-center justify-start">
+<div class="flex min-h-screen flex-col items-center justify-start gap-8 pb-10">
 	<section class="mt-1 flex w-full flex-col gap-1 md:mt-10">
 		<div class="flex w-full items-baseline justify-between">
 			<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Upcoming Games</h2>
@@ -60,6 +63,12 @@
 					]}
 				></div>
 			{/each}
+		</div>
+	</section>
+	<section class="flex w-full flex-col gap-1">
+		<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Standings</h2>
+		<div class="rounded-2xl border bg-card p-3 text-card-foreground shadow-sm">
+			<PointsChart data={pointsProgression} />
 		</div>
 	</section>
 </div>

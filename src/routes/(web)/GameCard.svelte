@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
+	import { teamColours } from '$lib/components/layout/assets/team-colours';
 	import type { GameCardData, TeamStanding } from '$lib/remote/games/games.remote';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 
@@ -19,17 +20,6 @@
 	});
 
 	const startDate = $derived(new Date(game.startDate));
-
-	// Glow colours pulled from each logo's dominant fills. Leafs navy (#00205b) is
-	// lifted a bit so it still reads against the dark card; Bruins gold (#fcb514)
-	// is deepened since yellow reads much brighter than the reds and blues. Habs
-	// uses red only: their navy (#192168) vanished against the dark card.
-	const glowColours: Record<TeamName, [string, string]> = {
-		Leafs: ['#2a62e0', '#1a3f9e'],
-		Habs: ['#d6293b', '#b3202f'],
-		Bruins: ['#b8860b', '#8a6410'],
-		Wings: ['#ce1126', '#ce1126']
-	};
 </script>
 
 <article
@@ -44,7 +34,7 @@
 
 	<div class="flex items-center justify-center gap-7 md:gap-10">
 		{#each [game.homeTeam, game.awayTeam] as team, i (i)}
-			{@const glow = glowColours[team?.teamName as TeamName]}
+			{@const glow = teamColours[team?.teamName as TeamName]?.glow}
 			<div class="flex flex-col items-center justify-center gap-2">
 				<div
 					class="logo-glow"

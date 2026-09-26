@@ -11,9 +11,10 @@
 	type Props = {
 		name: TeamName;
 		className?: string;
+		size?: number;
 	};
 
-	let { name, className = '' }: Props = $props();
+	let { name, className = '', size }: Props = $props();
 
 	const logos = new Map<string, Component<any>>([
 		['Leafs', Leafs],
@@ -26,7 +27,7 @@
 </script>
 
 {#if Logo}
-	<Logo {className} />
+	<Logo {className} {size} />
 {:else}
 	<Zap />
 {/if}
