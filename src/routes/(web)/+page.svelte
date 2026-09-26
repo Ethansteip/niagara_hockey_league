@@ -1,13 +1,16 @@
 <script lang="ts">
 	import GameCard from './GameCard.svelte';
+	import Hero from './Hero.svelte';
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import type { CarouselAPI } from '$lib/components/ui/carousel/context.js';
 	import { getGameCardData, type GameCardData } from '$lib/remote/games/games.remote';
 	import { getPointsProgression } from '$lib/remote/standings/standings.remote';
 	import PointsChart from '$lib/components/standings/PointsChart.svelte';
+	import { getActiveSeasonSummary } from '$lib/remote/seasons/seasons.remote';
 
 	const games = $derived<GameCardData[]>(await getGameCardData({ status: 'scheduled', limit: 4 }));
 	const pointsProgression = $derived(await getPointsProgression());
+	const season = $derived(await getActiveSeasonSummary());
 
 	let carouselApi = $state<CarouselAPI>();
 	let selectedIndex = $state(0);
@@ -27,7 +30,14 @@
 </script>
 
 <div class="flex min-h-screen flex-col items-center justify-start gap-8 pb-10">
-	<section class="mt-1 flex w-full flex-col gap-1 md:mt-10">
+	<div class="mt-1 w-full md:mt-6">
+		<Hero
+			{season}
+			nextGame={games[0]}
+			teamNames={pointsProgression.teams.map((team) => team.name)}
+		/>
+	</div>
+	<section id="upcoming-games" class="flex w-full scroll-mt-6 flex-col gap-1">
 		<div class="flex w-full items-baseline justify-between">
 			<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Upcoming Games</h2>
 			<a href="/games" class=" tracking-wide text-secondary-foreground">View All</a>
@@ -66,7 +76,12 @@
 		</div>
 	</section>
 	<section class="flex w-full flex-col gap-1">
-		<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Standings</h2>
+		<div class="flex flex-col">
+			<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Standings</h2>
+			<p class="text-sm text-muted-foreground">
+				The points race, week by week. Tap a team to follow their climb.
+			</p>
+		</div>
 		<div class="rounded-2xl border bg-card p-3 text-card-foreground shadow-sm">
 			<PointsChart data={pointsProgression} />
 		</div>

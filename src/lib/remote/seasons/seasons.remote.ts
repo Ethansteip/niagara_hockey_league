@@ -1,7 +1,7 @@
 import { query, form, command } from '$app/server';
 import { db } from '$lib/drizzle';
-import { seasons, teams, teamSeasons, type Team } from '$lib/drizzle/schema';
-import { desc, eq, type InferSelectModel } from 'drizzle-orm';
+import { games, seasons, teams, teamSeasons, type Team } from '$lib/drizzle/schema';
+import { desc, eq, max, type InferSelectModel } from 'drizzle-orm';
 import * as z from 'zod';
 import { redirect } from '@sveltejs/kit';
 
@@ -30,6 +30,24 @@ const SeasonUpdate = SeasonFields.extend({
 
 const SeasonDelete = z.object({
 	seasonId: z.int().nonnegative().nonoptional()
+});
+
+export type ActiveSeasonSummary = {
+	name: string;
+	/* Highest week number on the schedule, or null before any games are scheduled */
+	totalWeeks: number | null;
+};
+
+/* Get the active season's name and length in weeks */
+export const getActiveSeasonSummary = query(async (): Promise<ActiveSeasonSummary | null> => {
+	const [summary] = await db
+		.select({ name: seasons.name, totalWeeks: max(games.weekNumber) })
+		.from(seasons)
+		.leftJoin(games, eq(games.seasonId, seasons.id))
+		.where(eq(seasons.active, true))
+		.groupBy(seasons.id);
+
+	return summary ?? null;
 });
 
 /* Get all seasons - sorted by season start date */

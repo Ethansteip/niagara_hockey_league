@@ -190,7 +190,9 @@
 					{/each}
 				{/snippet}
 				{#snippet tooltip()}
-					<Chart.Tooltip labelFormatter={(week: number) => (week === 0 ? 'Start' : `Week ${week}`)} />
+					<Chart.Tooltip
+						labelFormatter={(week: number) => (week === 0 ? 'Start' : `Week ${week}`)}
+					/>
 				{/snippet}
 			</LineChart>
 		</Chart.Container>
@@ -199,7 +201,9 @@
 			class="flex h-40 flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-center md:h-56"
 		>
 			<p class="text-sm font-semibold text-card-foreground">No points yet</p>
-			<p class="text-xs text-muted-foreground">Standings will fill in after the first game night.</p>
+			<p class="text-xs text-muted-foreground">
+				Standings will fill in after the first game night.
+			</p>
 		</div>
 	{/if}
 
