@@ -19,37 +19,42 @@
 	});
 
 	const startDate = $derived(new Date(game.startDate));
+
+	// Glow colours pulled from each logo's dominant fills. Leafs navy (#00205b) is
+	// lifted a bit so it still reads against the dark card; Bruins gold (#fcb514)
+	// is deepened since yellow reads much brighter than the reds and blues. Habs
+	// uses red only: their navy (#192168) vanished against the dark card.
+	const glowColours: Record<TeamName, [string, string]> = {
+		Leafs: ['#2a62e0', '#1a3f9e'],
+		Habs: ['#d6293b', '#b3202f'],
+		Bruins: ['#b8860b', '#8a6410'],
+		Wings: ['#ce1126', '#ce1126']
+	};
 </script>
 
-{#snippet teamRow(team: TeamStanding | undefined)}
-	<div class="flex items-center justify-between gap-2">
-		<p class="truncate text-sm font-semibold">{team?.teamName ?? 'TBD'}</p>
-		<p class="text-xs text-muted-foreground tabular-nums">
-			{#if team}
-				{team.regularSeasonWins}-{team.regularSeasonLosses}-{team.regularSeasonTies}
-			{:else}
-				&ndash;
-			{/if}
-		</p>
-	</div>
-{/snippet}
-
 <article
-	class="flex h-full flex-col gap-4 rounded-2xl border bg-card p-3 text-card-foreground shadow-sm"
+	class="flex h-full flex-col gap-4 rounded-2xl border border-ring bg-card p-3 text-card-foreground shadow-sm"
 >
 	<header class="flex items-center justify-between gap-2">
 		<Badge class="">{dateFormat.format(startDate)}</Badge>
-		<time datetime={startDate.toISOString()} class="text-xs font-medium text-muted-foreground">
+		<time datetime={startDate.toISOString()} class="text-sm font-medium text-primary-foreground">
 			{timeFormat.format(startDate)}
 		</time>
 	</header>
 
-	<div class="flex items-center justify-center gap-12">
+	<div class="flex items-center justify-center gap-7 md:gap-10">
 		{#each [game.homeTeam, game.awayTeam] as team, i (i)}
+			{@const glow = glowColours[team?.teamName as TeamName]}
 			<div class="flex flex-col items-center justify-center gap-2">
-				<Logo name={team?.teamName as TeamName} className="size-25" />
+				<div
+					class="logo-glow"
+					style:--glow-inner={glow?.[0] ?? 'transparent'}
+					style:--glow-outer={glow?.[1] ?? 'transparent'}
+				>
+					<Logo name={team?.teamName as TeamName} className="size-25" />
+				</div>
 				<div class="flex flex-col items-center">
-					<p class="text-lg font-semibold tracking-wide text-secondary-foreground">
+					<p class="text-lg font-semibold tracking-wide text-primary-foreground">
 						{team?.teamName}
 					</p>
 					<p class="text-xs text-muted-foreground tabular-nums">
@@ -61,11 +66,29 @@
 					</p>
 				</div>
 			</div>
+			{#if i === 0}
+				<div class="-pt-10 flex size-10 items-center justify-center rounded-full bg-muted">
+					<p class="text-xs font-bold tracking-wide uppercase">VS</p>
+				</div>
+			{/if}
 		{/each}
 	</div>
-
-	<!-- <div class="flex flex-col gap-1">
-		{@render teamRow(game.homeTeam)}
-		{@render teamRow(game.awayTeam)}
-	</div> -->
 </article>
+
+<style>
+	/* drop-shadow follows the SVG's alpha channel, so the glow hugs the logo's
+	   silhouette instead of its bounding box. Three layers with rising blur and
+	   falling opacity give a soft, gradual falloff past the edge. */
+	.logo-glow :global(svg) {
+		filter: drop-shadow(0 0 3px color-mix(in oklab, var(--glow-inner) 40%, transparent))
+			drop-shadow(0 0 12px color-mix(in oklab, var(--glow-outer) 25%, transparent))
+			drop-shadow(0 0 28px color-mix(in oklab, var(--glow-outer) 15%, transparent));
+		transition: filter 200ms ease;
+	}
+
+	article:hover .logo-glow :global(svg) {
+		filter: drop-shadow(0 0 4px color-mix(in oklab, var(--glow-inner) 55%, transparent))
+			drop-shadow(0 0 16px color-mix(in oklab, var(--glow-outer) 35%, transparent))
+			drop-shadow(0 0 34px color-mix(in oklab, var(--glow-outer) 20%, transparent));
+	}
+</style>
