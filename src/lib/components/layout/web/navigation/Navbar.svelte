@@ -3,15 +3,16 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Menu from '$lib/components/layout/web/navigation/Menu.svelte';
+	import TuesdayNight from '$lib/components/layout/assets/tuesday-night.png';
 </script>
 
 <nav
 	class="sticky mx-auto my-4 flex h-18 w-full items-center justify-between rounded-lg border-2 border-secondary bg-background px-3 md:w-full md:px-6"
 >
 	<!-- Section 1 -->
-	<div class="flex w-1/4 justify-start gap-2 md:w-1/3">
+	<div class="flex w-1/4 items-center justify-start gap-2 md:w-1/3">
 		<a href="/">
-			<Zap />
+			<img src={TuesdayNight} class="size-10" alt="Tuesday Night Hockey Logo" />
 		</a>
 		<div class="hidden w-full gap-2 md:flex">
 			<Separator orientation="vertical" />

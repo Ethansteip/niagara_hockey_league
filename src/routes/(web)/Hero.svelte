@@ -116,10 +116,10 @@
 			>
 				Men's Tuesday night hockey in Niagara-on-the-Lake.
 			</h1>
-			<p class="max-w-md text-sm text-pretty text-muted-foreground md:text-base">
+			<!-- <p class="max-w-md text-sm text-pretty text-muted-foreground md:text-base">
 				Four teams, two games every Tuesday night from September through March. Scores, schedules
 				and standings all live here.
-			</p>
+			</p> -->
 		</div>
 
 		{#if nextGameDate}
