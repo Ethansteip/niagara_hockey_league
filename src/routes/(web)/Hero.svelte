@@ -4,6 +4,7 @@
 	import type { ActiveSeasonSummary } from '$lib/remote/seasons/seasons.remote';
 	import type { GameCardData } from '$lib/remote/games/games.remote';
 	import { ArrowDown } from '@lucide/svelte';
+	import Cooler from '$lib/components/layout/assets/cooler-1.png';
 
 	type Props = {
 		season: ActiveSeasonSummary | null;
@@ -49,13 +50,13 @@
 		viewBox="0 0 400 240"
 		preserveAspectRatio="xMidYMid slice"
 	>
-		<line x1="118" y1="0" x2="118" y2="240" stroke="#2a62e0" stroke-width="6" opacity="0.22" />
-		<line x1="282" y1="0" x2="282" y2="240" stroke="#2a62e0" stroke-width="6" opacity="0.22" />
+		<line x1="111" y1="0" x2="111" y2="240" stroke="#2a62e0" stroke-width="6" opacity="0.22" />
+		<line x1="288" y1="0" x2="288" y2="240" stroke="#2a62e0" stroke-width="6" opacity="0.22" />
 		<line x1="200" y1="0" x2="200" y2="240" stroke="#c8102e" stroke-width="3" opacity="0.3" />
 		<circle
 			cx="200"
 			cy="120"
-			r="78"
+			r="85"
 			fill="none"
 			stroke="#c8102e"
 			stroke-width="1.5"
@@ -68,13 +69,6 @@
 <section
 	class="relative isolate flex overflow-hidden rounded-2xl border bg-card px-5 py-7 text-card-foreground md:items-center md:gap-10 md:px-10 md:py-12"
 >
-	<!-- Mobile: centre ice sits faded behind the copy -->
-	{@render rinkMarkings('absolute inset-0 -z-10 size-full md:hidden')}
-	<div
-		aria-hidden="true"
-		class="absolute inset-0 -z-10 bg-linear-to-b from-card/40 via-card/85 to-card md:hidden"
-	></div>
-
 	<div class="flex max-w-xl flex-col gap-5">
 		{#if seasonLabel || currentWeek}
 			<div class="flex flex-col gap-2">
@@ -116,11 +110,15 @@
 			>
 				Men's Tuesday night hockey in Niagara-on-the-Lake.
 			</h1>
-			<!-- <p class="max-w-md text-sm text-pretty text-muted-foreground md:text-base">
-				Four teams, two games every Tuesday night from September through March. Scores, schedules
-				and standings all live here.
-			</p> -->
 		</div>
+
+		<div class="h-auto bg-green-200"></div>
+
+		<img
+			src={Cooler}
+			class="w-auto md:hidden"
+			alt="cooler, stanley cup and crock-pot illustration"
+		/>
 
 		{#if nextGameDate}
 			<a
@@ -146,33 +144,12 @@
 				/>
 			</a>
 		{/if}
-
-		{#if teamNames.length}
-			<ul class="flex items-center gap-4 md:hidden" aria-label="Teams">
-				{#each teamNames as name (name)}
-					{@const glow = teamColours[name as TeamName]?.glow}
-					<li class="hero-logo" title={name} style:--glow={glow?.[0] ?? 'transparent'}>
-						<Logo name={name as TeamName} className="size-9 md:size-10" />
-					</li>
-				{/each}
-			</ul>
-		{/if}
 	</div>
-
-	<!-- Desktop: centre ice with the league's teams inside the faceoff circle -->
-	{#if teamNames.length}
-		<div class="relative -my-12 hidden flex-1 items-center justify-center self-stretch md:flex">
-			{@render rinkMarkings('absolute inset-0 -z-10 size-full')}
-			<ul class="grid grid-cols-2 gap-x-8 gap-y-6 py-12" aria-label="Teams">
-				{#each teamNames as name (name)}
-					{@const glow = teamColours[name as TeamName]?.glow}
-					<li class="hero-logo" title={name} style:--glow={glow?.[0] ?? 'transparent'}>
-						<Logo name={name as TeamName} className="size-16 lg:size-20" />
-					</li>
-				{/each}
-			</ul>
-		</div>
-	{/if}
+	<img
+		src={Cooler}
+		class="hidden h-60 md:flex"
+		alt="cooler, stanley cup and crock-pot illustration"
+	/>
 </section>
 
 <style>
