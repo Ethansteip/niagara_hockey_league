@@ -31,7 +31,7 @@
 		</Button>
 		<Button href="/" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>
 			<Calendar />
-			All Games
+			Game History
 		</Button>
 		<Separator />
 		<Button href="/" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>

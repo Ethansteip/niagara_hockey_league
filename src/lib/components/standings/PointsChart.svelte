@@ -219,7 +219,7 @@
 					onclick={() => toggleTeam(team.id)}
 					style:--team={colourFor(team.name)}
 					class={[
-						'flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-[opacity,background-color,border-color] duration-200 disabled:cursor-default',
+						'flex items-center gap-2 rounded border bg-secondary/80 px-2.5 py-2 text-left transition-[opacity,background-color,border-color] duration-200 disabled:cursor-default',
 						isSelected
 							? 'border-(--team) bg-[color-mix(in_oklab,var(--team)_14%,transparent)]'
 							: 'border-border hover:bg-muted/50',
