@@ -40,7 +40,7 @@
 	<section id="upcoming-games" class="flex w-full scroll-mt-6 flex-col gap-1">
 		<div class="flex w-full items-baseline justify-between">
 			<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Upcoming Games</h2>
-			<a href="/games" class=" tracking-wide text-secondary-foreground">View All</a>
+			<a href="/games/upcoming" class=" tracking-wide text-secondary-foreground">View All</a>
 		</div>
 		<!-- Desktop Game Cards -->
 		<div class="hidden grid-cols-2 gap-3 md:grid">

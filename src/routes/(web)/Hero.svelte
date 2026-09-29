@@ -43,29 +43,6 @@
 	const nextGameDate = $derived(nextGame ? new Date(nextGame.startDate) : null);
 </script>
 
-{#snippet rinkMarkings(className: string)}
-	<svg
-		aria-hidden="true"
-		class={['pointer-events-none', className]}
-		viewBox="0 0 400 240"
-		preserveAspectRatio="xMidYMid slice"
-	>
-		<line x1="111" y1="0" x2="111" y2="240" stroke="#2a62e0" stroke-width="6" opacity="0.22" />
-		<line x1="288" y1="0" x2="288" y2="240" stroke="#2a62e0" stroke-width="6" opacity="0.22" />
-		<line x1="200" y1="0" x2="200" y2="240" stroke="#c8102e" stroke-width="3" opacity="0.3" />
-		<circle
-			cx="200"
-			cy="120"
-			r="85"
-			fill="none"
-			stroke="#c8102e"
-			stroke-width="1.5"
-			opacity="0.3"
-		/>
-		<circle cx="200" cy="120" r="3.5" fill="#c8102e" opacity="0.4" />
-	</svg>
-{/snippet}
-
 <section
 	class="relative isolate flex overflow-hidden rounded-2xl border bg-card px-5 py-7 text-card-foreground md:items-center md:gap-10 md:px-10 md:py-12"
 >
@@ -151,11 +128,3 @@
 		alt="cooler, stanley cup and crock-pot illustration"
 	/>
 </section>
-
-<style>
-	/* Same outline-following glow as the game cards, a touch softer */
-	.hero-logo :global(svg) {
-		filter: drop-shadow(0 0 3px color-mix(in oklab, var(--glow) 35%, transparent))
-			drop-shadow(0 0 10px color-mix(in oklab, var(--glow) 20%, transparent));
-	}
-</style>
