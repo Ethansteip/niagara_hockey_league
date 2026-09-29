@@ -2,7 +2,6 @@
 	import { type GameCardData, getGameCardData } from '$lib/remote/games/games.remote';
 	import GameCard from '../../GameCard.svelte';
 	const games = $derived<GameCardData[]>(await getGameCardData({ status: 'scheduled' }));
-	const test = [];
 </script>
 
 <main class="flex w-full flex-col gap-4 md:grid md:grid-cols-2">
