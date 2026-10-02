@@ -50,6 +50,13 @@
       "when": 1789606230809,
       "tag": "0006_add_unique_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790903762117,
+      "tag": "0007_gray_amphibian",
+      "breakpoints": true
     }
   ]
 }

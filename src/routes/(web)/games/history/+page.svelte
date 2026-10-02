@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type GameCardData, getGameCardData } from '$lib/remote/games/games.remote';
-	import GameFinalCard from './GameFinalCard.svelte';
+	import GameFinalCard from '../../GameFinalCard.svelte';
 
 	const games = $derived<GameCardData[]>((await getGameCardData({ status: 'final' })).toReversed());
 

@@ -1,16 +1,25 @@
 <script lang="ts">
 	import GameCard from './GameCard.svelte';
+	import GameFinalCard from './GameFinalCard.svelte';
 	import Hero from './Hero.svelte';
+	import Footer from '$lib/components/layout/web/navigation/Footer.svelte';
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import type { CarouselAPI } from '$lib/components/ui/carousel/context.js';
 	import { getGameCardData, type GameCardData } from '$lib/remote/games/games.remote';
 	import { getPointsProgression } from '$lib/remote/standings/standings.remote';
 	import PointsChart from '$lib/components/standings/PointsChart.svelte';
 	import { getActiveSeasonSummary } from '$lib/remote/seasons/seasons.remote';
+	import { getPlayerStats } from '$lib/remote/stats/stats.remote';
+	import PlayerStatsTable from '$lib/components/stats/PlayerStatsTable.svelte';
 
 	const games = $derived<GameCardData[]>(await getGameCardData({ status: 'scheduled', limit: 4 }));
+	const latestGames = $derived<GameCardData[]>(
+		(await getGameCardData({ status: 'final', limit: 2 })).toReversed()
+	);
+
 	const pointsProgression = $derived(await getPointsProgression());
 	const season = $derived(await getActiveSeasonSummary());
+	const playerStats = $derived(await getPlayerStats({ limit: 10 }));
 
 	let carouselApi = $state<CarouselAPI>();
 	let selectedIndex = $state(0);
@@ -75,15 +84,41 @@
 			{/each}
 		</div>
 	</section>
+
+	<!-- Latest game results -->
+	<section class="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+		<div class="flex w-full items-baseline justify-between md:col-span-full">
+			<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Latest</h2>
+			<a href="/games/history" class="tracking-wide text-secondary-foreground">View All</a>
+		</div>
+		{#if !latestGames.length}
+			<div
+				class="flex h-100 w-full items-center justify-center rounded-lg bg-secondary md:col-span-full"
+			>
+				<p class="text-md font-semibold">No games have been played yet this season.</p>
+			</div>
+		{:else}
+			{#each latestGames as game (game.id)}
+				<GameFinalCard {game} />
+			{/each}
+		{/if}
+	</section>
+
 	<section class="flex w-full flex-col gap-1">
 		<div class="flex flex-col">
 			<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Standings</h2>
-			<p class="text-sm text-muted-foreground">
-				The points race, week by week. Tap a team to follow their climb.
-			</p>
 		</div>
 		<div class="rounded-2xl border bg-card p-3 text-card-foreground shadow-sm">
 			<PointsChart data={pointsProgression} />
+		</div>
+	</section>
+	<section class="flex w-full flex-col gap-1">
+		<div class="flex w-full items-baseline justify-between">
+			<h2 class="text-[1.5rem] font-bold text-primary-foreground md:text-2xl">Player Stats</h2>
+			<a href="/stats" class="tracking-wide text-secondary-foreground">View All</a>
+		</div>
+		<div class="rounded-2xl border bg-card p-3 text-card-foreground shadow-sm">
+			<PlayerStatsTable data={playerStats} />
 		</div>
 	</section>
 </div>

@@ -263,7 +263,9 @@ export const playerStats = pgTable(
 			.references(() => games.id, { onDelete: 'cascade' }),
 		goals: integer('goals').notNull().default(0),
 		assists: integer('assists').notNull().default(0),
-		penaltyMinutes: integer('penalty_minutes').notNull().default(0)
+		penaltyMinutes: integer('penalty_minutes').notNull().default(0),
+		createdAt: createdAt(),
+		updatedAt: updatedAt().$onUpdate(() => new Date())
 	},
 	(t) => [
 		uniqueIndex('player_game_unique').on(t.playerId, t.gameId),

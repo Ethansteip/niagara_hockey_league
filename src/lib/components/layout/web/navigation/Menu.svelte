@@ -29,12 +29,17 @@
 			<CalendarCheck />
 			Upcoming Games
 		</Button>
-		<Button href="/" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>
+		<Button
+			href="/games/history"
+			variant="ghost"
+			class="flex justify-start gap-2"
+			onclick={handleClose}
+		>
 			<Calendar />
 			Game History
 		</Button>
 		<Separator />
-		<Button href="/" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>
+		<Button href="/stats" variant="ghost" class="flex justify-start gap-2" onclick={handleClose}>
 			<ChartColumn />
 			Player Stats
 		</Button>

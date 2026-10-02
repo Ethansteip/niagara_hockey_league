@@ -28,7 +28,7 @@
 		<div class="hidden w-full items-center justify-end gap-2 md:flex">
 			<Button variant="outline" href="/games/upcoming">Upcoming Games</Button>
 			<Button variant="outline" href="/games/history">Game History</Button>
-			<Button variant="outline" href="/">Stats</Button>
+			<Button variant="outline" href="/stats">Stats</Button>
 		</div>
 		<div class="flex w-full items-center justify-end md:hidden">
 			<Menu />
