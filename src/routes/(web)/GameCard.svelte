@@ -49,7 +49,7 @@
 					</p>
 					<p class="text-xs text-muted-foreground tabular-nums">
 						{#if team}
-							{team.regularSeasonWins}-{team.regularSeasonLosses}-{team.regularSeasonTies}
+							{team.regularSeasonWins}-{team.regularSeasonTies}-{team.regularSeasonLosses}
 						{:else}
 							&ndash;
 						{/if}

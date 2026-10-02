@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
-	import { teamColours } from '$lib/components/layout/assets/team-colours';
 	import type { ActiveSeasonSummary } from '$lib/remote/seasons/seasons.remote';
 	import type { GameCardData } from '$lib/remote/games/games.remote';
 	import { ArrowDown } from '@lucide/svelte';
@@ -31,8 +29,8 @@
 	// "2026-2027" -> "2026–27 Season"
 	const seasonLabel = $derived.by(() => {
 		if (!season) return null;
-		const years = season.name.match(/^(\d{4})\s*[-–]\s*\d{2}(\d{2})$/);
-		return years ? `${years[1]}–${years[2]} Season` : season.name;
+		const years = season.name.match(/^(\d{4})\s*[--]\s*\d{2}(\d{2})$/);
+		return years ? `${years[1]}-${years[2]} Season` : season.name;
 	});
 
 	const currentWeek = $derived(nextGame?.weekNumber ?? null);
