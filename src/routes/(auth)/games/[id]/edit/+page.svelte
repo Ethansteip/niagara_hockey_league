@@ -55,6 +55,17 @@
 
 	/* Game Status */
 	let gameStatus = $derived(game.status);
+	let gameStatuses = [
+		{ label: 'Scheduled', value: 'scheduled' },
+		{ label: 'Final', value: 'final' },
+		{ label: 'In Progress', value: 'in_progress' },
+		{ label: 'Cancelled', value: 'cancelled' },
+		{ label: 'Forfeit', value: 'forfeit' },
+		{ label: 'Postponed', value: 'postponed' }
+	];
+	let gameStatusTriggerContent = $derived(
+		gameStatuses.find((t) => t.value === gameStatus)?.label ?? 'Select a game status'
+	);
 
 	/* Scores */
 	let homeScore = $derived(game.homeScore);
@@ -130,36 +141,41 @@
 	let homeTeamIdIssues = $derived(editGame.fields.homeTeamId.issues());
 	let awayTeamIdIssues = $derived(editGame.fields.awayTeamId.issues());
 	let startDateIssues = $derived(editGame.fields.startDate.issues());
+	let gameStatusIssues = $derived(editGame.fields.gameStatus.issues());
 	let gameTypeIssues = $derived(editGame.fields.gameType.issues());
 	let notesIssues = $derived(editGame.fields.notes.issues());
 	let homeTeamScoreIssues = $derived(editGame.fields.homeScore.issues());
 	let awayTeamScoreIssues = $derived(editGame.fields.awayScore.issues());
 
-	$inspect(seasonIdIssues);
+	$inspect(gameStatusIssues);
 
 	let form: HTMLFormElement;
 	let submitting = $derived<boolean>(!!updateGame.pending);
 
 	const rows = $derived([
 		{
-			side: 'away',
-			team: currentAwayTeam?.label,
-			score: awayScore,
-			won: game.awayScore > game.homeScore
-		},
-		{
 			side: 'home',
 			team: currentHomeTeam?.label,
 			score: homeScore,
 			won: game.homeScore > game.awayScore
+		},
+		{
+			side: 'away',
+			team: currentAwayTeam?.label,
+			score: awayScore,
+			won: game.awayScore > game.homeScore
 		}
 	]);
 </script>
 
-<main class="flex flex-col items-start justify-start gap-3">
+<!-- Pinned to the viewport height (minus site header, inset margin and layout
+     padding) so the overview card stays put and only the tab content scrolls -->
+<main
+	class="flex h-[calc(100svh-var(--header-height)-2rem)] flex-col items-start justify-start gap-3 md:h-[calc(100svh-var(--header-height)-6rem)]"
+>
 	<!-- Game overview card -->
 	<article
-		class="w-full overflow-hidden rounded-xl border border-white/5 bg-card text-card-foreground"
+		class="w-full shrink-0 overflow-hidden rounded-xl border border-white/5 bg-card text-card-foreground"
 	>
 		<header
 			class="flex items-center justify-between gap-2 border-b border-white/5 px-4 py-2.5 text-xs"
@@ -231,27 +247,57 @@
 		</ul>
 	</article>
 
-	<Tabs.Root value="overview" class="w-full">
-		<Tabs.List variant="line" class="mb-4">
+	<Tabs.Root value="overview" class="min-h-0 w-full flex-1">
+		<Tabs.List variant="line" class="mb-4 shrink-0">
 			<Tabs.Trigger class="m-0 p-0 text-left" value="overview">Overview</Tabs.Trigger>
 			<Tabs.Trigger value="score">Score</Tabs.Trigger>
 			<Tabs.Trigger value="player-stats">Player Stats</Tabs.Trigger>
 			<Tabs.Trigger value="goalies">Goalies</Tabs.Trigger>
 		</Tabs.List>
-		<form {...editGame} bind:this={form} class="w-full">
+		<form {...editGame} bind:this={form} class="min-h-0 w-full flex-1 overflow-y-auto">
 			<!-- Custom components (Calendar, Checkbox) don't render named form controls,
 		     so hidden inputs carry their values into the submitted form data -->
 			<input {...editGame.fields.startDate.as('hidden', startDateTime)} />
-			<input {...editGame.fields.gameStatus.as('hidden', 'scheduled')} />
 			<Tabs.Content value="overview">
 				<Field.Group>
 					<Field.Set>
 						<Field.Group>
+							<!-- Game Status -->
+							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+								<Field.Field data-invalid={gameStatusIssues ? true : undefined}>
+									<Field.Label for="gameStatus">Game Status</Field.Label>
+									<Select.Root type="single" name="gameStatus" bind:value={gameStatus}>
+										<Select.Trigger
+											class="flex items-center"
+											aria-invalid={gameStatusIssues ? 'true' : undefined}
+										>
+											{gameStatusTriggerContent}
+										</Select.Trigger>
+										<Select.Content>
+											<Select.Group>
+												<Select.Label>Statuses</Select.Label>
+												{#each gameStatuses as status (status.value)}
+													<Select.Item value={status.value} label={status.label}>
+														{status.label}
+													</Select.Item>
+												{/each}
+											</Select.Group>
+										</Select.Content>
+									</Select.Root>
+									<Field.Error errors={gameStatusIssues} />
+								</Field.Field>
+							</div>
 							<!-- Season & Week Number -->
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<Field.Field data-invalid={weekNumberIssues ? true : undefined}>
 									<Field.Label for="weekNumber">Week Number</Field.Label>
-									<Input id="weekNumber" min="0" bind:value={weekNumber} placeholder="1" />
+									<Input
+										id="weekNumber"
+										name="weekNumber"
+										min="0"
+										bind:value={weekNumber}
+										placeholder="1"
+									/>
 									<Field.Error errors={weekNumberIssues} />
 								</Field.Field>
 								<Field.Field data-invalid={seasonIdIssues ? true : undefined}>
@@ -327,6 +373,8 @@
 									<Field.Label for="homeTeamScore">Home Team Score</Field.Label>
 									<Input
 										id="homeTeamScore"
+										type="number"
+										name="n:homeScore"
 										enterkeyhint="next"
 										bind:value={homeScore}
 										min="0"
@@ -335,9 +383,11 @@
 									<Field.Error errors={homeTeamScoreIssues} />
 								</Field.Field>
 								<Field.Field data-invalid={awayTeamScoreIssues ? true : undefined}>
-									<Field.Label for="homeTeamScore">Away Team Score</Field.Label>
+									<Field.Label for="awayTeamScore">Away Team Score</Field.Label>
 									<Input
-										id="homeTeamScore"
+										id="awayTeamScore"
+										type="number"
+										name="n:awayScore"
 										enterkeyhint="next"
 										bind:value={awayScore}
 										min="0"
@@ -424,14 +474,21 @@
 					</Field.Set>
 					<Field.Separator />
 					<Field.Field orientation="horizontal">
-						<Button type="submit" class="min-w-20">
-							{#if submitting}
-								<Spinner />
-							{:else}
-								Save
-							{/if}
-						</Button>
-						<Button variant="outline" type="button" href="/games">Cancel</Button>
+						<div class="flex w-full flex-col gap-2 md:flex-row">
+							<Button type="submit" class="w-full md:w-auto md:min-w-20">
+								{#if submitting}
+									<Spinner />
+								{:else}
+									Save
+								{/if}
+							</Button>
+							<Button
+								variant="secondary"
+								class="w-full md:w-auto md:min-w-20"
+								type="button"
+								href="/games">Cancel</Button
+							>
+						</div>
 					</Field.Field>
 				</Field.Group>
 			</Tabs.Content>
