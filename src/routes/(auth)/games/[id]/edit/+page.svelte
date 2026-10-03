@@ -179,10 +179,15 @@
 					<Badge class="h-5 px-1.5 text-[0.625rem] tracking-wider uppercase">Playoffs</Badge>
 				{/if}
 				<time datetime={startDateValue?.toString()}>{startDateValue}</time>
-				{#if weekNumber}
-					<span aria-hidden="true">·</span>
-					<span class="text-secondary-foreground">Week {weekNumber}</span>
-				{/if}
+				<span aria-hidden="true">·</span>
+				<span class="text-secondary-foreground">
+					Week:
+					{#if weekNumber}
+						{weekNumber}
+					{:else}
+						-
+					{/if}
+				</span>
 			</div>
 		</header>
 
@@ -246,11 +251,7 @@
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<Field.Field data-invalid={weekNumberIssues ? true : undefined}>
 									<Field.Label for="weekNumber">Week Number</Field.Label>
-									<Input
-										id="weekNumber"
-										{...editGame.fields.weekNumber.as('number', weekNumber ?? 0)}
-										placeholder="1"
-									/>
+									<Input id="weekNumber" min="0" bind:value={weekNumber} placeholder="1" />
 									<Field.Error errors={weekNumberIssues} />
 								</Field.Field>
 								<Field.Field data-invalid={seasonIdIssues ? true : undefined}>
@@ -327,7 +328,7 @@
 									<Input
 										id="homeTeamScore"
 										enterkeyhint="next"
-										{...editGame.fields.homeScore.as('number', homeScore)}
+										bind:value={homeScore}
 										min="0"
 										placeholder="1"
 									/>
@@ -338,7 +339,7 @@
 									<Input
 										id="homeTeamScore"
 										enterkeyhint="next"
-										{...editGame.fields.awayScore.as('number', awayScore)}
+										bind:value={awayScore}
 										min="0"
 										placeholder="1"
 									/>
