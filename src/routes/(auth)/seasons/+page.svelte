@@ -78,7 +78,7 @@
 						<Table.Cell class="font-medium">{season.id}</Table.Cell>
 						<Table.Cell>{season.name}</Table.Cell>
 						<Table.Cell>
-							<Badge variant={season.active ? 'default' : 'outline'}>
+							<Badge variant={season.active ? 'default' : 'secondary'}>
 								{season.active ? 'active' : 'inactive'}
 							</Badge>
 						</Table.Cell>

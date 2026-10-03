@@ -104,7 +104,7 @@
 							>{mobileGameDateFormat.format(game.startDate)}</Table.Cell
 						>
 						<Table.Cell>
-							<Badge variant={game.gameType === 'playoff' ? 'default' : 'outline'}>
+							<Badge variant={game.gameType === 'playoff' ? 'default' : 'secondary'}>
 								{capitalizeWords(game.gameType)}
 							</Badge>
 						</Table.Cell>
