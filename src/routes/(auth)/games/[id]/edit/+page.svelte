@@ -5,6 +5,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import { teamColours } from '$lib/components/layout/assets/team-colours';
 	import {
 		CalendarDateTime,
 		fromDate,
@@ -15,6 +16,7 @@
 		today,
 		type CalendarDate
 	} from '@internationalized/date';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import { getGame, updateGame } from '$lib/remote/games/games.remote';
@@ -51,9 +53,13 @@
 	/* Week number */
 	let weekNumber = $derived(game.weekNumber);
 
+	/* Game Status */
+	let gameStatus = $derived(game.status);
+
 	/* Scores */
 	let homeScore = $derived(game.homeScore);
 	let awayScore = $derived(game.awayScore);
+	let isTie = $derived(homeScore === awayScore);
 
 	/* Teams */
 	let teamSelectValues = $derived(
@@ -68,9 +74,13 @@
 	let homeTeamIdTriggerContent = $derived(
 		teamSelectValues.find((t) => t.value === homeTeamId)?.label ?? 'Select a home team'
 	);
+
 	let awayTeamIdTriggerContent = $derived(
 		teamSelectValues.find((t) => t.value === awayTeamId)?.label ?? 'Select an away team'
 	);
+
+	let currentHomeTeam = $derived(teamSelectValues.find((t) => t.value === homeTeamId));
+	let currentAwayTeam = $derived(teamSelectValues.find((t) => t.value === awayTeamId));
 
 	/* Game Date & Time */
 	let startDateOpen = $state(false);
@@ -129,9 +139,93 @@
 
 	let form: HTMLFormElement;
 	let submitting = $derived<boolean>(!!updateGame.pending);
+
+	const rows = $derived([
+		{
+			side: 'away',
+			team: currentAwayTeam?.label,
+			score: awayScore,
+			won: game.awayScore > game.homeScore
+		},
+		{
+			side: 'home',
+			team: currentHomeTeam?.label,
+			score: homeScore,
+			won: game.homeScore > game.awayScore
+		}
+	]);
 </script>
 
 <main class="flex flex-col items-start justify-start gap-3">
+	<!-- Game overview card -->
+	<article
+		class="w-full overflow-hidden rounded-xl border border-white/5 bg-card text-card-foreground"
+	>
+		<header
+			class="flex items-center justify-between gap-2 border-b border-white/5 px-4 py-2.5 text-xs"
+		>
+			<div class="flex items-center gap-2">
+				<span class="font-bold tracking-widest text-foreground uppercase">{gameStatus}</span>
+				{#if isTie}
+					<span
+						class="rounded-sm bg-secondary px-1.5 py-0.5 text-[0.625rem] font-bold tracking-widest text-secondary-foreground uppercase"
+					>
+						Tie
+					</span>
+				{/if}
+			</div>
+			<div class="flex items-center gap-2 text-muted-foreground">
+				{#if game.gameType === 'playoff'}
+					<Badge class="h-5 px-1.5 text-[0.625rem] tracking-wider uppercase">Playoffs</Badge>
+				{/if}
+				<time datetime={startDateValue?.toString()}>{startDateValue}</time>
+				{#if weekNumber}
+					<span aria-hidden="true">·</span>
+					<span class="text-secondary-foreground">Week {weekNumber}</span>
+				{/if}
+			</div>
+		</header>
+
+		<ul class="flex flex-col py-1.5">
+			{#each rows as row (row.side)}
+				{@const name = row?.team as TeamName | undefined}
+				<li
+					class="team-row relative flex items-center gap-3 px-4 py-2"
+					class:winner={row.won}
+					class:loser={!row.won && !isTie}
+					style:--accent={name ? teamColours[name]?.line : 'transparent'}
+				>
+					{#if name}
+						<Logo {name} className="size-11 shrink-0" />
+					{:else}
+						<div class="size-11 shrink-0 rounded-full bg-muted"></div>
+					{/if}
+
+					<div class="min-w-0 flex-1">
+						<p class="team-name truncate text-lg leading-tight font-bold tracking-tight">
+							{row.team ?? 'TBD'}
+						</p>
+					</div>
+
+					<div class="flex items-center gap-2">
+						<span class="score text-4xl leading-none font-black tabular-nums">{row.score}</span>
+						<!-- Winner caret; always takes up space so both scores stay aligned -->
+						{#if row.won && !isTie}
+							<span
+								class="caret size-0 border-y-[5px] border-r-[6px] border-y-transparent border-r-current"
+								aria-hidden="true"
+							></span>
+						{/if}
+					</div>
+
+					{#if row.won}
+						<span class="sr-only">Winner</span>
+					{/if}
+				</li>
+			{/each}
+		</ul>
+	</article>
+
 	<Tabs.Root value="overview" class="w-full">
 		<Tabs.List variant="line" class="mb-4">
 			<Tabs.Trigger class="m-0 p-0 text-left" value="overview">Overview</Tabs.Trigger>
@@ -346,3 +440,42 @@
 		</form>
 	</Tabs.Root>
 </main>
+
+<style>
+	/* Winner gets a jersey-colour edge and a faint wash bleeding in from the left */
+	.team-row.winner {
+		background: linear-gradient(
+			90deg,
+			color-mix(in oklab, var(--accent) 14%, transparent),
+			transparent 65%
+		);
+	}
+
+	.team-row.winner::before {
+		content: '';
+		position: absolute;
+		inset-block: 0.375rem;
+		left: 0;
+		width: 3px;
+		border-radius: 0 2px 2px 0;
+		background: var(--accent);
+	}
+
+	.team-row .caret {
+		opacity: 0;
+	}
+
+	.team-row.winner .caret {
+		opacity: 1;
+	}
+
+	/* Loser fades back so the result reads at a glance */
+	.team-row.loser .team-name,
+	.team-row.loser .score {
+		color: var(--muted-foreground);
+	}
+
+	.team-row.loser :global(svg) {
+		opacity: 0.55;
+	}
+</style>
