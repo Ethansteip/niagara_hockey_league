@@ -25,6 +25,17 @@
 		</p>
 	</div>
 {:else}
+	<p
+		class="mb-2 flex items-start gap-2 rounded-md border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-muted-foreground"
+		role="note"
+	>
+		<TriangleAlert class="mt-px size-3.5 shrink-0 text-amber-400" aria-hidden="true" />
+		<span>
+			<span class="font-semibold text-foreground">Stats are incomplete.</span>
+			We're still collecting everyone's jersey numbers, so some goals and assists haven't been recorded
+			yet.
+		</span>
+	</p>
 	<Table.Root>
 		<Table.Header>
 			<Table.Row class="hover:bg-transparent">

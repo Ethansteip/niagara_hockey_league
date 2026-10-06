@@ -38,8 +38,6 @@
 		class="mt-6 flex flex-col gap-1 border-t border-secondary/50 pt-6 text-xs md:flex-row md:justify-between"
 	>
 		<p>{currentYear} Tuesday Night Hockey</p>
-		<p class="itemsn-center flex gap-1">
-			<Beer class="size-4 rotate-12" /> Built between shifts by E. Steip
-		</p>
+		<p class="itemsn-center flex gap-1">Built by E. Steip</p>
 	</div>
 </footer>
