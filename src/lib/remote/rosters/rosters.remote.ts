@@ -14,7 +14,7 @@ import {
 } from '$lib/drizzle/schema';
 import { eq, asc, desc, and, getTableColumns } from 'drizzle-orm';
 import * as z from 'zod';
-import { redirect } from '@sveltejs/kit';
+import { redirect, invalid } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 
 export type RosterData = Roster & {
@@ -110,38 +110,50 @@ export const getRosters = query(async (): Promise<RosterData[]> => {
 		.orderBy(asc(rosters.id));
 });
 
-export const createRoster = form(CreateRosterSchema, async ({ teamId, seasonId, players }) => {
-	const teamIdInt = parseInt(teamId, 10);
-	const seasonIdInt = parseInt(seasonId, 10);
-	const playerIds = players?.length ? players?.map((id) => parseInt(id, 10)) : undefined;
+export const createRoster = form(
+	CreateRosterSchema,
+	async ({ teamId, seasonId, players }, issue) => {
+		const teamIdInt = parseInt(teamId, 10);
+		const seasonIdInt = parseInt(seasonId, 10);
+		// A player can only be on a roster once
+		const playerIds = [...new Set(players?.map((id) => parseInt(id, 10)))];
 
-	const [teamSeason] = await db
-		.select()
-		.from(teamSeasons)
-		.where(and(eq(teamSeasons.teamId, teamIdInt), eq(teamSeasons.seasonId, seasonIdInt)));
+		const [teamSeason] = await db
+			.select({ id: teamSeasons.id })
+			.from(teamSeasons)
+			.where(and(eq(teamSeasons.teamId, teamIdInt), eq(teamSeasons.seasonId, seasonIdInt)))
+			.limit(1);
 
-	if (!teamSeason.id) {
-		return error(
-			404,
-			`Unable to find corresponding team season using season id: ${seasonIdInt} and team id: ${teamIdInt}`
-		);
+		if (!teamSeason) {
+			invalid(issue.teamId('This team is not part of the selected season'));
+		}
+
+		const [existingRoster] = await db
+			.select({ id: rosters.id })
+			.from(rosters)
+			.where(eq(rosters.teamSeasonId, teamSeason.id))
+			.limit(1);
+
+		if (existingRoster) {
+			invalid(issue.teamId('This team already has a roster for the selected season'));
+		}
+
+		await db.transaction(async (tx) => {
+			const [roster] = await tx
+				.insert(rosters)
+				.values({ teamSeasonId: teamSeason.id })
+				.returning({ id: rosters.id });
+
+			if (playerIds.length) {
+				await tx
+					.insert(rostersPlayers)
+					.values(playerIds.map((playerId) => ({ rosterId: roster.id, playerId })));
+			}
+		});
+
+		redirect(303, '/rosters?created=true');
 	}
-
-	const [rosterResult] = await db
-		.insert(rosters)
-		.values({
-			teamSeasonId: teamSeason.id
-		})
-		.returning({ insertId: rosters.id });
-
-	if (rosterResult?.insertId && playerIds) {
-		await db
-			.insert(rostersPlayers)
-			.values(playerIds.map((id) => ({ rosterId: rosterResult.insertId, playerId: id })));
-	}
-
-	return redirect(301, '/rosters?created=true');
-});
+);
 
 export const deleteRoster = command(
 	z.object({ rosterId: z.int().nonoptional() }),
