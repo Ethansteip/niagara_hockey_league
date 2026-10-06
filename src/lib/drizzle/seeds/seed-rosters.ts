@@ -1,6 +1,6 @@
 /*
  * Seeds one roster per team for the active season, spreading every player
- * across the 4 rosters (2 goalies + 13 skaters each) with unique jersey numbers.
+ * across the 4 rosters (goalies and skaters dealt evenly) with unique jersey numbers.
  *
  * Requires: teams, seasons (team_seasons), players.
  * NOTE: truncating rosters cascades to rosters_players.

@@ -1,5 +1,6 @@
 /*
- * Seeds 60 players: 52 skaters + 8 goalies (2 per team).
+ * Seeds the 60 league players from src/data/players_202606131025.csv.
+ * Everyone starts as a skater ('player'); flag the goalies by hand afterwards.
  *
  * NOTE: truncating players cascades to rosters_players, players_stats and
  * goalies_games. Re-run the rosters/games seeds afterwards.
@@ -7,84 +8,74 @@
 import { players, type NewPlayer } from '../schema';
 import { db, truncate, log, runStandalone } from './shared';
 
-const GOALIES: [string, string][] = [
-	['Marc-André', 'Tremblay'],
-	['Kyle', 'Brannigan'],
-	['Devon', 'Whitaker'],
-	['Sam', 'Okafor'],
-	['Trevor', 'Lindqvist'],
-	['Jordan', 'Pelletier'],
-	['Rick', 'Havlicek'],
-	['Mason', 'Delorme']
+const NAMES: [string, string][] = [
+	['Gary', 'Friesen'],
+	['Jeff', 'Peckham'],
+	['Steve', 'Peckham'],
+	['Mike', 'Cw'],
+	['Zenon', 'Konopka'],
+	['Matt', 'Friesen'],
+	['Ryan', 'Fowler'],
+	['Jay', 'Reynolds'],
+	['Matt', 'Mines'],
+	['Eric', 'Teichgraf'],
+	['Kevin', 'Disher'],
+	['Travis', 'Saunders'],
+	['Mark', 'Lepp'],
+	['Corey', 'Fowler'],
+	['Corey', 'Motley'],
+	['Brian', 'Neufeld'],
+	['Devin', 'Sartor'],
+	['John', 'Vanderhoeven'],
+	['Garrett', 'Kazycki'],
+	['Josh', 'Petrokowski'],
+	['Greg', 'Litke'],
+	['Kevin', 'Coffey'],
+	['Thomas', 'Baker'],
+	['Mikey', 'Werner'],
+	['Neil', 'Wachs'],
+	['Corey', 'Paul'],
+	['Brad', 'Neudorf'],
+	['Travis', 'Kazycki'],
+	['Jay', 'Disher'],
+	['Ryan', 'Wagner'],
+	['Reid', 'Watson'],
+	['Cody', 'Wall'],
+	['Joe', 'Vanegmond'],
+	['Kyle', 'Greenside'],
+	['Shane', 'Wall'],
+	['Shawn', 'Merza'],
+	['Malcolm', 'Vanderzalm'],
+	['Brandon', 'Andres'],
+	['Dale', 'Landry'],
+	['Jarrod', 'Warren'],
+	['Eric', 'Vanderzalm'],
+	['Quinton', 'Spagnol'],
+	['Josh', 'Wicharyic'],
+	['Dave', 'Dehaan'],
+	['Layne', 'Gobeil'],
+	['Derek', 'Merza'],
+	['Jared', 'Hope'],
+	['Paul', 'Disher'],
+	['Mike', 'Hicks'],
+	['Adam', 'Epp'],
+	['Trevor', 'Vanderzalm'],
+	['Dan', 'Willms'],
+	['Ethan', 'Steip'],
+	['Scott', 'Falk'],
+	['Brad', 'Burns'],
+	['Brendan', 'Misener'],
+	['Jay', 'Haubrok'],
+	['Jeff', 'Sinclair'],
+	['Jeff', 'Martens'],
+	['Dan', 'Tiessen']
 ];
 
-const SKATERS: [string, string][] = [
-	['Liam', 'Carter'],
-	['Noah', 'Bouchard'],
-	['Ethan', 'Gallagher'],
-	['Owen', 'McKinnon'],
-	['Jake', 'Sorensen'],
-	['Connor', 'Whelan'],
-	['Tyler', 'Nakamura'],
-	['Brandon', 'Fitzgerald'],
-	['Matt', 'Dubois'],
-	['Chris', 'Lombardi'],
-	['Ryan', "O'Neill"],
-	['Josh', 'Kowalski'],
-	['Andrew', 'Petrov'],
-	['Danny', 'Ferreira'],
-	['Mike', 'Sutherland'],
-	['Nick', 'Castellano'],
-	['Adam', 'Bergeron'],
-	['Sean', 'Murphy'],
-	['Ben', 'Thibodeau'],
-	['Zach', 'Hollis'],
-	['Kevin', 'Lachance'],
-	['Tom', 'Rasmussen'],
-	['Pat', 'Gauthier'],
-	['Alex', 'Moreau'],
-	['Cody', 'Vanderbeek'],
-	['Dylan', 'Scott'],
-	['Eric', 'Fontaine'],
-	['Greg', 'Molina'],
-	['Jeff', 'Blackwood'],
-	['Luke', 'Harrington'],
-	['Nate', 'Cyr'],
-	['Rob', 'Ianello'],
-	['Steve', 'Marchand'],
-	['Vince', 'Russo'],
-	['Will', 'Dempsey'],
-	['Aaron', 'Kaplan'],
-	['Blake', 'Tessier'],
-	['Carl', 'Nyström'],
-	['Derek', 'Sawyer'],
-	['Evan', 'Roy'],
-	['Frank', 'Desjardins'],
-	['Graham', 'Ellis'],
-	['Henry', 'Boivin'],
-	['Ian', 'Fraser'],
-	['Jamie', 'Leclerc'],
-	['Kurt', 'Weber'],
-	['Lucas', 'Beaulieu'],
-	['Marco', 'Santini'],
-	['Neil', 'Prasad'],
-	['Oscar', 'Lindgren'],
-	['Paul', 'Kingsley'],
-	['Quinn', 'Ashby']
-];
-
-/** A few skaters flagged inactive so "active only" filters have something to hide. */
-const INACTIVE_LAST_NAMES = new Set(['Hollis', 'Kingsley', 'Ashby']);
-
-export const PLAYERS: NewPlayer[] = [
-	...GOALIES.map(([firstName, lastName]) => ({ firstName, lastName, role: 'goalie' as const })),
-	...SKATERS.map(([firstName, lastName]) => ({
-		firstName,
-		lastName,
-		role: 'player' as const,
-		active: !INACTIVE_LAST_NAMES.has(lastName)
-	}))
-];
+export const PLAYERS: NewPlayer[] = NAMES.map(([firstName, lastName]) => ({
+	firstName,
+	lastName,
+	role: 'player' as const
+}));
 
 export async function seedPlayers() {
 	log('Clearing players (and their roster spots, stats and goalie games)');
@@ -92,10 +83,7 @@ export async function seedPlayers() {
 
 	const inserted = await db.insert(players).values(PLAYERS).returning();
 
-	const goalies = inserted.filter((p) => p.role === 'goalie').length;
-	log(
-		`Inserted ${inserted.length} players (${inserted.length - goalies} skaters, ${goalies} goalies)`
-	);
+	log(`Inserted ${inserted.length} players`);
 	return inserted;
 }
 

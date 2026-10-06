@@ -168,16 +168,15 @@ export const games = pgTable(
 
 /*
  * -- Goalie Games --
- * Tracks which goalie played in which game.
+ * Tracks which goalie played for each team in each game - one row per team per game.
+ * A null player id means a substitute goalie (not a league player) played.
  * Goals against is derived from total games played by goalie / total goals against.
  */
 export const goalieGames = pgTable(
 	'goalies_games',
 	{
 		id: id(),
-		playerId: integer('player_id')
-			.notNull()
-			.references(() => players.id, { onDelete: 'cascade' }),
+		playerId: integer('player_id').references(() => players.id, { onDelete: 'cascade' }),
 		gameId: integer('game_id')
 			.notNull()
 			.references(() => games.id, { onDelete: 'cascade' }),
@@ -189,7 +188,7 @@ export const goalieGames = pgTable(
 	},
 	(t) => [
 		index('goalie_games_idx').on(t.playerId, t.gameId),
-		uniqueIndex('goalie_games_unique').on(t.playerId, t.gameId)
+		uniqueIndex('goalie_games_team_unique').on(t.gameId, t.teamId)
 	]
 );
 

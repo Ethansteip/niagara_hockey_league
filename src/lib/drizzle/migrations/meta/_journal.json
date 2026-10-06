@@ -57,6 +57,13 @@
       "when": 1790903762117,
       "tag": "0007_gray_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791248854719,
+      "tag": "0008_goalie_games_per_team",
+      "breakpoints": true
     }
   ]
 }

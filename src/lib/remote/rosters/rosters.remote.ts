@@ -12,7 +12,7 @@ import {
 	type Roster,
 	type Player
 } from '$lib/drizzle/schema';
-import { eq, asc, and, getTableColumns } from 'drizzle-orm';
+import { eq, asc, desc, and, getTableColumns } from 'drizzle-orm';
 import * as z from 'zod';
 import { redirect } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
@@ -67,6 +67,32 @@ export const getRoster = query(
 			.orderBy(asc(players.lastName), asc(players.firstName));
 
 		return { ...roster, players: rosterPlayers };
+	}
+);
+
+/* Players on a team's roster for a season - goalies first, then by jersey number */
+export const getTeamSeasonRoster = query(
+	z.object({
+		teamId: z.int().nonnegative().nonoptional(),
+		seasonId: z.int().nonnegative().nonoptional()
+	}),
+	async ({ teamId, seasonId }): Promise<RosterPlayer[]> => {
+		return await db
+			.select({
+				...getTableColumns(players),
+				jerseyNumber: rostersPlayers.jerseyNumber
+			})
+			.from(rostersPlayers)
+			.innerJoin(players, eq(rostersPlayers.playerId, players.id))
+			.innerJoin(rosters, eq(rosters.id, rostersPlayers.rosterId))
+			.innerJoin(teamSeasons, eq(teamSeasons.id, rosters.teamSeasonId))
+			.where(and(eq(teamSeasons.teamId, teamId), eq(teamSeasons.seasonId, seasonId)))
+			.orderBy(
+				desc(players.role),
+				asc(rostersPlayers.jerseyNumber),
+				asc(players.lastName),
+				asc(players.firstName)
+			);
 	}
 );
 

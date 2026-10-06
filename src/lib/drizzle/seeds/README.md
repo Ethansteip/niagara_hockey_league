@@ -7,7 +7,7 @@ Dummy data for local/staging development. Scripts run with [bun](https://bun.sh)
 | `bun run seed`         | Everything below, in order                                                              |
 | `bun run seed:teams`   | Bruins, Leafs, Wings, Habs                                                              |
 | `bun run seed:seasons` | 2025-2026 (active) and 2026-2027, every team registered in both, empty standings        |
-| `bun run seed:players` | 60 players: 52 skaters + 8 goalies                                                      |
+| `bun run seed:players` | 60 real league players from `src/data/players_202606131025.csv`, all skaters for now  |
 | `bun run seed:rosters` | 4 rosters for the active season, every player on exactly one (15 per team)              |
 | `bun run seed:games`   | Real 2026-27 schedule from `src/data/tuesday_hockey_schedule_2026_27.json`, zeroed standings |
 

@@ -14,7 +14,7 @@
 
 	const games = $derived<GameCardData[]>(await getGameCardData({ status: 'scheduled', limit: 4 }));
 	const latestGames = $derived<GameCardData[]>(
-		(await getGameCardData({ status: 'final', limit: 2 })).toReversed()
+		await getGameCardData({ status: 'final', limit: 2, order: 'desc' })
 	);
 
 	const pointsProgression = $derived(await getPointsProgression());

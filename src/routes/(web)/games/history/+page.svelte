@@ -2,7 +2,7 @@
 	import { type GameCardData, getGameCardData } from '$lib/remote/games/games.remote';
 	import GameFinalCard from '../../GameFinalCard.svelte';
 
-	const games = $derived<GameCardData[]>((await getGameCardData({ status: 'final' })).toReversed());
+	const games = $derived<GameCardData[]>(await getGameCardData({ status: 'final', order: 'desc' }));
 
 	const monthFormat = new Intl.DateTimeFormat('en-CA', {
 		month: 'long',
