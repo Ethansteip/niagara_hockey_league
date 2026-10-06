@@ -27,6 +27,7 @@ const NAMES: [string, string][] = [
 	['Brian', 'Neufeld'],
 	['Devin', 'Sartor'],
 	['John', 'Vanderhoeven'],
+	['Johnson', 'Andrews'],
 	['Garrett', 'Kazycki'],
 	['Josh', 'Petrokowski'],
 	['Greg', 'Litke'],
@@ -40,6 +41,7 @@ const NAMES: [string, string][] = [
 	['Jay', 'Disher'],
 	['Ryan', 'Wagner'],
 	['Reid', 'Watson'],
+	['Reid', 'Woodcock'],
 	['Cody', 'Wall'],
 	['Joe', 'Vanegmond'],
 	['Kyle', 'Greenside'],
@@ -68,7 +70,15 @@ const NAMES: [string, string][] = [
 	['Jay', 'Haubrok'],
 	['Jeff', 'Sinclair'],
 	['Jeff', 'Martens'],
-	['Dan', 'Tiessen']
+	['Dan', 'Tiessen'],
+	['Isaac', 'Vanderzalm'],
+	['Johnny', 'Pillitteri'],
+	['Dave', 'Funk'],
+	['Mike', 'Viscek'],
+	['Brian', 'Rowan'],
+	['Jordan', 'Wiens'],
+	['Bowen', 'Neufeld'],
+	['Zach', 'Mcquade']
 ];
 
 export const PLAYERS: NewPlayer[] = NAMES.map(([firstName, lastName]) => ({
