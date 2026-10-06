@@ -29,12 +29,14 @@
 		timeZone: 'America/Toronto'
 	});
 
+	// en-CA formats as yyyy-mm-dd; swap the dashes for yyyy/mm/dd
 	const mobileGameDateFormat = new Intl.DateTimeFormat('en-CA', {
-		month: 'short',
-		day: 'numeric',
 		year: 'numeric',
-		hour: 'numeric'
+		month: '2-digit',
+		day: '2-digit',
+		timeZone: 'America/Toronto'
 	});
+	const formatMobileDate = (date: Date) => mobileGameDateFormat.format(date).replaceAll('-', '/');
 
 	onMount(() => {
 		if (page.url.searchParams.get('created')) {
@@ -71,12 +73,11 @@
 		<Table.Root>
 			<Table.Header>
 				<Table.Row>
-					<Table.Head class="">Week</Table.Head>
-					<Table.Head class="hidden md:table-cell">Home Team</Table.Head>
-					<Table.Head class="hidden md:table-cell">Away Team</Table.Head>
-					<Table.Head class="md:hidden">Matchup</Table.Head>
+					<Table.Head>Week</Table.Head>
+					<Table.Head>Home<span class="hidden md:inline"> Team</span></Table.Head>
+					<Table.Head>Away<span class="hidden md:inline"> Team</span></Table.Head>
 					<Table.Head>Date</Table.Head>
-					<Table.Head>Type</Table.Head>
+					<Table.Head class="hidden md:table-cell">Type</Table.Head>
 					<Table.Head class="text-end">Edit</Table.Head>
 				</Table.Row>
 			</Table.Header>
@@ -84,26 +85,19 @@
 				{#each paginatedGames as game (game.id)}
 					<Table.Row>
 						<Table.Cell class="font-medium">{game.weekNumber}</Table.Cell>
-						<Table.Cell class="hidden md:table-cell">
+						<Table.Cell>
 							<Logo name={game.homeTeam.name as TeamName} />
 						</Table.Cell>
-						<Table.Cell class="hidden md:table-cell">
+						<Table.Cell>
 							<Logo name={game.awayTeam.name as TeamName} />
-						</Table.Cell>
-						<Table.Cell class="md:hidden">
-							<div class="flex items-center gap-x-2">
-								<Logo name={game.homeTeam.name as TeamName} />
-								<span class="text-sm">vs</span>
-								<Logo name={game.awayTeam.name as TeamName} />
-							</div>
 						</Table.Cell>
 						<Table.Cell class="hidden md:table-cell"
 							>{gameDateFormat.format(game.startDate)}</Table.Cell
 						>
-						<Table.Cell class="table-cell md:hidden"
-							>{mobileGameDateFormat.format(game.startDate)}</Table.Cell
+						<Table.Cell class="table-cell tabular-nums md:hidden"
+							>{formatMobileDate(game.startDate)}</Table.Cell
 						>
-						<Table.Cell>
+						<Table.Cell class="hidden md:table-cell">
 							<Badge variant={game.gameType === 'playoff' ? 'default' : 'secondary'}>
 								{capitalizeWords(game.gameType)}
 							</Badge>
@@ -119,7 +113,7 @@
 			{#if games.length > perPage}
 				<Table.Footer>
 					<Table.Row>
-						<Table.Cell colspan={7}>
+						<Table.Cell colspan={6}>
 							<Pagination.Root count={games.length} {perPage} bind:page={currentPage}>
 								{#snippet children({ pages, currentPage })}
 									<Pagination.Content>

@@ -28,7 +28,8 @@
 	data-active={isActive}
 	data-size={size}
 	class={cn(
-		buttonVariants({ size, variant: isActive ? "outline" : "ghost" }),
+		// Solid primary fill so the current page stands out in dark mode too
+		buttonVariants({ size, variant: isActive ? "default" : "ghost" }),
 		"cn-pagination-link",
 		className
 	)}

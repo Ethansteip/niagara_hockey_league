@@ -1,6 +1,8 @@
 <script lang="ts">
 	import * as Field from '$lib/components/ui/field/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { enterToNext } from '$lib/attachments/enter-to-next';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { SvelteMap } from 'svelte/reactivity';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -11,7 +13,7 @@
 	import { getTeams } from '$lib/remote/teams/teams.remote';
 	import { getPlayers } from '$lib/remote/players/players.remote';
 	import type { Player } from '$lib/drizzle/schema';
-	import { createRoster } from '$lib/remote/rosters/rosters.remote';
+	import { createRoster, type RosterPlayer } from '$lib/remote/rosters/rosters.remote';
 	import Logo, { type TeamName } from '$lib/components/layout/assets/Logo.svelte';
 	import { Trash, UserRoundPlus } from '@lucide/svelte';
 	import CheckIcon from '@lucide/svelte/icons/check';
@@ -48,7 +50,7 @@
 
 	/* Players */
 	let players = $derived(await getPlayers());
-	let selectedPlayers = new SvelteMap<number, Player>();
+	let selectedPlayers = new SvelteMap<number, RosterPlayer>();
 	let playerSearchOpen = $state(false);
 
 	// Goalies first, then alphabetical, so the roster reads like a lineup card
@@ -66,12 +68,14 @@
 		if (selectedPlayers.has(player.id)) {
 			selectedPlayers.delete(player.id);
 		} else {
-			selectedPlayers.set(player.id, player);
+			selectedPlayers.set(player.id, { ...player, jerseyNumber: null });
 		}
 	};
 
 	let seasonIdIssues = $derived(createRoster.fields.seasonId.issues());
 	let teamIdIssues = $derived(createRoster.fields.teamId.issues());
+	// Includes nested issues, like an invalid jersey number
+	let playersIssues = $derived(createRoster.fields.players.allIssues());
 
 	let form: HTMLFormElement;
 	let submitting = $derived<boolean>(!!createRoster.pending);
@@ -82,13 +86,7 @@
 </script>
 
 <main class="flex flex-col items-center justify-center gap-3">
-	<form {...createRoster} bind:this={form} class="w-full">
-		<!-- The player picker isn't a form control, so each selected player
-		     submits through a hidden input -->
-		{#each rosterPlayers as player (player.id)}
-			<input type="hidden" name="players[]" value={player.id} />
-		{/each}
-
+	<form {...createRoster} bind:this={form} {@attach enterToNext} class="w-full">
 		<Field.Group>
 			<Field.Set>
 				<Field.Legend>Create A New Roster</Field.Legend>
@@ -196,11 +194,13 @@
 						</Command.Root>
 					</Popover.Content>
 				</Popover.Root>
+				<Field.Error errors={playersIssues} />
 				<section class="flex flex-col items-center justify-center gap-3">
 					{#if rosterPlayers.length > 0}
 						<Table.Root>
 							<Table.Header>
 								<Table.Row>
+									<Table.Head class="w-20">Number</Table.Head>
 									<Table.Head>Name</Table.Head>
 									<Table.Head>Role</Table.Head>
 									<Table.Head class="text-end">
@@ -209,8 +209,26 @@
 								</Table.Row>
 							</Table.Header>
 							<Table.Body>
-								{#each rosterPlayers as player (player.id)}
+								{#each rosterPlayers as player, i (player.id)}
 									<Table.Row>
+										<!-- The number input is left uncontrolled, so what's typed stays with
+										     the row when adding a player re-sorts the list -->
+										<Table.Cell>
+											<input type="hidden" name="n:players[{i}].playerId" value={player.id} />
+											<Input
+												type="text"
+												name="n:players[{i}].jerseyNumber"
+												value={player.jerseyNumber ?? ''}
+												inputmode="numeric"
+												pattern="[0-9]*"
+												maxlength={2}
+												enterkeyhint="next"
+												autocomplete="off"
+												placeholder="#"
+												aria-label="Jersey number for {player.firstName} {player.lastName}"
+												class="w-14 text-center tabular-nums"
+											/>
+										</Table.Cell>
 										<Table.Cell class="font-medium">
 											{player.firstName}
 											{player.lastName}
