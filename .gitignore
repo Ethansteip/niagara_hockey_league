@@ -18,6 +18,8 @@ Thumbs.db
 !.env.example
 !.env.test
 
+./lib/drizzle/seeds
+
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
